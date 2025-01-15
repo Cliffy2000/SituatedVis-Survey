@@ -1,4 +1,4 @@
-function generateChart(data, title, width = 700, height = 400) {
+function generateChart(data, title, width = 700, height = 400, transition = 250) {
 	const MARGIN = { top: 30, right: 20, bottom: 30, left: 40 };
 
 	const COLS = 10;
@@ -11,17 +11,7 @@ function generateChart(data, title, width = 700, height = 400) {
 		.attr("width", width)
 		.attr("height", height);
 
-	const clipPath = svg.append("clipPath")
-		.attr("id", "border")
-		.append("rect")
-		.attr("x", MARGIN.left)
-		.attr("y", MARGIN.top)
-		.attr("width", width - MARGIN.left - MARGIN.right)
-		.attr("height", height - MARGIN.top - MARGIN.bottom)
-		.attr("fill", "white");
-
-	const lineChart = svg.append("g")
-		.attr("clip-path", "url(#border");
+	const lineChart = svg.append("g");
 
 	const titleText = svg.append("text")
 		.attr("x", width / 2)
@@ -58,19 +48,52 @@ function generateChart(data, title, width = 700, height = 400) {
 
 	let verticalGap = x(1) - x(0);
 
+	const pointClipPath = svg.append("clipPath")
+		.attr("id", "pointClipPath")
+		.append("rect")
+		.attr("x", MARGIN.left)
+		.attr("y", MARGIN.top)
+		.attr("width", width - MARGIN.left - MARGIN.right)
+		.attr("height", height - MARGIN.top - MARGIN.bottom)
+		.attr("fill", "white");
+
+	const lineClipPath = svg.append("clipPath")
+		.attr("id", "lineClipPath")
+		.append("rect")
+		.attr("x", MARGIN.left + (verticalGap) / 2)
+		.attr("y", MARGIN.top)
+		.attr("width", width - MARGIN.left - MARGIN.right - verticalGap)
+		.attr("height", height - MARGIN.top - MARGIN.bottom)
+		.attr("fill", "white");
+
+	lineChart.append("path")
+		.datum(data)
+		.attr("stroke", "#8C8C8C")
+		.attr("stroke-width", 1.5)
+		.attr("fill", "none")
+		.attr("d", d3.line()
+			.x(d => x(d.index))
+			.y(d => y(d.value))
+		)
+		.attr("clip-path", "url(#lineClipPath)");
+
 	lineChart.append("g")
 		.selectAll("dot")
 		.data(data)
 		.enter()
 		.append("circle")
-		.attr("cx", d => x(d.index) )
-		.attr("cy", d => y(d.value) )
+		.attr("cx", d => x(d.index))
+		.attr("cy", d => y(d.value))
 		.attr("r", 4)
 		.attr("fill", d => {
 			if (d.value > MAX_THRESHOLD) { return "#FF7F50" }
 			else if (d.value < MIN_THRESHOLD) { return "#00B2EE" }
 			else { return "#8C8C8C" }
-		});
+		})
+		.attr("clip-path", "url(#pointClipPath)");
+
+
+
 
 	return svg.node();
 }
