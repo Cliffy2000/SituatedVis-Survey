@@ -1,0 +1,14 @@
+#container {
+    width: 1440px;
+    height: 720px; /* Adjust as needed */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#chartsContainer {
+    width: 100%;
+    height: 100%; /* Ensure it has a height */
+    display: grid;
+    grid-gap: 10px;
+}
