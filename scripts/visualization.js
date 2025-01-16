@@ -18,7 +18,7 @@ function generateChart(data, title, width = 700, height = 400) {
 
 	const titleText = svg.append("text")
 		.attr("x", width / 2)
-		.attr("y", 10)
+		.attr("y", 15)
 		.attr("text-anchor", "middle")
 		.attr("dominant-baseline", "hanging")
 		.attr("font-family", "sans-serif")
@@ -49,9 +49,33 @@ function generateChart(data, title, width = 700, height = 400) {
 		.attr("transform", `translate(${MARGIN.left},0)`)
 		.call(yAxis);
 
+	const gridGroup = svg.insert("g", ":first-child").attr("class", "grid");
+
+	gridGroup.selectAll(".horizontal-line")
+		.data(y.ticks())
+		.join("line")
+		.attr("class", "horizontal-line")
+		.attr("x1", MARGIN.left)
+		.attr("x2", width - MARGIN.right)
+		.attr("y1", d => y(d))
+		.attr("y2", d => y(d))
+		.attr("stroke", "#eee")
+		.style("z-index", -1);
+
+	// Vertical grid lines
+	gridGroup.selectAll(".vertical-line")
+		.data(x.ticks())
+		.join("line")
+		.attr("class", "vertical-line")
+		.attr("x1", d => x(d))
+		.attr("x2", d => x(d))
+		.attr("y1", MARGIN.top)
+		.attr("y2", height - MARGIN.bottom)
+		.attr("stroke", "#eee")
+		.style("z-index", -1);
+
 	let verticalGap = x(1) - x(0);
 
-	console.log("test changes");
 	const clipPath = svg.append("clipPath")
 		.attr("id", "chartClipPath")
 		.append("rect")
@@ -67,7 +91,7 @@ function generateChart(data, title, width = 700, height = 400) {
 		.attr("stroke-width", 1.5)
 		.attr("fill", "none")
 		.attr("d", d3.line()
-			.defined(d => d.index <= COLS)
+			//.defined(d => d.index <= COLS)
 			.x(d => x(d.index))
 			.y(d => y(d.value))
 		)
@@ -103,7 +127,6 @@ function generateChart(data, title, width = 700, height = 400) {
 		.duration(0)
 		.on("end", function () {
 			const textBBox = d3.select(this).node().getBBox();
-			console.log(textBBox.width);
 
 			labelGroup.insert("rect", "text")
 				.attr("x", textBBox.x - TEXT_PADDING.horizontal)
@@ -117,18 +140,13 @@ function generateChart(data, title, width = 700, height = 400) {
 
 
 	function update(step, animTime) {
-		lines.attr("d", d3.line()
-			.defined(d => d.index <= step + COLS)
-			.x(d => x(d.index))
-			.y(d => y(d.value))
-		)
 		x.domain([OFFSET + step, COLS + OFFSET + step + X_AXIS_TAIL]);
 		const newXAxis = customAxisBottom(x, step + 1);
 
 		const anim = d3.transition("transmove").duration(animTime);
 		lines.transition(anim)
 			.attr("d", d3.line()
-				.defined(d => d.index <= step + COLS)
+				//.defined(d => d.index <= step + COLS)
 				.x(d => x(d.index))
 				.y(d => y(d.value))
 			)
@@ -136,9 +154,8 @@ function generateChart(data, title, width = 700, height = 400) {
 			.attr("cx", d => x(d.index));
 		xAxisGroup.transition(anim).call(newXAxis);
 
-		tickValues = xAxisGroup.selectAll(".tick").data();
-		lastTickValue = tickValues[tickValues.length - 1];
 
+		lastTickValue = step + COLS;
 		rightPoint = data[lastTickValue - 1];
 
 		labelGroup.transition(anim).attr("transform", `translate(${x(rightPoint.index)}, ${y(rightPoint.value)})`);
@@ -182,7 +199,7 @@ function generateChart(data, title, width = 700, height = 400) {
 			.attr("stroke-width", 1.5)
 			.attr("fill", "none")
 			.attr("d", d3.line()
-				.defined(d => d.index <= COLS)
+				// .defined(d => d.index <= COLS)
 				.x(d => x(d.index))
 				.y(d => y(d.value))
 			)
@@ -197,7 +214,7 @@ function generateChart(data, title, width = 700, height = 400) {
 				else { return "#8C8C8C" }
 			})
 			.attr("clip-path", "url(#chartClipPath)");
-		
+
 
 		const tickValues = xAxisGroup.selectAll(".tick").data();
 		const lastTickValue = tickValues[tickValues.length - 1];
@@ -207,10 +224,10 @@ function generateChart(data, title, width = 700, height = 400) {
 
 		const textBBox = labelText.node().getBBox();
 		labelGroup.select("rect")
-		.attr("x", textBBox.x - TEXT_PADDING.horizontal)
-		.attr("y", textBBox.y - TEXT_PADDING.vertical)
-		.attr("width", textBBox.width + 2 * TEXT_PADDING.horizontal)
-		.attr("height", textBBox.height + 2 * TEXT_PADDING.vertical);
+			.attr("x", textBBox.x - TEXT_PADDING.horizontal)
+			.attr("y", textBBox.y - TEXT_PADDING.vertical)
+			.attr("width", textBBox.width + 2 * TEXT_PADDING.horizontal)
+			.attr("height", textBBox.height + 2 * TEXT_PADDING.vertical);
 	}
 
 	Object.assign(svg.node(), { update, resize });

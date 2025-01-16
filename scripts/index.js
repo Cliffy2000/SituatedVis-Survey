@@ -1,11 +1,7 @@
 /** This is for d3.js intelliSense */
 /** @type {import("d3")} */
 
-Promise.all([
-    d3.csv('data/demo_data1.csv', d3.autoType),
-    d3.csv('data/demo_data2.csv', d3.autoType),
-    d3.csv('data/demo_data3.csv', d3.autoType),
-]).then((datasets) => {
+Promise.all(Array.from({ length: 20 }, (_, i) => d3.csv(`data/demo_data${i + 1}.csv`, d3.autoType))).then((datasets) => {
 
     const ROWS = 4;
     const COLS = 5;
@@ -13,6 +9,8 @@ Promise.all([
     let INTERVAL_ID;
     const ANIM_DURATION = 500;
     const ANIM_DELAY = 1500;
+
+    let flag_running = true;
     let step = 1;
 
     const container = d3.select("#container");
@@ -25,13 +23,43 @@ Promise.all([
     let cellHeight = gridHeight / ROWS;
 
     // Fills the titles array
-    const titles = Array.from({ length: 3 }, (_, i) => `Machine ${i + 1}`);
+    const titles = Array.from({ length: 20 }, (_, i) => `Machine ${i + 1}`);
     const charts = chartsContainer.selectAll("div")
         .data(d3.zip(datasets, titles))
         .join("div")
         .append(([data, title]) => generateChart(data, title, cellWidth, cellHeight))
         .nodes();
 
+
+    const buttonPause = d3.select("#buttonsContainer").select("#pause")
+        .on("click", onPauseClick);
+    const buttonRestart = d3.select("#buttonsContainer").select("#restart")
+        .on("click", onRestartClick);
+
+    function onPauseClick() {
+        console.log("click");
+        if (flag_running) {
+            stopAnimation();
+            buttonPause.text("Unpause");
+        } else {
+            animate();
+            startAnimation();
+            buttonPause.text("Pause");
+        }
+        flag_running = !flag_running;
+    }
+
+    function onRestartClick() {
+        stopAnimation();
+        step = 0;
+        for (const chart of charts) {
+            chart.update(step, ANIM_DURATION);
+        }
+        if (flag_running) {
+            animate();
+            startAnimation();
+        }
+    }
 
     function startAnimation() {
         INTERVAL_ID = setInterval(animate, ANIM_DELAY);
