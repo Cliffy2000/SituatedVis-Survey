@@ -1,8 +1,10 @@
 function generateChart(data, title, width = 700, height = 400) {
 	const MARGIN = { top: 35, right: 15, bottom: 30, left: 35 };
+	const TEXT_PADDING = { horizontal: 4, vertical: 3 };
 
 	const COLS = 10;
 	const OFFSET = 0.5;
+	const X_AXIS_TAIL = 0.75;
 	const POINT_SIZE = 4
 
 	const MIN_THRESHOLD = 30;
@@ -24,7 +26,7 @@ function generateChart(data, title, width = 700, height = 400) {
 		.text(title);
 
 	const x = d3.scaleLinear()
-		.domain([OFFSET, COLS + OFFSET])
+		.domain([OFFSET, COLS + OFFSET + X_AXIS_TAIL])
 		.range([MARGIN.left, width - MARGIN.right]);
 
 	const y = d3.scaleLinear()
@@ -32,18 +34,18 @@ function generateChart(data, title, width = 700, height = 400) {
 		.range([height - MARGIN.bottom, MARGIN.top]);
 
 	const xAxis = customAxisBottom(x);
-	const xAxisgroup = svg.append("g")
+	const xAxisGroup = svg.append("g")
 		.attr("transform", `translate(0,${height - MARGIN.bottom})`)
 		.call(xAxis);
 
 	// Remove the ending tick on the axis
-	const xAxisPath = xAxisgroup.select(".domain");
+	const xAxisPath = xAxisGroup.select(".domain");
 	const originalD = xAxisPath.attr("d");
 	const newD = originalD.replace(/V-?\d+(\.\d+)?$/, "");
 	xAxisPath.attr("d", newD);
 
 	const yAxis = d3.axisLeft(y);
-	const yAxisgroup = svg.append("g")
+	const yAxisGroup = svg.append("g")
 		.attr("transform", `translate(${MARGIN.left},0)`)
 		.call(yAxis);
 
@@ -55,7 +57,7 @@ function generateChart(data, title, width = 700, height = 400) {
 		.append("rect")
 		.attr("x", MARGIN.left + (verticalGap) / 2 - POINT_SIZE)
 		.attr("y", MARGIN.top)
-		.attr("width", width - MARGIN.left - MARGIN.right - verticalGap + POINT_SIZE * 2)
+		.attr("width", verticalGap * (COLS - 1) + POINT_SIZE * 2)
 		.attr("height", height - MARGIN.top - MARGIN.bottom)
 		.attr("fill", "white");
 
@@ -79,12 +81,40 @@ function generateChart(data, title, width = 700, height = 400) {
 		.attr("cx", d => x(d.index))
 		.attr("cy", d => y(d.value))
 		.attr("r", POINT_SIZE)
-		.attr("fill", d => {
-			if (d.value > MAX_THRESHOLD) { return "#FF7F50" }
-			else if (d.value < MIN_THRESHOLD) { return "#00B2EE" }
-			else { return "#8C8C8C" }
-		})
+		.attr("fill", d => checkColor(d.value))
 		.attr("clip-path", "url(#chartClipPath)");
+
+	let tickValues = xAxisGroup.selectAll(".tick").data();
+	let lastTickValue = tickValues[tickValues.length - 1];
+
+	let rightPoint = data[lastTickValue - 1];
+	const labelGroup = lineChart.append("g")
+		.attr("transform", `translate(${x(rightPoint.index)}, ${y(rightPoint.value)})`);
+
+	const labelText = labelGroup.append("text")
+		.text(rightPoint.value)
+		.attr("text-anchor", "middle")
+		.attr("dominant-baseline", "middle")
+		.style("font-family", "sans-serif")
+		.style("font-size", "14px")
+		.style("fill", "white");
+
+	labelText.transition()
+		.duration(0)
+		.on("end", function () {
+			const textBBox = d3.select(this).node().getBBox();
+			console.log(textBBox.width);
+
+			labelGroup.insert("rect", "text")
+				.attr("x", textBBox.x - TEXT_PADDING.horizontal)
+				.attr("y", textBBox.y - TEXT_PADDING.vertical)
+				.attr("width", textBBox.width + 2 * TEXT_PADDING.horizontal)
+				.attr("height", textBBox.height + 2 * TEXT_PADDING.vertical)
+				.attr("fill", checkColor(rightPoint.value))
+				.attr("rx", 3)
+				.attr("ry", 3);
+		});
+
 
 	function update(step, animTime) {
 		lines.attr("d", d3.line()
@@ -92,7 +122,8 @@ function generateChart(data, title, width = 700, height = 400) {
 			.x(d => x(d.index))
 			.y(d => y(d.value))
 		)
-		x.domain([OFFSET + step, COLS + OFFSET + step]);
+		x.domain([OFFSET + step, COLS + OFFSET + step + X_AXIS_TAIL]);
+		const newXAxis = customAxisBottom(x, step + 1);
 
 		const anim = d3.transition("transmove").duration(animTime);
 		lines.transition(anim)
@@ -103,8 +134,25 @@ function generateChart(data, title, width = 700, height = 400) {
 			)
 		points.transition(anim)
 			.attr("cx", d => x(d.index));
-		xAxisgroup.transition(anim).call(xAxis);
+		xAxisGroup.transition(anim).call(newXAxis);
+
+		tickValues = xAxisGroup.selectAll(".tick").data();
+		lastTickValue = tickValues[tickValues.length - 1];
+
+		rightPoint = data[lastTickValue - 1];
+
+		labelGroup.transition(anim).attr("transform", `translate(${x(rightPoint.index)}, ${y(rightPoint.value)})`);
+		labelText.text(rightPoint.value);
+
+		const textBBox = labelText.node().getBBox();
+		labelGroup.transition(anim).select("rect")
+			.attr("x", textBBox.x - TEXT_PADDING.horizontal)
+			.attr("y", textBBox.y - TEXT_PADDING.vertical)
+			.attr("width", textBBox.width + 2 * TEXT_PADDING.horizontal)
+			.attr("height", textBBox.height + 2 * TEXT_PADDING.vertical)
+			.attr("fill", checkColor(rightPoint.value));
 	}
+
 
 	function resize(newWidth, newHeight) {
 		width = newWidth;
@@ -116,9 +164,9 @@ function generateChart(data, title, width = 700, height = 400) {
 		x.range([MARGIN.left, width - MARGIN.right]);
 		y.range([height - MARGIN.bottom, MARGIN.top]);
 
-		xAxisgroup.attr("transform", `translate(0,${height - MARGIN.bottom})`)
+		xAxisGroup.attr("transform", `translate(0,${height - MARGIN.bottom})`)
 			.call(xAxis);
-		yAxisgroup.attr("transform", `translate(${MARGIN.left},0)`)
+		yAxisGroup.attr("transform", `translate(${MARGIN.left},0)`)
 			.call(yAxis);
 
 		titleText.attr("x", width / 2);
@@ -126,9 +174,9 @@ function generateChart(data, title, width = 700, height = 400) {
 		verticalGap = x(1) - x(0);
 
 		clipPath.attr("x", MARGIN.left + (verticalGap) / 2 - POINT_SIZE)
-		.attr("y", MARGIN.top)
-		.attr("width", width - MARGIN.left - MARGIN.right - verticalGap + POINT_SIZE * 2)
-		.attr("height", height - MARGIN.top - MARGIN.bottom);
+			.attr("y", MARGIN.top)
+			.attr("width", verticalGap * (COLS - 1) + POINT_SIZE * 2)
+			.attr("height", height - MARGIN.top - MARGIN.bottom);
 
 		lines.attr("stroke", "#8C8C8C")
 			.attr("stroke-width", 1.5)
@@ -149,13 +197,27 @@ function generateChart(data, title, width = 700, height = 400) {
 				else { return "#8C8C8C" }
 			})
 			.attr("clip-path", "url(#chartClipPath)");
+		
+
+		const tickValues = xAxisGroup.selectAll(".tick").data();
+		const lastTickValue = tickValues[tickValues.length - 1];
+		const rightPoint = data[lastTickValue - 1];
+
+		labelGroup.attr("transform", `translate(${x(rightPoint.index)}, ${y(rightPoint.value)})`);
+
+		const textBBox = labelText.node().getBBox();
+		labelGroup.select("rect")
+		.attr("x", textBBox.x - TEXT_PADDING.horizontal)
+		.attr("y", textBBox.y - TEXT_PADDING.vertical)
+		.attr("width", textBBox.width + 2 * TEXT_PADDING.horizontal)
+		.attr("height", textBBox.height + 2 * TEXT_PADDING.vertical);
 	}
 
 	Object.assign(svg.node(), { update, resize });
 	return svg.node();
 
-	function customAxisBottom(scale) {
-		const axis = d3.axisBottom(scale).ticks(COLS);
+	function customAxisBottom(scale, startX = 1) {
+		const axis = d3.axisBottom(scale).tickValues(d3.range(startX, startX + COLS));
 
 		return function (selection) {
 			selection.call(axis);
@@ -165,5 +227,15 @@ function generateChart(data, title, width = 700, height = 400) {
 					return old.replace(/V-?\d+(\.\d+)?$/, "");
 				});
 		};
+	}
+
+	function checkColor(n) {
+		if (n > MAX_THRESHOLD) {
+			return "#FF7F50";
+		} else if (n < MIN_THRESHOLD) {
+			return "#00B2EE";
+		} else {
+			return "#8C8C8C";
+		}
 	}
 }

@@ -48,9 +48,15 @@ Promise.all([
         step++;
     }
 
-    // startAnimation();
+    startAnimation();
 
+    let skipFirstResize = true;
     const resizeObserver = new ResizeObserver((entries) => {
+        if (skipFirstResize) {
+            skipFirstResize = false;
+            return;
+        }
+
         if (!entries) {
             return;
         }
