@@ -1,8 +1,9 @@
-function generateChart(data, title, width = 700, height = 400, transition = 250) {
-	const MARGIN = { top: 30, right: 20, bottom: 30, left: 40 };
+function generateChart(data, title, width = 700, height = 400) {
+	const MARGIN = { top: 35, right: 15, bottom: 30, left: 35 };
 
 	const COLS = 10;
 	const OFFSET = 0.5;
+	const POINT_SIZE = 4
 
 	const MIN_THRESHOLD = 30;
 	const MAX_THRESHOLD = 70;
@@ -15,7 +16,7 @@ function generateChart(data, title, width = 700, height = 400, transition = 250)
 
 	const titleText = svg.append("text")
 		.attr("x", width / 2)
-		.attr("y", 5)
+		.attr("y", 10)
 		.attr("text-anchor", "middle")
 		.attr("dominant-baseline", "hanging")
 		.attr("font-family", "sans-serif")
@@ -48,43 +49,44 @@ function generateChart(data, title, width = 700, height = 400, transition = 250)
 
 	let verticalGap = x(1) - x(0);
 
-	const pointClipPath = svg.append("clipPath")
+	const chartClipPath = svg.append("clipPath")
 		.attr("id", "pointClipPath")
 		.append("rect")
-		.attr("x", MARGIN.left)
+		.attr("x", MARGIN.left + (verticalGap) / 2 - POINT_SIZE)
 		.attr("y", MARGIN.top)
-		.attr("width", width - MARGIN.left - MARGIN.right)
+		.attr("width", width - MARGIN.left - MARGIN.right - verticalGap + POINT_SIZE * 2)
 		.attr("height", height - MARGIN.top - MARGIN.bottom)
 		.attr("fill", "white");
 
 	const lineClipPath = svg.append("clipPath")
 		.attr("id", "lineClipPath")
 		.append("rect")
-		.attr("x", MARGIN.left + (verticalGap) / 2)
+		.attr("x", MARGIN.left + (verticalGap) / 2 - POINT_SIZE)
 		.attr("y", MARGIN.top)
-		.attr("width", width - MARGIN.left - MARGIN.right - verticalGap)
+		.attr("width", width - MARGIN.left - MARGIN.right - verticalGap + POINT_SIZE * 2)
 		.attr("height", height - MARGIN.top - MARGIN.bottom)
 		.attr("fill", "white");
 
-	lineChart.append("path")
+	const lines = lineChart.append("path")
 		.datum(data)
 		.attr("stroke", "#8C8C8C")
 		.attr("stroke-width", 1.5)
 		.attr("fill", "none")
 		.attr("d", d3.line()
+			.defined(d => d.index <= COLS)
 			.x(d => x(d.index))
 			.y(d => y(d.value))
 		)
 		.attr("clip-path", "url(#lineClipPath)");
 
-	lineChart.append("g")
+	const points = lineChart.append("g")
 		.selectAll("dot")
 		.data(data)
 		.enter()
 		.append("circle")
 		.attr("cx", d => x(d.index))
 		.attr("cy", d => y(d.value))
-		.attr("r", 4)
+		.attr("r", POINT_SIZE)
 		.attr("fill", d => {
 			if (d.value > MAX_THRESHOLD) { return "#FF7F50" }
 			else if (d.value < MIN_THRESHOLD) { return "#00B2EE" }
@@ -92,8 +94,29 @@ function generateChart(data, title, width = 700, height = 400, transition = 250)
 		})
 		.attr("clip-path", "url(#pointClipPath)");
 
+	function update(step, animTime) {
+		lines.attr("d", d3.line()
+				.defined(d => d.index <= step + COLS)
+				.x(d => x(d.index))
+				.y(d => y(d.value))
+			)
+		x.domain([OFFSET + step, COLS + OFFSET + step]);
+		const anim = d3.transition("transmove").duration(animTime);
+		lines.transition(anim)
+			.attr("d", d3.line()
+				.defined(d => d.index <= step + COLS)
+				.x(d => x(d.index))
+				.y(d => y(d.value))
+			)
+		points.transition(anim)
+			.attr("cx", d => x(d.index));
+		xAxisgroup.transition(anim).call(xAxis);
+	}
 
+	function resize() {
 
+	}
 
+	Object.assign(svg.node(), {update, resize});
 	return svg.node();
 }
