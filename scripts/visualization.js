@@ -91,7 +91,6 @@ function generateChart(data, title, width = 700, height = 400) {
 		.attr("stroke-width", 1.5)
 		.attr("fill", "none")
 		.attr("d", d3.line()
-			//.defined(d => d.index <= COLS)
 			.x(d => x(d.index))
 			.y(d => y(d.value))
 		)
@@ -146,7 +145,6 @@ function generateChart(data, title, width = 700, height = 400) {
 		const anim = d3.transition("transmove").duration(animTime);
 		lines.transition(anim)
 			.attr("d", d3.line()
-				//.defined(d => d.index <= step + COLS)
 				.x(d => x(d.index))
 				.y(d => y(d.value))
 			)
@@ -199,7 +197,6 @@ function generateChart(data, title, width = 700, height = 400) {
 			.attr("stroke-width", 1.5)
 			.attr("fill", "none")
 			.attr("d", d3.line()
-				// .defined(d => d.index <= COLS)
 				.x(d => x(d.index))
 				.y(d => y(d.value))
 			)

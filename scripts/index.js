@@ -1,7 +1,9 @@
 /** This is for d3.js intelliSense */
 /** @type {import("d3")} */
 
-Promise.all(Array.from({ length: 20 }, (_, i) => d3.csv(`data/demo_data${i + 1}.csv`, d3.autoType))).then((datasets) => {
+const FILE_COUNT = 20;
+
+Promise.all(Array.from({ length: FILE_COUNT }, (_, i) => d3.csv(`data/demo_data${i + 1}.csv`, d3.autoType))).then((datasets) => {
 
     const ROWS = 4;
     const COLS = 5;
@@ -23,7 +25,7 @@ Promise.all(Array.from({ length: 20 }, (_, i) => d3.csv(`data/demo_data${i + 1}.
     let cellHeight = gridHeight / ROWS;
 
     // Fills the titles array
-    const titles = Array.from({ length: 20 }, (_, i) => `Machine ${i + 1}`);
+    const titles = Array.from({ length: FILE_COUNT }, (_, i) => `Machine ${i + 1}`);
     const charts = chartsContainer.selectAll("div")
         .data(d3.zip(datasets, titles))
         .join("div")
