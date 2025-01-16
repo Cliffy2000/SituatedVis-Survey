@@ -20,7 +20,7 @@ Promise.all([
         .style("grid-template-rows", `repeat(${ROWS}, 1fr)`)
         .style("grid-template-columns", `repeat(${COLS}, 1fr)`)
 
-    const { width: gridWidth, height: gridHeight } = chartsContainer.node().getBoundingClientRect();
+    let { width: gridWidth, height: gridHeight } = chartsContainer.node().getBoundingClientRect();
     let cellWidth = gridWidth / COLS;
     let cellHeight = gridHeight / ROWS;
 
@@ -48,5 +48,32 @@ Promise.all([
         step++;
     }
 
-    startAnimation();
+    // startAnimation();
+
+    const resizeObserver = new ResizeObserver((entries) => {
+        if (!entries) {
+            return;
+        }
+
+        let entry = entries[0];
+
+        if (entry.contentBoxSize) {
+            let contentBoxSize = entry.contentBoxSize[0];
+            gridWidth = contentBoxSize.inlineSize;
+            gridHeight = contentBoxSize.blockSize;
+        } else {
+            gridWidth = entry.contentRect.width;
+            gridHeight = entry.contentRect.height;
+        }
+
+        cellWidth = gridWidth / COLS;
+        cellHeight = gridHeight / ROWS;
+
+        for (const chart of charts) {
+            chart.resize(cellWidth, cellHeight);
+        }
+
+    });
+
+    resizeObserver.observe(chartsContainer.node());
 })

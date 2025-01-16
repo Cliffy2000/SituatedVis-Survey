@@ -31,7 +31,7 @@ function generateChart(data, title, width = 700, height = 400) {
 		.domain([0, 100])
 		.range([height - MARGIN.bottom, MARGIN.top]);
 
-	const xAxis = d3.axisBottom(x).ticks(COLS);
+	const xAxis = customAxisBottom(x);
 	const xAxisgroup = svg.append("g")
 		.attr("transform", `translate(0,${height - MARGIN.bottom})`)
 		.call(xAxis);
@@ -49,17 +49,9 @@ function generateChart(data, title, width = 700, height = 400) {
 
 	let verticalGap = x(1) - x(0);
 
-	const chartClipPath = svg.append("clipPath")
-		.attr("id", "pointClipPath")
-		.append("rect")
-		.attr("x", MARGIN.left + (verticalGap) / 2 - POINT_SIZE)
-		.attr("y", MARGIN.top)
-		.attr("width", width - MARGIN.left - MARGIN.right - verticalGap + POINT_SIZE * 2)
-		.attr("height", height - MARGIN.top - MARGIN.bottom)
-		.attr("fill", "white");
-
-	const lineClipPath = svg.append("clipPath")
-		.attr("id", "lineClipPath")
+	console.log("test changes");
+	const clipPath = svg.append("clipPath")
+		.attr("id", "chartClipPath")
 		.append("rect")
 		.attr("x", MARGIN.left + (verticalGap) / 2 - POINT_SIZE)
 		.attr("y", MARGIN.top)
@@ -77,7 +69,7 @@ function generateChart(data, title, width = 700, height = 400) {
 			.x(d => x(d.index))
 			.y(d => y(d.value))
 		)
-		.attr("clip-path", "url(#lineClipPath)");
+		.attr("clip-path", "url(#chartClipPath)");
 
 	const points = lineChart.append("g")
 		.selectAll("dot")
@@ -92,15 +84,16 @@ function generateChart(data, title, width = 700, height = 400) {
 			else if (d.value < MIN_THRESHOLD) { return "#00B2EE" }
 			else { return "#8C8C8C" }
 		})
-		.attr("clip-path", "url(#pointClipPath)");
+		.attr("clip-path", "url(#chartClipPath)");
 
 	function update(step, animTime) {
 		lines.attr("d", d3.line()
-				.defined(d => d.index <= step + COLS)
-				.x(d => x(d.index))
-				.y(d => y(d.value))
-			)
+			.defined(d => d.index <= step + COLS)
+			.x(d => x(d.index))
+			.y(d => y(d.value))
+		)
 		x.domain([OFFSET + step, COLS + OFFSET + step]);
+
 		const anim = d3.transition("transmove").duration(animTime);
 		lines.transition(anim)
 			.attr("d", d3.line()
@@ -113,10 +106,64 @@ function generateChart(data, title, width = 700, height = 400) {
 		xAxisgroup.transition(anim).call(xAxis);
 	}
 
-	function resize() {
+	function resize(newWidth, newHeight) {
+		width = newWidth;
+		height = newHeight;
 
+		svg.attr("width", width)
+			.attr("height", height);
+
+		x.range([MARGIN.left, width - MARGIN.right]);
+		y.range([height - MARGIN.bottom, MARGIN.top]);
+
+		xAxisgroup.attr("transform", `translate(0,${height - MARGIN.bottom})`)
+			.call(xAxis);
+		yAxisgroup.attr("transform", `translate(${MARGIN.left},0)`)
+			.call(yAxis);
+
+		titleText.attr("x", width / 2);
+
+		verticalGap = x(1) - x(0);
+
+		clipPath.attr("x", MARGIN.left + (verticalGap) / 2 - POINT_SIZE)
+		.attr("y", MARGIN.top)
+		.attr("width", width - MARGIN.left - MARGIN.right - verticalGap + POINT_SIZE * 2)
+		.attr("height", height - MARGIN.top - MARGIN.bottom);
+
+		lines.attr("stroke", "#8C8C8C")
+			.attr("stroke-width", 1.5)
+			.attr("fill", "none")
+			.attr("d", d3.line()
+				.defined(d => d.index <= COLS)
+				.x(d => x(d.index))
+				.y(d => y(d.value))
+			)
+			.attr("clip-path", "url(#chartClipPath)");
+
+		points.attr("cx", d => x(d.index))
+			.attr("cy", d => y(d.value))
+			.attr("r", POINT_SIZE)
+			.attr("fill", d => {
+				if (d.value > MAX_THRESHOLD) { return "#FF7F50" }
+				else if (d.value < MIN_THRESHOLD) { return "#00B2EE" }
+				else { return "#8C8C8C" }
+			})
+			.attr("clip-path", "url(#chartClipPath)");
 	}
 
-	Object.assign(svg.node(), {update, resize});
+	Object.assign(svg.node(), { update, resize });
 	return svg.node();
+
+	function customAxisBottom(scale) {
+		const axis = d3.axisBottom(scale).ticks(COLS);
+
+		return function (selection) {
+			selection.call(axis);
+			selection.selectAll(".domain")
+				.attr("d", d => {
+					const old = d3.select(selection.node()).select(".domain").attr("d");
+					return old.replace(/V-?\d+(\.\d+)?$/, "");
+				});
+		};
+	}
 }

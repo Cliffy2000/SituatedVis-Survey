@@ -2,6 +2,7 @@ html {
     width: 100dvw;
     height: 100dvh;
     user-select: none;
+    min-width: 960px;
 }
 
 body {
