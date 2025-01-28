@@ -7,8 +7,10 @@ html {
 }
 
 body {
-    margin: 15px 10px 10px 10px;
+    margin: 0;
+    padding: 15px;
     height: 100%;
+    box-sizing: border-box;
 }
 
 #container {

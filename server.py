@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from http.server import HTTPServer, SimpleHTTPRequestHandler
+import os
+import json
 
 PORT = 8000
 
@@ -15,6 +17,16 @@ class CustomHandler(SimpleHTTPRequestHandler):
         '.js': 'application/javascript',  # Correct MIME type for JS
         '': 'application/octet-stream',   # Default MIME type
     }
+
+def generate_files_json():
+    data_dir = os.path.join(os.path.dirname(__file__), 'data')
+    try:
+        csv_files = [f for f in os.listdir(data_dir) if f.endswith('.csv')]
+        with open(os.path.join(data_dir, 'files.json'), 'w', encoding='utf-8') as f:
+            json.dump(csv_files, f, indent=4)
+        print("files.json has been updated.")
+    except Exception as e:
+        print(f"Error generating files.json: {e}")
 
 # Create the server
 def run_server():

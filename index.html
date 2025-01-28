@@ -1,25 +1,25 @@
 <!DOCTYPE html>
 
-<html>
-
+<html lang="en">
 <head>
-	<meta charset="utf-8">
-	<title>Situated Vis -- Cliff</title>
-	<link rel="stylesheet" href="styles/styles.css">
-	<script src="d3/d3.js" type="text/javascript" defer></script>
-
-	<script src="scripts/visualization.js" type="text/javascript" defer></script>
-	<script src="scripts/index.js" type="text/javascript" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Situated Visualization</title>
+    <link rel="icon" href="/logo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/styles/index.css">
 </head>
-
 <body>
-	<div id="container">
-		<div id="chartsContainer"></div>
-	</div>
-	<div id="buttonsContainer">
-		<button id="pause">Pause</button>
-		<button id="restart">Restart</button>
-	</div>
+    <div class="header-div">
+        <div class="header-text">Situated Vis Dashboard</div>
+        <img class="header-logo" src="/logo.svg" alt="Northeastern University Logo">
+    </div>
+    <div class="selection-panel">
+        <div id="datasetsList">
+            <input type="text" id="searchInput" placeholder="Search datasets..." />
+            <!-- Removed static dataset rows -->
+        </div>
+    </div>
+    <button onclick="window.location.href='/dashboard.html'">Go to Dashboard</button>
+    <script src="/scripts/index.js"></script>
 </body>
-
 </html>
