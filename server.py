@@ -30,6 +30,7 @@ def generate_files_json():
 
 # Create the server
 def run_server():
+    generate_files_json()
     httpd = HTTPServer(("", PORT), CustomHandler)
     print(f"Serving at port {PORT}")
     httpd.serve_forever()

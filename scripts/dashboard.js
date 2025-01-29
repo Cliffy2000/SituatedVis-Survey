@@ -3,7 +3,7 @@
 
 const FILE_COUNT = 20;
 
-Promise.all(Array.from({ length: FILE_COUNT }, (_, i) => d3.csv(`/data/demo_data${i + 1}.csv`, d3.autoType))).then((datasets) => {
+Promise.all(Array.from({ length: FILE_COUNT }, (_, i) => d3.csv(`/data/demo_data${String(i + 1).padStart(2, '0')}.csv`, d3.autoType))).then((datasets) => {
 
     const ROWS = 4;
     const COLS = 5;

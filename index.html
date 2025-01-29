@@ -6,20 +6,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Situated Visualization</title>
     <link rel="icon" href="/logo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/styles/styles.css">
     <link rel="stylesheet" href="/styles/index.css">
+    <script src="/scripts/index.js" type="text/javascript" defer></script>   
 </head>
 <body>
-    <div class="header-div">
-        <div class="header-text">Situated Vis Dashboard</div>
-        <img class="header-logo" src="/logo.svg" alt="Northeastern University Logo">
-    </div>
-    <div class="selection-panel">
-        <div id="datasetsList">
-            <input type="text" id="searchInput" placeholder="Search datasets..." />
-            <!-- Removed static dataset rows -->
+    <div class="page-container">
+        <div class="header-row">
+            <div class="header-text">Situated Vis Dashboard</div>
+            <img class="header-logo" src="/logo.svg" alt="Northeastern University Logo">
+        </div>
+
+        <div class="options-row">
+            <div class="dataset-panel">
+                <input type="text" id="dataset-input" placeholder="Search datasets..." />
+                <div id="dataset-scroll-pane"></div>
+                <div class="dataset-buttons-row">
+                    <button>Select Visible</button>
+                    <button>Select All</button>
+                    <button>Clear</button>
+                </div>
+            </div>
+            <div class="display-options-panel">
+                <div class="slider-container">
+                    <label for="slider1">Slider 1</label>
+                    <input type="range" id="slider1" name="slider1" min="0" max="100" value="50">
+                    <input type="number" id="slider1-value" min="0" max="100" value="50">
+                </div>
+                <div class="slider-container">
+                    <label for="slider2">Slider 2</label>
+                    <input type="range" id="slider2" name="slider2" min="0" max="100" value="50">
+                    <input type="number" id="slider2-value" min="0" max="100" value="50">
+                </div>
+                <div class="slider-container">
+                    <label for="slider3">Slider 3</label>
+                    <input type="range" id="slider3" name="slider3" min="0" max="100" value="50">
+                    <input type="number" id="slider3-value" min="0" max="100" value="50">
+                </div>
+            </div>
+            <div class="visualization-options-panel">
+                <label><input type="checkbox" value="1">Show X axis ticks in plots</label>
+                <label><input type="checkbox" value="1">Dynamic lable size</label>
+            </div>
+        </div>
+
+        <div class="confirmation-row">
+            <button onclick="window.location.href='/dashboard.html'">Confirm Settings</button>
         </div>
     </div>
-    <button onclick="window.location.href='/dashboard.html'">Go to Dashboard</button>
-    <script src="/scripts/index.js"></script>
 </body>
 </html>

@@ -1,0 +1,36 @@
+body {
+    padding: 15px;
+}
+
+#container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: calc(100% - 50px);
+}
+
+#chartsContainer {
+    width: 100%;
+    height: 100%;
+    display: grid;
+}
+
+#buttonsContainer {
+    display: flex;
+    justify-content: center;
+    height: 50px;
+    align-items: center;
+}
+
+#pause {
+    margin: 0px 10px 0px 10px;
+    width: 75px;
+    height: 30px;
+}
+
+#restart {
+    margin: 0px 10px 0px 10px;
+    width: 75px;
+    height: 30px;
+}

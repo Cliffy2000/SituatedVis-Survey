@@ -1,9 +1,18 @@
-.header-div {
+.page-container {
+    display: grid;
+    grid-template-rows: 1fr 5fr 1fr;
+    height: 100dvh;
+    box-sizing: border-box;
+}
+
+.header-row {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 5px;
     position: relative;
+    padding: 10px;
+    padding-top: 15px;
+    background-color: lightgray;
 }
 
 .header-text {
@@ -11,12 +20,94 @@
     width: 100%;
     font-size: 36px;
     font-weight: 500;
-    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
     margin: 20px 0;
 }
 
 .header-logo {
-    height: 95%;
+    height: 85%;
     position: absolute;
-    right: 5px;
+    right: 10px;
+}
+
+.options-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.dataset-panel {
+    min-width: 300px;
+    width: 20%;
+    min-height: 350px;
+    padding: 15px;
+    background-color: #eafaff;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+#dataset-input {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 5px;
+}
+
+.dataset-buttons-row {
+    display: flex;
+    justify-content: space-around;
+}
+
+#dataset-scroll-pane {
+    height: 40dvh;
+    min-height: 300px;
+    overflow-y: scroll;
+    margin-bottom: 10px;
+}
+
+#dataset-scroll-pane::-webkit-scrollbar {
+    width: 9px;
+}
+
+#dataset-scroll-pane::-webkit-scrollbar-track {
+    border-radius: 8px;
+    background-color: #e7e7e7;
+    border: 1px solid #cacaca;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, .2);
+}
+
+#dataset-scroll-pane::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    background-color: #868686;
+}
+
+.dataset-row {
+    margin-bottom: 4px;
+    padding-left: 2px;
+}
+
+.display-options-panel {
+    display: grid;
+    row-gap: 10px;
+    min-width: 350px;
+    width: 25%;
+    box-sizing: border-box;
+    padding: 15px;
+    background-color: #eafaff;
+    border-radius: 10px;
+}
+
+.visualization-options-panel {
+    display: grid;
+    row-gap: 10px;
+    min-width: 300px;
+    width: 20%;
+    box-sizing: border-box;
+    padding: 15px;
+    background-color: #eafaff;
+    border-radius: 10px;
+}
+
+.confirmation-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

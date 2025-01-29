@@ -62,7 +62,6 @@ function generateChart(data, title, width = 700, height = 400) {
 		.attr("stroke", "#eee")
 		.style("z-index", -1);
 
-	// Vertical grid lines
 	gridGroup.selectAll(".vertical-line")
 		.data(x.ticks())
 		.join("line")
@@ -185,6 +184,28 @@ function generateChart(data, title, width = 700, height = 400) {
 			.call(yAxis);
 
 		titleText.attr("x", width / 2);
+
+		gridGroup.selectAll(".horizontal-line")
+			.data(y.ticks())
+			.join("line")
+			.attr("class", "horizontal-line")
+			.attr("x1", MARGIN.left)
+			.attr("x2", width - MARGIN.right)
+			.attr("y1", d => y(d))
+			.attr("y2", d => y(d))
+			.attr("stroke", "#eee")
+			.style("z-index", -1);
+
+		gridGroup.selectAll(".vertical-line")
+			.data(x.ticks())
+			.join("line")
+			.attr("class", "vertical-line")
+			.attr("x1", d => x(d))
+			.attr("x2", d => x(d))
+			.attr("y1", MARGIN.top)
+			.attr("y2", height - MARGIN.bottom)
+			.attr("stroke", "#eee")
+			.style("z-index", -1);
 
 		verticalGap = x(1) - x(0);
 
