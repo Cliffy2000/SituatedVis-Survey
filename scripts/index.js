@@ -11,23 +11,43 @@ fetch('/data/files.json')
     })
     .catch(error => console.error('Error fetching files.json:', error));
 
-
 const sliders = document.querySelectorAll('.slider-container input[type="range"]');
-sliders.forEach(slider => {
-    const numberInput = document.getElementById(`${slider.id}-value`);
-    // Update number input when slider changes
-    slider.addEventListener('input', () => {
-        numberInput.value = slider.value;
+    sliders.forEach(slider => {
+        const numberInput = document.getElementById(`${slider.id}-value`);
+    
+        slider.addEventListener('input', () => {
+            numberInput.value = slider.value;
+        });
+    
+        function snapValue() {
+            let value = parseInt(numberInput.value, 10);
+            let min = parseInt(slider.min);
+            let max = parseInt(slider.max);
+            let step = parseInt(slider.step) || 1;
+    
+            if (isNaN(value) || value < min) {
+                value = min;
+            } else if (value > max) {
+                value = max;
+            } else if (slider.id === 'slider2') {
+                value = Math.round(value / step) * step;
+                value = Math.max(min, Math.min(value, max));
+            }
+    
+            slider.value = value;
+            numberInput.value = value;
+        }
+    
+        numberInput.addEventListener('blur', snapValue);
+        numberInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                snapValue();
+                numberInput.blur();
+            }
+        });
     });
-    // Update slider when number input changes
-    numberInput.addEventListener('input', () => {
-        let value = parseInt(numberInput.value, 10);
-        if (isNaN(value)) value = slider.min;
-        value = Math.min(Math.max(value, slider.min), slider.max);
-        slider.value = value;
-        numberInput.value = value;
-    });
-});
+    
+    
 
 document.getElementById('dataset-input').addEventListener('keyup', function () {
     const filter = this.value.toLowerCase();

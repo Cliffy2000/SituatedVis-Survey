@@ -32,7 +32,8 @@
 .options-row {
     display: flex;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: center;
+    gap: 20px;
 }
 
 .dataset-panel {
@@ -94,6 +95,25 @@
     background-color: #eafaff;
     border-radius: 10px;
 }
+
+.slider-container {
+    display: grid;
+    grid-template-columns: 7fr 10fr 1fr;
+    gap: 5px;
+}
+
+.slider-container input[type="number"] {
+    width: 40px;
+    text-align: center;
+    -moz-appearance: textfield;
+}
+
+.slider-container input[type="number"]::-webkit-inner-spin-button,
+.slider-container input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
 
 .visualization-options-panel {
     display: grid;
