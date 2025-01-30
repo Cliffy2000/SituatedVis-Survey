@@ -18,11 +18,23 @@
 
 .header-text {
     text-align: center;
-    font-size: 54px;
+    font-size: 72px;
     font-weight: 600;
     margin: 20px 0;
     position: absolute;
-    left: calc(20% - 100px);
+    left: calc(22% - 200px);
+}
+
+@media (max-width: 1200px) {
+    .header-text {
+        font-size: 64px;
+    }
+}
+
+@media (max-width: 960px) {
+    .header-text {
+        font-size: 60px;
+    }
 }
 
 .header-logo {
@@ -34,20 +46,27 @@
 .options-row {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: clamp(0px, (100% - 980px) / 2, 75px);
+    justify-content: space-between;
     height: 45%;
     width: 100%;
     min-height: 350px;
     box-sizing: border-box;
-    background-color: #4D4D4D;
+    background-color: #333;
+}
+
+.options-row > div:first-child {
+    margin-left: calc(22% - 200px);
+}
+
+.options-row > div:last-child {
+    margin-right: calc(22% - 200px);
 }
 
 .dataset-panel {
-    width: 300px;
-    min-width: 300px;
+    width: 400px;
+    min-width: 400px;
     height: 350px;
-    padding: 15px;
+    padding: 15px 20px;
     background-color: #F5F5F5;
     border-radius: 10px;
     box-sizing: border-box;
@@ -91,17 +110,28 @@
     padding-left: 2px;
 }
 
+.dataset-button-visible, .dataset-button-all, .dataset-button-clear {
+    padding: 3px 8px;
+}
+
 .display-options-panel {
     display: grid;
     row-gap: 10px;
-    width: 360px;
-    min-width: 360px;
+    width: 400px;
+    min-width: 400px;
     height: 350px;
     box-sizing: border-box;
-    padding: 15px;
+    padding: 15px 20px;
     background-color: #F5F5F5;
     border-radius: 10px;
     grid-auto-rows: 25px;
+}
+
+@media (max-width: 1440px) {
+    .display-options-panel {
+        width: 360px;
+        min-width: 360px;
+    }
 }
 
 .slider-container {
@@ -127,19 +157,38 @@
 .visualization-options-panel {
     display: grid;
     row-gap: 10px;
-    width: 300px;
-    min-width: 300px;
+    width: 400px;
+    min-width: 400px;
     height: 350px;
     box-sizing: border-box;
-    padding: 15px;
+    padding: 15px 20px;
     background-color: #F5F5F5;
     border-radius: 10px;
     position: relative;
     grid-auto-rows: 25px;
 }
 
+@media (max-width: 1440px) and (min-width: 1200px) {
+    .dataset-panel, .visualization-options-panel {
+        width: 360px;
+        min-width: 360px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .dataset-panel, .visualization-options-panel {
+        width: 300px;
+        min-width: 300px;
+    }
+}
+
 .confirmation-container {
     position: absolute;
     bottom: 15px;
     right: 15px;
+}
+
+.confirmation-button {
+    font-size: 16px;
+    padding: 5px 12px;
 }
