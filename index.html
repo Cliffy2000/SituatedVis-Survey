@@ -57,15 +57,14 @@
             </div>
             
             <div class="visualization-options-panel">
-                <label><input type="checkbox" value="1">Show X axis ticks in plots</label>
-                <label><input type="checkbox" value="1">Dynamic lable size</label>
-                <label><input type="checkbox" value="1">Show threshold encodings</label>
+                <label><input type="checkbox" name="vis-showXAxis" value="1" checked>Show X axis ticks in plots</label>
+                <label><input type="checkbox" name="vis-showThreshold" value="1" checked>Show threshold encodings</label>
                 <div class="dropdown-container">
-                    <label for="dropdown">Vis. Type:</label>
-                    <select id="dropdown" name="dropdown">
-                        <option value="bar" selected>Bar Chart</option>
-                        <option value="line">Line Chart</option>
-                        <option value="pie">Pie Chart</option>
+                    <label for="dropdown">Dynamic label size</label>
+                    <select id="dropdown" name="vis-dynamicLabelSize">
+                        <option value="none" selected>None</option>
+                        <option value="linear">Linear</option>
+                        <option value="ushaped">U shaped</option>
                     </select>
                 </div>
                 <div class="confirmation-container">

@@ -1,11 +1,14 @@
-function generateChart(data, title, width = 700, height = 400, cols = 10) {
+function generateChart(data, title, width = 700, height = 400, cols = 10, showXAxisTicks = true, showThreshold = true, dynamicLabel = "none") {
 	const MARGIN = { top: 35, right: 15, bottom: 30, left: 35 };
 	const TEXT_PADDING = { horizontal: 4, vertical: 3 };
 
 	const COLS = cols;
 	const OFFSET = 0.5;
 	const X_AXIS_TAIL = 0.75;
-	const POINT_SIZE = 4
+
+	const FONT_SIZE_DEFAULT = 14;
+	const FONT_RANGE = [8, 24];
+	const POINT_SIZE_DEFAULT = 4
 
 	const MIN_THRESHOLD = 30;
 	const MAX_THRESHOLD = 70;
@@ -78,9 +81,9 @@ function generateChart(data, title, width = 700, height = 400, cols = 10) {
 	const clipPath = svg.append("clipPath")
 		.attr("id", "chartClipPath")
 		.append("rect")
-		.attr("x", MARGIN.left + (verticalGap) / 2 - POINT_SIZE)
+		.attr("x", MARGIN.left + (verticalGap) / 2 - POINT_SIZE_DEFAULT)
 		.attr("y", MARGIN.top)
-		.attr("width", verticalGap * (COLS - 1) + POINT_SIZE * 2)
+		.attr("width", verticalGap * (COLS - 1) + POINT_SIZE_DEFAULT * 2)
 		.attr("height", height - MARGIN.top - MARGIN.bottom)
 		.attr("fill", "white");
 
@@ -102,8 +105,8 @@ function generateChart(data, title, width = 700, height = 400, cols = 10) {
 		.append("circle")
 		.attr("cx", d => x(d.index))
 		.attr("cy", d => y(d.value))
-		.attr("r", POINT_SIZE)
-		.attr("fill", d => checkColor(d.value))
+		.attr("r", POINT_SIZE_DEFAULT)
+		.attr("fill", d => getThresholdColor(d.value))
 		.attr("clip-path", "url(#chartClipPath)");
 
 	let tickValues = xAxisGroup.selectAll(".tick").data();
@@ -113,12 +116,20 @@ function generateChart(data, title, width = 700, height = 400, cols = 10) {
 	const labelGroup = lineChart.append("g")
 		.attr("transform", `translate(${x(rightPoint.index)}, ${y(rightPoint.value)})`);
 
+	const linearFontSizeScale = d3.scaleLinear()
+		.domain(y.domain())
+		.range([FONT_RANGE[0], FONT_RANGE[1]]);
+	
+	const ushapedFontSizeScale = d3.scaleLinear()
+		.domain([y.domain()[0], (y.domain()[0] + y.domain()[1]) / 2, y.domain()[1]])
+		.range([FONT_RANGE[1], FONT_RANGE[0], FONT_RANGE[1]]);
+
 	const labelText = labelGroup.append("text")
 		.text(rightPoint.value)
 		.attr("text-anchor", "middle")
 		.attr("dominant-baseline", "middle")
 		.style("font-family", "sans-serif")
-		.style("font-size", "14px")
+		.style("font-size", getDynamicFontSize(rightPoint.value))
 		.style("fill", "white");
 
 	labelText.transition()
@@ -131,7 +142,7 @@ function generateChart(data, title, width = 700, height = 400, cols = 10) {
 				.attr("y", textBBox.y - TEXT_PADDING.vertical)
 				.attr("width", textBBox.width + 2 * TEXT_PADDING.horizontal)
 				.attr("height", textBBox.height + 2 * TEXT_PADDING.vertical)
-				.attr("fill", checkColor(rightPoint.value))
+				.attr("fill", getThresholdColor(rightPoint.value))
 				.attr("rx", 3)
 				.attr("ry", 3);
 		});
@@ -156,7 +167,8 @@ function generateChart(data, title, width = 700, height = 400, cols = 10) {
 		rightPoint = data[lastTickValue - 1];
 
 		labelGroup.transition(anim).attr("transform", `translate(${x(rightPoint.index)}, ${y(rightPoint.value)})`);
-		labelText.text(rightPoint.value);
+		labelText.text(rightPoint.value)
+			.style("font-size", getDynamicFontSize(rightPoint.value));
 
 		const textBBox = labelText.node().getBBox();
 		labelGroup.transition(anim).select("rect")
@@ -164,7 +176,7 @@ function generateChart(data, title, width = 700, height = 400, cols = 10) {
 			.attr("y", textBBox.y - TEXT_PADDING.vertical)
 			.attr("width", textBBox.width + 2 * TEXT_PADDING.horizontal)
 			.attr("height", textBBox.height + 2 * TEXT_PADDING.vertical)
-			.attr("fill", checkColor(rightPoint.value));
+			.attr("fill", getThresholdColor(rightPoint.value));
 	}
 
 
@@ -209,9 +221,9 @@ function generateChart(data, title, width = 700, height = 400, cols = 10) {
 
 		verticalGap = x(1) - x(0);
 
-		clipPath.attr("x", MARGIN.left + (verticalGap) / 2 - POINT_SIZE)
+		clipPath.attr("x", MARGIN.left + (verticalGap) / 2 - POINT_SIZE_DEFAULT)
 			.attr("y", MARGIN.top)
-			.attr("width", verticalGap * (COLS - 1) + POINT_SIZE * 2)
+			.attr("width", verticalGap * (COLS - 1) + POINT_SIZE_DEFAULT * 2)
 			.attr("height", height - MARGIN.top - MARGIN.bottom);
 
 		lines.attr("stroke", "#8C8C8C")
@@ -225,12 +237,8 @@ function generateChart(data, title, width = 700, height = 400, cols = 10) {
 
 		points.attr("cx", d => x(d.index))
 			.attr("cy", d => y(d.value))
-			.attr("r", POINT_SIZE)
-			.attr("fill", d => {
-				if (d.value > MAX_THRESHOLD) { return "#FF7F50" }
-				else if (d.value < MIN_THRESHOLD) { return "#00B2EE" }
-				else { return "#8C8C8C" }
-			})
+			.attr("r", POINT_SIZE_DEFAULT)
+			.attr("fill", d => getThresholdColor(d.value))
 			.attr("clip-path", "url(#chartClipPath)");
 
 
@@ -254,7 +262,8 @@ function generateChart(data, title, width = 700, height = 400, cols = 10) {
 	function customAxisBottom(scale, startX = 1) {
 		const axis = d3.axisBottom(scale)
 			.tickValues(d3.range(startX, startX + COLS))
-			.tickFormat(d3.format("d"));
+			.tickFormat(showXAxisTicks ? d3.format("d") : "")
+			.tickSizeInner(showXAxisTicks ? 6 : 0);
 
 		return function (selection) {
 			selection.call(axis);
@@ -266,13 +275,37 @@ function generateChart(data, title, width = 700, height = 400, cols = 10) {
 		};
 	}
 
-	function checkColor(n) {
+	function getThresholdColor(n) {
+		if (!showThreshold) {
+			return "#8C8C8C";
+		}
+
 		if (n > MAX_THRESHOLD) {
 			return "#FF7F50";
 		} else if (n < MIN_THRESHOLD) {
 			return "#00B2EE";
 		} else {
 			return "#8C8C8C";
+		}
+	}
+
+	function getDynamicFontSize(n) {
+		if (dynamicLabel === "none") {
+			return `${FONT_SIZE_DEFAULT}px`;
+		} else if (dynamicLabel === "linear") {
+			return `${linearFontSizeScale(n)}px`;
+		} else if (dynamicLabel === "ushaped") {
+			return `${ushapedFontSizeScale(n)}px`;
+		}
+	}
+
+	function getDynamicPointSize(n) {
+		if (dynamicLabel === "none") {
+			return POINT_SIZE_DEFAULT;
+		} else if (dynamicLabel === "linear") {
+			return linearPointSizeScale(n);
+		} else if (dynamicLabel === "ushaped") {
+			return ushapedPointSizeScale(n);
 		}
 	}
 }

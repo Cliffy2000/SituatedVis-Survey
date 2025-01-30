@@ -2,19 +2,20 @@
 /** @type {import("d3")} */
 
 const selectedFiles = JSON.parse(sessionStorage.getItem('SituatedVisSelectedFiles')) || [];
-const displaySliders = JSON.parse(sessionStorage.getItem('SituatedVisDisplaySliders')) || {};
 
+const displaySliders = JSON.parse(sessionStorage.getItem('SituatedVisDisplaySliders')) || {};
 const ROWS = parseInt(displaySliders['num-rows']);
 const COLS = parseInt(displaySliders['num-columns']);
 const ANIM_DURATION = parseInt(displaySliders['anim-duration']);
 const ANIM_DELAY = parseInt(displaySliders['anim-delay']);
 const POINTS = parseInt(displaySliders['num-points']);
 
-console.log(POINTS);
+const visOptions = JSON.parse(sessionStorage.getItem('visualizationOptions')) || {};
+const SHOW_X_AXIS = visOptions['vis-showXAxis'];
+const SHOW_THRESHOLD = visOptions['vis-showThreshold'];
+const DYNAMIC_LABEL_SIZE = visOptions['vis-dynamicLabelSize'];
 
 Promise.all(selectedFiles.map(file => d3.csv(`/data/${file}`, d3.autoType))).then((datasets) => {
-
-
     
     // const POINTS = 10;
 
@@ -37,7 +38,7 @@ Promise.all(selectedFiles.map(file => d3.csv(`/data/${file}`, d3.autoType))).the
     const charts = chartsContainer.selectAll("div")
         .data(d3.zip(datasets, titles))
         .join("div")
-        .append(([data, title]) => generateChart(data, title, cellWidth, cellHeight, POINTS))
+        .append(([data, title]) => generateChart(data = data, title = title, width = cellWidth, height = cellHeight, cols = POINTS, showXAxis = SHOW_X_AXIS, showThreshold = SHOW_THRESHOLD, dynamicLabelSize = DYNAMIC_LABEL_SIZE))
         .nodes();
 
 

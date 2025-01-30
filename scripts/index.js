@@ -95,10 +95,11 @@ function confirmationOnClick() {
 
 	const options = {};
     document.querySelectorAll('.visualization-options-panel input[type="checkbox"]').forEach(checkbox => {
-        options[checkbox.parentElement.textContent.trim()] = checkbox.checked;
+        options[checkbox.name] = checkbox.checked;
     });
-    const optionDropdown = document.getElementById('dropdown');
-    options['Visualization Type'] = optionDropdown.value;
+    document.querySelectorAll('.visualization-options-panel select').forEach(dropdown => {
+        options[dropdown.name] = dropdown.value;
+    });
     sessionStorage.setItem('visualizationOptions', JSON.stringify(options));
 
 	window.location.href='/dashboard.html';
