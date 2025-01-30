@@ -61,24 +61,24 @@ document.getElementById('dataset-input').addEventListener('keyup', function () {
 function datasetSelectVisible() {
 	const visibleCheckboxes = Array.from(document.querySelectorAll('#dataset-scroll-pane .dataset-row:not([style*="display: none"]) input[type="checkbox"]'));
 
-    if (visibleCheckboxes.length === 0) return;
+	if (visibleCheckboxes.length === 0) return;
 
-    const values = visibleCheckboxes.map(checkbox => checkbox.checked);
-    const allSame = values.every(v => v === values[0]);
+	const values = visibleCheckboxes.map(checkbox => checkbox.checked);
+	const allSame = values.every(v => v === values[0]);
 
-    const newState = allSame ? !values[0] : true;
+	const newState = allSame ? !values[0] : true;
 
-    visibleCheckboxes.forEach(checkbox => {
-        checkbox.checked = newState;
-    });
+	visibleCheckboxes.forEach(checkbox => {
+		checkbox.checked = newState;
+	});
 }
 
 function datasetToggleAll(newValue) {
-    const allCheckboxes = document.querySelectorAll('#dataset-scroll-pane input[type="checkbox"]');
-    
-    allCheckboxes.forEach(checkbox => {
-        checkbox.checked = newValue;
-    });
+	const allCheckboxes = document.querySelectorAll('#dataset-scroll-pane input[type="checkbox"]');
+
+	allCheckboxes.forEach(checkbox => {
+		checkbox.checked = newValue;
+	});
 }
 
 function confirmationOnClick() {
@@ -87,20 +87,20 @@ function confirmationOnClick() {
 	sessionStorage.setItem('SituatedVisSelectedFiles', JSON.stringify(selectedFiles));
 
 	const sliders = document.querySelectorAll('.slider-container input[type="range"]');
-    const sliderValues = {};
-    sliders.forEach(slider => {
-        sliderValues[slider.name] = slider.value;
-    });
-    sessionStorage.setItem('SituatedVisDisplaySliders', JSON.stringify(sliderValues));
+	const sliderValues = {};
+	sliders.forEach(slider => {
+		sliderValues[slider.name] = slider.value;
+	});
+	sessionStorage.setItem('SituatedVisDisplaySliders', JSON.stringify(sliderValues));
 
 	const options = {};
-    document.querySelectorAll('.visualization-options-panel input[type="checkbox"]').forEach(checkbox => {
-        options[checkbox.name] = checkbox.checked;
-    });
-    document.querySelectorAll('.visualization-options-panel select').forEach(dropdown => {
-        options[dropdown.name] = dropdown.value;
-    });
-    sessionStorage.setItem('visualizationOptions', JSON.stringify(options));
+	document.querySelectorAll('.visualization-options-panel input[type="checkbox"]').forEach(checkbox => {
+		options[checkbox.name] = checkbox.checked;
+	});
+	document.querySelectorAll('.visualization-options-panel select').forEach(dropdown => {
+		options[dropdown.name] = dropdown.value;
+	});
+	sessionStorage.setItem('visualizationOptions', JSON.stringify(options));
 
-	window.location.href='/dashboard.html';
+	window.location.href = '/dashboard.html';
 }

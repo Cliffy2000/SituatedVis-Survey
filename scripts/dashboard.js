@@ -15,110 +15,157 @@ const SHOW_X_AXIS = visOptions['vis-showXAxis'];
 const SHOW_THRESHOLD = visOptions['vis-showThreshold'];
 const DYNAMIC_LABEL_SIZE = visOptions['vis-dynamicLabelSize'];
 
+// ==== 
+const slider = document.getElementById("window-slider");
+const numberInput = document.getElementById("window-slider-value");
+
+function updateSliderMax(newMax) {
+	slider.max = newMax;
+	numberInput.max = newMax;
+}
+
 Promise.all(selectedFiles.map(file => d3.csv(`/data/${file}`, d3.autoType))).then((datasets) => {
-    
-    // const POINTS = 10;
 
-    let INTERVAL_ID;
+	// const POINTS = 10;
 
-    let flag_running = true;
-    let step = 1;
+	let INTERVAL_ID;
 
-    const container = d3.select("#container");
-    const chartsContainer = container.select("#chartsContainer")
-        .style("grid-template-rows", `repeat(${ROWS}, 1fr)`)
-        .style("grid-template-columns", `repeat(${COLS}, 1fr)`)
+	let flag_running = true;
+	let step = 1;
 
-    let { width: gridWidth, height: gridHeight } = chartsContainer.node().getBoundingClientRect();
-    let cellWidth = gridWidth / COLS;
-    let cellHeight = gridHeight / ROWS;
+	const container = d3.select("#container");
+	const chartsContainer = container.select("#chartsContainer")
+		.style("grid-template-rows", `repeat(${ROWS}, 1fr)`)
+		.style("grid-template-columns", `repeat(${COLS}, 1fr)`)
 
-    // Fills the titles array
-    const titles = Array.from({ length: selectedFiles.length }, (_, i) => `Machine ${i + 1}`);
-    const charts = chartsContainer.selectAll("div")
-        .data(d3.zip(datasets, titles))
-        .join("div")
-        .append(([data, title]) => generateChart(data = data, title = title, width = cellWidth, height = cellHeight, cols = POINTS, showXAxis = SHOW_X_AXIS, showThreshold = SHOW_THRESHOLD, dynamicLabelSize = DYNAMIC_LABEL_SIZE))
-        .nodes();
+	let { width: gridWidth, height: gridHeight } = chartsContainer.node().getBoundingClientRect();
+	let cellWidth = gridWidth / COLS;
+	let cellHeight = gridHeight / ROWS;
+
+	// Fills the titles array
+	const titles = Array.from({ length: selectedFiles.length }, (_, i) => `Machine ${i + 1}`);
+	const charts = chartsContainer.selectAll("div")
+		.data(d3.zip(datasets, titles))
+		.join("div")
+		.append(([data, title]) => generateChart(data = data, title = title, width = cellWidth, height = cellHeight, cols = POINTS, showXAxis = SHOW_X_AXIS, showThreshold = SHOW_THRESHOLD, dynamicLabelSize = DYNAMIC_LABEL_SIZE))
+		.nodes();
 
 
-    const buttonPause = d3.select("#buttonsContainer").select("#pause")
-        .on("click", onPauseClick);
-    const buttonRestart = d3.select("#buttonsContainer").select("#restart")
-        .on("click", onRestartClick);
+	const buttonPause = d3.select("#buttonsContainer").select("#pause")
+		.on("click", onPauseClick);
+	const buttonRestart = d3.select("#buttonsContainer").select("#restart")
+		.on("click", onRestartClick);
 
-    function onPauseClick() {
-        console.log("click");
-        if (flag_running) {
-            stopAnimation();
-            buttonPause.text("Unpause");
-        } else {
-            animate();
-            startAnimation();
-            buttonPause.text("Pause");
-        }
-        flag_running = !flag_running;
-    }
+	slider.addEventListener("input", () => {
+		numberInput.value = slider.value;
+		step = parseInt(slider.value, 10);
+		for (const chart of charts) {
+			chart.update(step, ANIM_DURATION);
+		}
+		onPauseClick();
+	});
 
-    function onRestartClick() {
-        stopAnimation();
-        step = 0;
-        for (const chart of charts) {
-            chart.update(step, ANIM_DURATION);
-        }
-        if (flag_running) {
-            animate();
-            startAnimation();
-        }
-    }
+	numberInput.addEventListener("blur", () => {
+		let value = parseInt(numberInput.value, 10);
+		let min = parseInt(slider.min);
+		let max = parseInt(slider.max);
 
-    function startAnimation() {
-        INTERVAL_ID = setInterval(animate, ANIM_DELAY);
-    }
+		if (isNaN(value) || value < min) {
+			value = min;
+		} else if (value > max) {
+			value = max;
+		}
 
-    function stopAnimation() {
-        clearInterval(INTERVAL_ID);
-    }
+		slider.value = value;
+		numberInput.value = value;
+		step = value;
 
-    function animate() {
-        for (let chart of charts) {
-            chart.update(step, ANIM_DURATION);
-        }
-        step++;
-    }
+		for (const chart of charts) {
+			chart.update(step, ANIM_DURATION);
+		}
+		onPauseClick();
+	});
 
-    startAnimation();
+	numberInput.addEventListener("keydown", (event) => {
+		if (event.key === "Enter") {
+			numberInput.blur();
+		}
+	});
 
-    let skipFirstResize = true;
-    const resizeObserver = new ResizeObserver((entries) => {
-        if (skipFirstResize) {
-            skipFirstResize = false;
-            return;
-        }
+	function onPauseClick() {
+		if (flag_running) {
+			stopAnimation();
+			buttonPause.text("Unpause");
+		} else {
+			animate();
+			startAnimation();
+			buttonPause.text("Pause");
+		}
+		flag_running = !flag_running;
+	}
 
-        if (!entries) {
-            return;
-        }
+	function onRestartClick() {
+		stopAnimation();
+		step = 0;
+		for (const chart of charts) {
+			chart.update(step, ANIM_DURATION);
+		}
+		if (flag_running) {
+			animate();
+			startAnimation();
+		}
+	}
 
-        let entry = entries[0];
+	function startAnimation() {
+		INTERVAL_ID = setInterval(animate, ANIM_DELAY);
+	}
 
-        if (entry.contentBoxSize) {
-            let contentBoxSize = entry.contentBoxSize[0];
-            gridWidth = contentBoxSize.inlineSize;
-            gridHeight = contentBoxSize.blockSize;
-        } else {
-            gridWidth = entry.contentRect.width;
-            gridHeight = entry.contentRect.height;
-        }
+	function stopAnimation() {
+		clearInterval(INTERVAL_ID);
+	}
 
-        cellWidth = gridWidth / COLS;
-        cellHeight = gridHeight / ROWS;
+	function animate() {
+		for (let chart of charts) {
+			chart.update(step, ANIM_DURATION);
+		}
+		step++;
+		updateSliderMax(step);
+		slider.value = step;
+		numberInput.value = step;
+	}
 
-        for (const chart of charts) {
-            chart.resize(cellWidth, cellHeight);
-        }
+	startAnimation();
 
-    });
+	let skipFirstResize = true;
+	const resizeObserver = new ResizeObserver((entries) => {
+		if (skipFirstResize) {
+			skipFirstResize = false;
+			return;
+		}
 
-    resizeObserver.observe(chartsContainer.node());
+		if (!entries) {
+			return;
+		}
+
+		let entry = entries[0];
+
+		if (entry.contentBoxSize) {
+			let contentBoxSize = entry.contentBoxSize[0];
+			gridWidth = contentBoxSize.inlineSize;
+			gridHeight = contentBoxSize.blockSize;
+		} else {
+			gridWidth = entry.contentRect.width;
+			gridHeight = entry.contentRect.height;
+		}
+
+		cellWidth = gridWidth / COLS;
+		cellHeight = gridHeight / ROWS;
+
+		for (const chart of charts) {
+			chart.resize(cellWidth, cellHeight);
+		}
+
+	});
+
+	resizeObserver.observe(chartsContainer.node());
 })
