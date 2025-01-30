@@ -1,4 +1,4 @@
-fetch('/data/files.json')
+fetch('data/files.json')
 	.then(response => response.json())
 	.then(csvFiles => {
 		const datasetsList = document.getElementById('dataset-scroll-pane');
