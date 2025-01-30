@@ -22,9 +22,9 @@
                 <input type="text" id="dataset-input" placeholder="Search datasets..." />
                 <div id="dataset-scroll-pane"></div>
                 <div class="dataset-buttons-row">
-                    <button>Select Visible</button>
-                    <button>Select All</button>
-                    <button>Clear</button>
+                    <button class="dataset-button-visible" onclick="datasetSelectVisible()">Select Visible</button>
+                    <button class="dataset-button-all" onclick="datasetToggleAll(true)">Select All</button>
+                    <button class="dataset-button-clear" onclick="datasetToggleAll(false)">Clear</button>
                 </div>
             </div>
 
@@ -67,7 +67,7 @@
         </div>
 
         <div class="confirmation-row">
-            <button onclick="window.location.href='/dashboard.html'">Confirm Settings</button>
+            <button onclick="confirmationOnClick()">Confirm Settings</button>
         </div>
     </div>
 </body>
