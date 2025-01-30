@@ -1,6 +1,5 @@
 .page-container {
-    display: grid;
-    grid-template-rows: 1fr 5fr 1fr;
+    width: 100dvw;
     height: 100dvh;
     box-sizing: border-box;
 }
@@ -12,36 +11,44 @@
     position: relative;
     padding: 10px;
     padding-top: 15px;
-    background-color: lightgray;
+    height: calc(100% - max(45%, 350px));
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .header-text {
     text-align: center;
-    width: 100%;
-    font-size: 36px;
-    font-weight: 500;
+    font-size: 54px;
+    font-weight: 600;
     margin: 20px 0;
+    position: absolute;
+    left: calc(20% - 100px);
 }
 
 .header-logo {
-    height: 85%;
+    width: 27.5%;
     position: absolute;
-    right: 10px;
+    right: calc(20% - 175px);
 }
 
 .options-row {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 20px;
+    gap: clamp(0px, (100% - 980px) / 2, 75px);
+    height: 45%;
+    width: 100%;
+    min-height: 350px;
+    box-sizing: border-box;
+    background-color: #4D4D4D;
 }
 
 .dataset-panel {
+    width: 300px;
     min-width: 300px;
-    width: 20%;
-    min-height: 350px;
+    height: 350px;
     padding: 15px;
-    background-color: #eafaff;
+    background-color: #F5F5F5;
     border-radius: 10px;
     box-sizing: border-box;
 }
@@ -58,10 +65,9 @@
 }
 
 #dataset-scroll-pane {
-    height: 40dvh;
-    min-height: 300px;
+    height: 250px;
     overflow-y: scroll;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 #dataset-scroll-pane::-webkit-scrollbar {
@@ -88,12 +94,14 @@
 .display-options-panel {
     display: grid;
     row-gap: 10px;
-    min-width: 350px;
-    width: 25%;
+    width: 360px;
+    min-width: 360px;
+    height: 350px;
     box-sizing: border-box;
     padding: 15px;
-    background-color: #eafaff;
+    background-color: #F5F5F5;
     border-radius: 10px;
+    grid-auto-rows: 25px;
 }
 
 .slider-container {
@@ -119,16 +127,19 @@
 .visualization-options-panel {
     display: grid;
     row-gap: 10px;
+    width: 300px;
     min-width: 300px;
-    width: 20%;
+    height: 350px;
     box-sizing: border-box;
     padding: 15px;
-    background-color: #eafaff;
+    background-color: #F5F5F5;
     border-radius: 10px;
+    position: relative;
+    grid-auto-rows: 25px;
 }
 
-.confirmation-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.confirmation-container {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
 }

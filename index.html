@@ -30,24 +30,29 @@
 
             <div class="display-options-panel">
                 <div class="slider-container">
-                    <label for="slider1">Num. Multiples</label>
-                    <input type="range" id="slider1" name="num-multiples" min="1" max="20" value="20">
-                    <input type="number" id="slider1-value" min="1" max="20" value="20">
+                    <label for="slider1">Num. Rows</label>
+                    <input type="range" id="slider1" name="num-multiples" min="1" max="4" value="4">
+                    <input type="number" id="slider1-value" min="1" max="4" value="4">
                 </div>
                 <div class="slider-container">
-                    <label for="slider2">Anim. Duration</label>
-                    <input type="range" id="slider2" name="anim-duration" min="200" max="1500" value="500" step="100">
-                    <input type="number" id="slider2-value" min="200" max="1500" value="500">
+                    <label for="slider2">Num. Columns</label>
+                    <input type="range" id="slider2" name="num-multiples" min="1" max="5" value="5">
+                    <input type="number" id="slider2-value" min="1" max="5" value="5">
                 </div>
                 <div class="slider-container">
-                    <label for="slider3">Anim. Delay</label>
-                    <input type="range" id="slider3" name="anim-delay" min="1500" max="5000" value="1500" step="250">
-                    <input type="number" id="slider3-value" min="1500" max="5000" value="1500">
+                    <label for="slider3">Anim. Duration</label>
+                    <input type="range" id="slider3" name="anim-duration" min="200" max="1500" value="500" step="100">
+                    <input type="number" id="slider3-value" min="200" max="1500" value="500">
                 </div>
                 <div class="slider-container">
-                    <label for="slider4">Num. Points</label>
-                    <input type="range" id="slider4" name="num-points" min="2" max="15" value="10">
-                    <input type="number" id="slider4-value" min="2" max="15" value="10">
+                    <label for="slider4">Anim. Delay</label>
+                    <input type="range" id="slider4" name="anim-delay" min="1500" max="5000" value="1500" step="250">
+                    <input type="number" id="slider4-value" min="1500" max="5000" value="1500">
+                </div>
+                <div class="slider-container">
+                    <label for="slider5">Num. Points</label>
+                    <input type="range" id="slider5" name="num-points" min="2" max="15" value="10">
+                    <input type="number" id="slider5-value" min="2" max="15" value="10">
                 </div>
             </div>
             
@@ -56,19 +61,20 @@
                 <label><input type="checkbox" value="1">Dynamic lable size</label>
                 <label><input type="checkbox" value="1">Show threshold encodings</label>
                 <div class="dropdown-container">
-                    <label for="dropdown">Select Visualization Type:</label>
+                    <label for="dropdown">Vis. Type:</label>
                     <select id="dropdown" name="dropdown">
                         <option value="bar" selected>Bar Chart</option>
                         <option value="line">Line Chart</option>
                         <option value="pie">Pie Chart</option>
                     </select>
                 </div>
+                <div class="confirmation-container">
+                    <button onclick="confirmationOnClick()">Confirm Settings</button>
+                </div>
             </div>
         </div>
 
-        <div class="confirmation-row">
-            <button onclick="confirmationOnClick()">Confirm Settings</button>
-        </div>
+
     </div>
 </body>
 </html>
