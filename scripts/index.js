@@ -102,5 +102,5 @@ function confirmationOnClick() {
 	});
 	sessionStorage.setItem('visualizationOptions', JSON.stringify(options));
 
-	window.location.href = '/dashboard.html';
+	window.location.href = 'dashboard.html';
 }
