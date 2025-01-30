@@ -24,7 +24,7 @@ function updateSliderMax(newMax) {
 	numberInput.max = newMax;
 }
 
-Promise.all(selectedFiles.map(file => d3.csv(`/data/${file}`, d3.autoType))).then((datasets) => {
+Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then((datasets) => {
 
 	// const POINTS = 10;
 
