@@ -1,8 +1,8 @@
-function generateChart(data, title, width = 700, height = 400) {
+function generateChart(data, title, width = 700, height = 400, cols = 10) {
 	const MARGIN = { top: 35, right: 15, bottom: 30, left: 35 };
 	const TEXT_PADDING = { horizontal: 4, vertical: 3 };
 
-	const COLS = 10;
+	const COLS = cols;
 	const OFFSET = 0.5;
 	const X_AXIS_TAIL = 0.75;
 	const POINT_SIZE = 4
@@ -252,7 +252,9 @@ function generateChart(data, title, width = 700, height = 400) {
 	return svg.node();
 
 	function customAxisBottom(scale, startX = 1) {
-		const axis = d3.axisBottom(scale).tickValues(d3.range(startX, startX + COLS));
+		const axis = d3.axisBottom(scale)
+			.tickValues(d3.range(startX, startX + COLS))
+			.tickFormat(d3.format("d"));
 
 		return function (selection) {
 			selection.call(axis);

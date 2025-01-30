@@ -1,16 +1,24 @@
 /** This is for d3.js intelliSense */
 /** @type {import("d3")} */
 
-const FILE_COUNT = 20;
+const selectedFiles = JSON.parse(sessionStorage.getItem('SituatedVisSelectedFiles')) || [];
+const displaySliders = JSON.parse(sessionStorage.getItem('SituatedVisDisplaySliders')) || {};
 
-Promise.all(Array.from({ length: FILE_COUNT }, (_, i) => d3.csv(`/data/demo_data${String(i + 1).padStart(2, '0')}.csv`, d3.autoType))).then((datasets) => {
+const ROWS = parseInt(displaySliders['num-rows']);
+const COLS = parseInt(displaySliders['num-columns']);
+const ANIM_DURATION = parseInt(displaySliders['anim-duration']);
+const ANIM_DELAY = parseInt(displaySliders['anim-delay']);
+const POINTS = parseInt(displaySliders['num-points']);
 
-    const ROWS = 4;
-    const COLS = 5;
+console.log(POINTS);
+
+Promise.all(selectedFiles.map(file => d3.csv(`/data/${file}`, d3.autoType))).then((datasets) => {
+
+
+    
+    // const POINTS = 10;
 
     let INTERVAL_ID;
-    const ANIM_DURATION = 500;
-    const ANIM_DELAY = 1500;
 
     let flag_running = true;
     let step = 1;
@@ -25,11 +33,11 @@ Promise.all(Array.from({ length: FILE_COUNT }, (_, i) => d3.csv(`/data/demo_data
     let cellHeight = gridHeight / ROWS;
 
     // Fills the titles array
-    const titles = Array.from({ length: FILE_COUNT }, (_, i) => `Machine ${i + 1}`);
+    const titles = Array.from({ length: selectedFiles.length }, (_, i) => `Machine ${i + 1}`);
     const charts = chartsContainer.selectAll("div")
         .data(d3.zip(datasets, titles))
         .join("div")
-        .append(([data, title]) => generateChart(data, title, cellWidth, cellHeight))
+        .append(([data, title]) => generateChart(data, title, cellWidth, cellHeight, POINTS))
         .nodes();
 
 
