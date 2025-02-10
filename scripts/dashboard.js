@@ -1,7 +1,7 @@
 /** This is for d3.js intelliSense */
 /** @type {import("d3")} */
 
-const selectedFiles = JSON.parse(sessionStorage.getItem('SituatedVisSelectedFiles')) || [];
+let selectedFiles = JSON.parse(sessionStorage.getItem('SituatedVisSelectedFiles')) || [];
 
 const displaySliders = JSON.parse(sessionStorage.getItem('SituatedVisDisplaySliders')) || {};
 const ROWS = parseInt(displaySliders['num-rows']);
@@ -16,6 +16,10 @@ const SHOW_X_AXIS_TICKS = visOptions['vis-showXAxisTicks'];
 const SHOW_THRESHOLD = visOptions['vis-showThreshold'];
 const DYNAMIC_LABEL_SIZE = visOptions['vis-dynamicLabelSize'];
 const EASE_IN_OUT = visOptions['vis-easeInOut'];
+
+if (selectedFiles.length > ROWS * COLS) {
+    selectedFiles = selectedFiles.slice(0, ROWS * COLS);
+}
 
 // ==== 
 const slider = document.getElementById("window-slider");

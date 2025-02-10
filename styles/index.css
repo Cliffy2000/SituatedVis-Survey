@@ -9,9 +9,8 @@
     justify-content: center;
     align-items: center;
     position: relative;
-    padding: 10px;
     padding-top: 15px;
-    height: calc(100% - max(45%, 350px));
+    height: calc(100% - max(45%, 380px));
     width: 100%;
     box-sizing: border-box;
 }
@@ -22,7 +21,7 @@
     font-weight: 600;
     margin: 20px 0;
     position: absolute;
-    left: calc(22% - 200px);
+    left: calc(22% - 210px);
 }
 
 @media (max-width: 1200px) {
@@ -39,8 +38,9 @@
 
 .header-logo {
     width: 27.5%;
+    max-height: 85%;
     position: absolute;
-    right: calc(20% - 175px);
+    right: calc(22% - 210px);
 }
 
 .options-row {
@@ -49,17 +49,17 @@
     justify-content: space-between;
     height: 45%;
     width: 100%;
-    min-height: 350px;
+    min-height: 380px;
     box-sizing: border-box;
     background-color: #333;
 }
 
 .options-row > div:first-child {
-    margin-left: calc(22% - 200px);
+    margin-left: calc(22% - 210px);
 }
 
 .options-row > div:last-child {
-    margin-right: calc(22% - 200px);
+    margin-right: calc(22% - 210px);
 }
 
 .dataset-panel {
@@ -112,6 +112,7 @@
 
 .dataset-button-visible, .dataset-button-all, .dataset-button-clear {
     padding: 3px 8px;
+    letter-spacing: 0.5px;
 }
 
 .display-options-panel {
@@ -127,7 +128,7 @@
     grid-auto-rows: 25px;
 }
 
-@media (max-width: 1440px) {
+@media (max-width: 960px) {
     .display-options-panel {
         width: 360px;
         min-width: 360px;
@@ -139,6 +140,7 @@
     grid-template-columns: 7fr 10fr 1fr;
     gap: 5px;
 }
+
 
 .slider-container input[type="number"] {
     width: 40px;
@@ -168,14 +170,7 @@
     grid-auto-rows: 25px;
 }
 
-@media (max-width: 1440px) and (min-width: 1200px) {
-    .dataset-panel, .visualization-options-panel {
-        width: 360px;
-        min-width: 360px;
-    }
-}
-
-@media (max-width: 1200px) {
+@media (max-width: 1440px) {
     .dataset-panel, .visualization-options-panel {
         width: 300px;
         min-width: 300px;
@@ -191,4 +186,5 @@
 .confirmation-button {
     font-size: 16px;
     padding: 5px 12px;
+    letter-spacing: 0.5px;
 }
