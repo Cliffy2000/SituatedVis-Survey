@@ -1,14 +1,15 @@
-function generateChart(data, title, width = 700, height = 400, cols = 10, showXAxisTicks = true, showThreshold = true, dynamicLabel = "none", easeInOut = false) {
+function generateChart(data, title, width = 700, height = 400, cols = 10, XAxisInverseStatic = false, showXAxisTicks = true, showThreshold = true, dynamicLabelSize = "none", easeInOut = false) {
 	const MARGIN = { top: 35, right: 15, bottom: 30, left: 35 };
 	const TEXT_PADDING = { horizontal: 4, vertical: 3 };
 
 	const COLS = cols;
 	const OFFSET = 0.5;
 	const X_AXIS_TAIL = 0.75;
+	const AXIS_TICK_SIZE = 4;
 
 	const FONT_SIZE_DEFAULT = 14;
 	const FONT_RANGE = [8, 24];
-	const POINT_SIZE_DEFAULT = 4
+	const POINT_SIZE_DEFAULT = 4;
 
 	const MIN_THRESHOLD = 30;
 	const MAX_THRESHOLD = 70;
@@ -47,10 +48,14 @@ function generateChart(data, title, width = 700, height = 400, cols = 10, showXA
 	const newD = originalD.replace(/V-?\d+(\.\d+)?$/, "");
 	xAxisPath.attr("d", newD);
 
-	const yAxis = d3.axisLeft(y);
+	const yAxis = d3.axisLeft(y)
+		.tickSizeInner(AXIS_TICK_SIZE);
 	const yAxisGroup = svg.append("g")
 		.attr("transform", `translate(${MARGIN.left},0)`)
 		.call(yAxis);
+	
+	yAxisGroup.selectAll(".tick text")
+		.style("fill", "gray");
 
 	const gridGroup = svg.insert("g", ":first-child").attr("class", "grid");
 
@@ -149,8 +154,9 @@ function generateChart(data, title, width = 700, height = 400, cols = 10, showXA
 
 
 	function update(step, animTime) {
-		x.domain([OFFSET + step, COLS + OFFSET + step + X_AXIS_TAIL]);
-		const newXAxis = customAxisBottom(x, step + 1);
+		startIndex = step - 1;
+
+		x.domain([OFFSET + startIndex, COLS + OFFSET + startIndex + X_AXIS_TAIL]);
 
 		const anim = d3.transition("transmove").duration(animTime);
 		if (easeInOut) {
@@ -165,10 +171,12 @@ function generateChart(data, title, width = 700, height = 400, cols = 10, showXA
 		points.transition(anim)
 			.attr("cx", d => x(d.index));
 
-		// TODO
-		xAxisGroup.transition(anim).call(newXAxis);
+		if (!XAxisInverseStatic) {
+			const newXAxis = customAxisBottom(x, startIndex + 1);
+			xAxisGroup.transition(anim).call(newXAxis);
+		}
 
-		lastTickValue = step + COLS;
+		lastTickValue = startIndex + COLS;
 		rightPoint = data[lastTickValue - 1];
 
 		labelGroup.transition(anim).attr("transform", `translate(${x(rightPoint.index)}, ${y(rightPoint.value)})`);
@@ -268,8 +276,12 @@ function generateChart(data, title, width = 700, height = 400, cols = 10, showXA
 		const axis = d3.axisBottom(scale)
 			.tickValues(d3.range(startX, startX + COLS))
 			.tickFormat(showXAxisTicks ? d3.format("d") : "")
-			.tickSizeInner(showXAxisTicks ? 6 : 0);
-
+			.tickSizeInner(showXAxisTicks ? AXIS_TICK_SIZE : 0);
+		
+		if (XAxisInverseStatic) {
+			axis.tickFormat((d, i) => -i);
+		}
+		
 		return function (selection) {
 			selection.call(axis);
 			selection.selectAll(".domain")
@@ -277,6 +289,9 @@ function generateChart(data, title, width = 700, height = 400, cols = 10, showXA
 					const old = d3.select(selection.node()).select(".domain").attr("d");
 					return old.replace(/V-?\d+(\.\d+)?$/, "");
 				});
+			
+			selection.selectAll(".tick text")
+				.style("fill", "gray");
 		};
 	}
 
@@ -295,22 +310,12 @@ function generateChart(data, title, width = 700, height = 400, cols = 10, showXA
 	}
 
 	function getDynamicFontSize(n) {
-		if (dynamicLabel === "none") {
+		if (dynamicLabelSize === "none") {
 			return `${FONT_SIZE_DEFAULT}px`;
-		} else if (dynamicLabel === "linear") {
+		} else if (dynamicLabelSize === "linear") {
 			return `${linearFontSizeScale(n)}px`;
-		} else if (dynamicLabel === "ushaped") {
+		} else if (dynamicLabelSize === "ushaped") {
 			return `${ushapedFontSizeScale(n)}px`;
-		}
-	}
-
-	function getDynamicPointSize(n) {
-		if (dynamicLabel === "none") {
-			return POINT_SIZE_DEFAULT;
-		} else if (dynamicLabel === "linear") {
-			return linearPointSizeScale(n);
-		} else if (dynamicLabel === "ushaped") {
-			return ushapedPointSizeScale(n);
 		}
 	}
 }
