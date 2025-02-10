@@ -41,13 +41,13 @@
                 </div>
                 <div class="slider-container">
                     <label for="slider3">Anim. Duration</label>
-                    <input type="range" id="slider3" name="anim-duration" min="200" max="1500" value="500" step="100">
-                    <input type="number" id="slider3-value" min="200" max="1500" value="500">
+                    <input type="range" id="slider3" name="anim-duration" min="100" max="1500" value="100" step="100">
+                    <input type="number" id="slider3-value" min="200" max="1500" value="100">
                 </div>
                 <div class="slider-container">
                     <label for="slider4">Anim. Delay</label>
-                    <input type="range" id="slider4" name="anim-delay" min="1500" max="5000" value="1500" step="250">
-                    <input type="number" id="slider4-value" min="1500" max="5000" value="1500">
+                    <input type="range" id="slider4" name="anim-delay" min="0" max="2000" value="100" step="100">
+                    <input type="number" id="slider4-value" min="1500" max="5000" value="100">
                 </div>
                 <div class="slider-container">
                     <label for="slider5">Num. Points</label>
@@ -59,6 +59,7 @@
             <div class="visualization-options-panel">
                 <label><input type="checkbox" name="vis-showXAxis" value="1" checked>Show X axis ticks in plots</label>
                 <label><input type="checkbox" name="vis-showThreshold" value="1" checked>Show threshold encodings</label>
+                <label><input type="checkbox" name="vis-easeInOut" value="1" checked>Use ease in and out in animations</label>
                 <div class="dropdown-container">
                     <label for="dropdown">Dynamic label size</label>
                     <select id="dropdown" name="vis-dynamicLabelSize">

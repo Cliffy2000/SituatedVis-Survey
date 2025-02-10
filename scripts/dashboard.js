@@ -14,12 +14,14 @@ const visOptions = JSON.parse(sessionStorage.getItem('visualizationOptions')) ||
 const SHOW_X_AXIS = visOptions['vis-showXAxis'];
 const SHOW_THRESHOLD = visOptions['vis-showThreshold'];
 const DYNAMIC_LABEL_SIZE = visOptions['vis-dynamicLabelSize'];
+const EASE_IN_OUT = visOptions['vis-easeInOut'];
 
 // ==== 
 const slider = document.getElementById("window-slider");
 const numberInput = document.getElementById("window-slider-value");
 
 function updateSliderMax(newMax) {
+	return;
 	slider.max = newMax;
 	numberInput.max = newMax;
 }
@@ -47,7 +49,17 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 	const charts = chartsContainer.selectAll("div")
 		.data(d3.zip(datasets, titles))
 		.join("div")
-		.append(([data, title]) => generateChart(data = data, title = title, width = cellWidth, height = cellHeight, cols = POINTS, showXAxis = SHOW_X_AXIS, showThreshold = SHOW_THRESHOLD, dynamicLabelSize = DYNAMIC_LABEL_SIZE))
+		.append(([data, title]) => generateChart(
+			data = data, 
+			title = title, 
+			width = cellWidth, 
+			height = cellHeight,
+			cols = POINTS, 
+			showXAxis = SHOW_X_AXIS, 
+			showThreshold = SHOW_THRESHOLD,
+			dynamicLabelSize = DYNAMIC_LABEL_SIZE,
+			easeInOut = EASE_IN_OUT
+		))
 		.nodes();
 
 
@@ -60,9 +72,8 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 		numberInput.value = slider.value;
 		step = parseInt(slider.value, 10);
 		for (const chart of charts) {
-			chart.update(step, ANIM_DURATION);
+			chart.update(step - 1, ANIM_DURATION);
 		}
-		onPauseClick();
 	});
 
 	numberInput.addEventListener("blur", () => {
@@ -81,9 +92,8 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 		step = value;
 
 		for (const chart of charts) {
-			chart.update(step, ANIM_DURATION);
+			chart.update(step - 1, ANIM_DURATION);
 		}
-		onPauseClick();
 	});
 
 	numberInput.addEventListener("keydown", (event) => {
@@ -96,17 +106,21 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 		if (flag_running) {
 			stopAnimation();
 			buttonPause.text("Unpause");
+			slider.disabled = false;
+			numberInput.disabled = false;
 		} else {
 			animate();
 			startAnimation();
 			buttonPause.text("Pause");
+			slider.disabled = true;
+			numberInput.disabled = true;
 		}
 		flag_running = !flag_running;
 	}
 
 	function onRestartClick() {
 		stopAnimation();
-		step = 0;
+		step = 1;
 		for (const chart of charts) {
 			chart.update(step, ANIM_DURATION);
 		}
@@ -117,7 +131,7 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 	}
 
 	function startAnimation() {
-		INTERVAL_ID = setInterval(animate, ANIM_DELAY);
+		INTERVAL_ID = setInterval(animate, ANIM_DURATION + ANIM_DELAY);
 	}
 
 	function stopAnimation() {

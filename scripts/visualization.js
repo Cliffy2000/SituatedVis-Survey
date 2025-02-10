@@ -1,4 +1,4 @@
-function generateChart(data, title, width = 700, height = 400, cols = 10, showXAxisTicks = true, showThreshold = true, dynamicLabel = "none") {
+function generateChart(data, title, width = 700, height = 400, cols = 10, showXAxisTicks = true, showThreshold = true, dynamicLabel = "none", easeInOut = false) {
 	const MARGIN = { top: 35, right: 15, bottom: 30, left: 35 };
 	const TEXT_PADDING = { horizontal: 4, vertical: 3 };
 
@@ -153,6 +153,10 @@ function generateChart(data, title, width = 700, height = 400, cols = 10, showXA
 		const newXAxis = customAxisBottom(x, step + 1);
 
 		const anim = d3.transition("transmove").duration(animTime);
+		if (easeInOut) {
+			anim.ease(d3.easePoly.exponent(3));
+		}
+
 		lines.transition(anim)
 			.attr("d", d3.line()
 				.x(d => x(d.index))
@@ -160,8 +164,9 @@ function generateChart(data, title, width = 700, height = 400, cols = 10, showXA
 			)
 		points.transition(anim)
 			.attr("cx", d => x(d.index));
-		xAxisGroup.transition(anim).call(newXAxis);
 
+		// TODO
+		xAxisGroup.transition(anim).call(newXAxis);
 
 		lastTickValue = step + COLS;
 		rightPoint = data[lastTickValue - 1];
