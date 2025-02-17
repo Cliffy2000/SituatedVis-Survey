@@ -19,7 +19,7 @@ function generateChart(data, title, width = 700, height = 400, pointCount = 10, 
 	let TOTAL_WIDTH = width;
 	let TOTAL_HEIGHT = height;
 	// If there is anything to show on the side of the chart
-	const INFO_DEFAULT_WIDTH = 120;
+	const INFO_DEFAULT_WIDTH = 150;
 	
 	let INFO_WIDTH = (labelPosition === "side") ? INFO_DEFAULT_WIDTH : 0;
 	// Plot is the chart image
@@ -31,7 +31,7 @@ function generateChart(data, title, width = 700, height = 400, pointCount = 10, 
 
 	const POINTS = pointCount;
 	const OFFSET = 0.5;
-	const X_AXIS_TAIL = 0.6;
+	const X_AXIS_TAIL = (labelPosition === "side") ? 0.4 : 0.6;
 	const AXIS_TICK_SIZE = 4;
 
 	const FONT_SIZE_DEFAULT = 14;
@@ -51,8 +51,8 @@ function generateChart(data, title, width = 700, height = 400, pointCount = 10, 
 	}
 
 	const svg = d3.create("svg")
-		.attr("width", PLOT_WIDTH)
-		.attr("height", PLOT_HEIGHT);
+		.attr("width", TOTAL_WIDTH)
+		.attr("height", TOTAL_HEIGHT);
 
 	const lineChart = svg.append("g");
 
@@ -165,13 +165,18 @@ function generateChart(data, title, width = 700, height = 400, pointCount = 10, 
 
 
 	// Label in the line chart
-	let labelYPos = y(rightPoint.value);
-	if (labelPosition === "fixed") {
+	let labelXPos = x(rightPoint.index);
+	let labelYPos = y((y.domain()[0] + y.domain()[1]) / 2);
+
+	if (labelPosition === "side") {
+		labelXPos = PLOT_WIDTH + INFO_WIDTH / 2;
+		labelYPos = TOTAL_HEIGHT / 1.9;
+	} else if (labelPosition === "fixed") {
 		labelYPos = y.range()[1] - 10;
 	}
 
 	const labelGroup = lineChart.append("g")
-		.attr("transform", `translate(${x(rightPoint.index)}, ${labelYPos})`);
+		.attr("transform", `translate(${labelXPos}, ${labelYPos})`);
 
 	const linearFontSizeScale = d3.scaleLinear()
 		.domain(y.domain())
@@ -188,21 +193,25 @@ function generateChart(data, title, width = 700, height = 400, pointCount = 10, 
 		.style("font-family", "sans-serif")
 		.style("font-size", getDynamicFontSize(rightPoint.value))
 		.style("fill", "white");
+	
+	if (labelPosition === "side") {
+		labelText.style("fill", "black");
+	} else {
+		labelText.transition()
+			.duration(0)
+			.on("end", function () {
+				const textBBox = d3.select(this).node().getBBox();
 
-	labelText.transition()
-		.duration(0)
-		.on("end", function () {
-			const textBBox = d3.select(this).node().getBBox();
-
-			labelGroup.insert("rect", "text")
-				.attr("x", textBBox.x - TEXT_PADDING.horizontal)
-				.attr("y", textBBox.y - TEXT_PADDING.vertical)
-				.attr("width", textBBox.width + 2 * TEXT_PADDING.horizontal)
-				.attr("height", textBBox.height + 2 * TEXT_PADDING.vertical)
-				.attr("fill", getThresholdColor(rightPoint.value))
-				.attr("rx", 3)
-				.attr("ry", 3);
-		});
+				labelGroup.insert("rect", "text")
+					.attr("x", textBBox.x - TEXT_PADDING.horizontal)
+					.attr("y", textBBox.y - TEXT_PADDING.vertical)
+					.attr("width", textBBox.width + 2 * TEXT_PADDING.horizontal)
+					.attr("height", textBBox.height + 2 * TEXT_PADDING.vertical)
+					.attr("fill", getThresholdColor(rightPoint.value))
+					.attr("rx", 3)
+					.attr("ry", 3);
+			});
+	}
 
 
 	function update(step, animTime) {
@@ -332,11 +341,18 @@ function generateChart(data, title, width = 700, height = 400, pointCount = 10, 
 		const lastTickValue = tickValues[tickValues.length - 1];
 		const rightPoint = data[lastTickValue - 1];
 
-		if (labelPosition === "fixed") {
-			labelGroup.attr("transform", `translate(${x(rightPoint.index)}, ${y.range()[1] - 10})`);
-		} else {
-			labelGroup.attr("transform", `translate(${x(rightPoint.index)}, ${y(rightPoint.value)})`);
+		//
+		let newLabelXPos = x(rightPoint.index);
+		let newLabelYPos = y((y.domain()[0] + y.domain()[1]) / 2);
+	
+		if (labelPosition === "side") {
+			newLabelXPos = PLOT_WIDTH + INFO_WIDTH / 2;
+			newLabelYPos = TOTAL_HEIGHT / 1.9;
+		} else if (labelPosition === "fixed") {
+			newLabelYPos = y.range()[1] - 10;
 		}
+
+		labelGroup.attr("transform", `translate(${newLabelXPos}, ${newLabelYPos})`);
 
 		const textBBox = labelText.node().getBBox();
 		labelGroup.select("rect")
@@ -402,6 +418,10 @@ function generateChart(data, title, width = 700, height = 400, pointCount = 10, 
 	}
 
 	function getDynamicFontSize(n) {
+		if (labelPosition === "side") {
+			return `54px`;
+		}
+
 		if (dynamicLabelSize === "none") {
 			return `${FONT_SIZE_DEFAULT}px`;
 		} else if (dynamicLabelSize === "linear") {
