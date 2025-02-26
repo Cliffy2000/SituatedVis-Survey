@@ -18,7 +18,7 @@
  * @param {string} [dynamicLabelSize="none"] - The size of the dynamic labels. Possible options: "none", "linear", "ushaped".
  * @param {string} [labelPosition="follow"] - The position of the labels. Possible options: "follow", "fixed", "side".
  */
-function generateChart(data, title, width = 700, height = 400, pointCount = 10, showXAxisTicks = true, showThreshold = true, easeInOut = false, XAxisInverseStatic = false, backgroundEncoding = false, dynamicLabelSize = "none", labelPosition = "follow") {
+function _generateChartPrev(data, title, width = 700, height = 400, pointCount = 10, showXAxisTicks = true, showThreshold = true, easeInOut = false, XAxisInverseStatic = false, backgroundEncoding = false, dynamicLabelSize = "none", labelPosition = "follow") {
 	// This is the overall size of the entire canvas
 	let TOTAL_WIDTH = width;
 	let TOTAL_HEIGHT = height;
