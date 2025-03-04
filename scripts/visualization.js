@@ -43,14 +43,14 @@ function generateChart(
 	let CHART_WIDTH = CANVAS_WIDTH - INFO_WIDTH;
 	let CHART_HEIGHT = CANVAS_HEIGHT;
 	const CHART_MARGIN = { top: 10, right: 15, bottom: 30, left: 35 };
-	const CHART_PADDING = { top: 30, right: 15, bottom: 20, left: 25 };
+	const CHART_PADDING = { top: 30, right: 25, bottom: 20, left: 25 };
 
 	const TEXT_PADDING = { horizontal: 4, vertical: 3 };
 
 	const VIEW_RANGE = viewRange;
 	// const X_AXIS_RIGHT_PADDING = CHART_WIDTH * 0.05;
-	const X_AXIS_LEFT_OFFSET = 0.5;
-	const X_AXIS_TAIL = (labelPosition === "side") ? 0.4 : 0.6;
+	const X_AXIS_LEFT_MARGIN = 0.5;
+	const X_AXIS_RIGHT_MARGIN = 0.25;
 
 	let AXIS_TICK_SIZE = 4;
 	let AXIS_FONT_SIZE = 10;
@@ -78,7 +78,6 @@ function generateChart(
 		.attr("font-size", "16px")
 		.text(title);
 
-
 	const movableChartClipPath = svg.append("clipPath")
 		.attr("id", "movableChartClipPath")
 		.append("rect")
@@ -93,8 +92,8 @@ function generateChart(
 	const movableChartGroup = movableChartGroupContainer.append("g");
 
 	const x = d3.scaleLinear()
-		.domain([X_AXIS_LEFT_OFFSET, data.length + X_AXIS_LEFT_OFFSET])
-		.range([CHART_PADDING.left, ((CHART_WIDTH - CHART_PADDING.left - CHART_PADDING.right) / (viewRange + 1)) * (data.length + 1) + CHART_PADDING.left]);
+		.domain([X_AXIS_LEFT_MARGIN, data.length + X_AXIS_RIGHT_MARGIN])
+		.range([CHART_PADDING.left, ((CHART_WIDTH - CHART_PADDING.left - CHART_PADDING.right) / (viewRange - 1 + X_AXIS_LEFT_MARGIN + X_AXIS_RIGHT_MARGIN)) * (data.length + (X_AXIS_LEFT_MARGIN + X_AXIS_RIGHT_MARGIN)) + CHART_PADDING.left]);
 
 	const xAxis = customXAxis(x);
 	const xAxisGroup = movableChartGroup.append("g")
@@ -134,12 +133,72 @@ function generateChart(
 		.attr("cx", d => x(d.index))
 		.attr("cy", d => y(d.value))
 		.attr("r", POINT_SIZE)
-		.attr("fill", d => getPointColor(d.value));
-
+		.attr("fill", d => getThresholdColor(d.value));
 	
+	let rightPoint = data[currentIndex + viewRange - 1];
+	let labelXPos = x(rightPoint.index);
+	let labelYPos = y(rightPoint.value);
+	
+	if (labelPosition === "side") {
+		labelXPos = CHART_WIDTH + INFO_WIDTH / 2;
+		labelYPos = CHART_HEIGHT / 1.9;
+	} else if (labelPosition === "fixed") {
+		labelYPos = y.range()[1] - 10;
+	}
 
-	function update() {
+	const labelGroup = svg.append("g")
+		.attr("transform", `translate(${labelXPos}, ${labelYPos})`);
 
+		
+	const linearFontSizeScale = d3.scaleLinear()
+		.domain(y.domain())
+		.range([LABEL_FONT_SIZE_RANGE[0], LABEL_FONT_SIZE_RANGE[1]]);
+
+	const ushapedFontSizeScale = d3.scaleLinear()
+		.domain([y.domain()[0], (y.domain()[0] + y.domain()[1]) / 2, y.domain()[1]])
+		.range([LABEL_FONT_SIZE_RANGE[1], LABEL_FONT_SIZE_RANGE[0], LABEL_FONT_SIZE_RANGE[1]]);
+
+	const labelText = labelGroup.append("text")
+		.text(rightPoint.value)
+		.attr("text-anchor", "middle")
+		.attr("dominant-baseline", "middle")
+		.style("font-family", "sans-serif")
+		.style("font-size", getDynamicFontSize(rightPoint.value))
+		.style("fill", "white");
+	
+	if (labelPosition === "side") {
+		labelText.style("fill", "black");
+	} else {
+		labelText.transition()
+			.duration(0)
+			.on("end", function () {
+				const textBBox = d3.select(this).node().getBBox();
+
+				labelGroup.insert("rect", "text")
+					.attr("x", textBBox.x - TEXT_PADDING.horizontal)
+					.attr("y", textBBox.y - TEXT_PADDING.vertical)
+					.attr("width", textBBox.width + 2 * TEXT_PADDING.horizontal)
+					.attr("height", textBBox.height + 2 * TEXT_PADDING.vertical)
+					.attr("fill", getThresholdColor(rightPoint.value))
+					.attr("rx", 3)
+					.attr("ry", 3);
+			});
+	}
+
+
+	function update(step, animTime) {
+		currentIndex = step;
+		
+		const anim = d3.transition("transmove").duration(animTime);
+		if (easeInOut) {
+			anim.ease(d3.easePoly.exponent(3));
+		}
+
+		rightPoint = data[currentIndex + viewRange - 1];
+		let tickDist = (x.range()[1] - x.range()[0]) / (x.ticks().length - 1);
+
+		movableChartGroup.transition(anim)
+			.attr("transform", `translate(${-tickDist * currentIndex}, 0)`);
 	}
 
 	function resize() {
@@ -170,7 +229,7 @@ function generateChart(
 		};
 	}
 
-	function getPointColor(n) {
+	function getThresholdColor(n) {
 		if (!showThreshold) {
 			return "#8C8C8C";
 		}
@@ -181,6 +240,35 @@ function generateChart(
 			return "#00B2EE";
 		} else {
 			return "#8C8C8C";
+		}
+	}
+
+	function getBackgroundColor(n) {
+		if (!backgroundEncoding) {
+			return "white";
+		}
+
+		if (n > MAX_THRESHOLD) {
+			return "#FFBFA8";
+		} else if (n < MIN_THRESHOLD) {
+			return "#80D9F7";
+		} else {
+			return "white";
+		}
+	}
+
+
+	function getDynamicFontSize(n) {
+		if (labelPosition === "side") {
+			return `54px`;
+		}
+
+		if (dynamicLabelSize === "none") {
+			return `${LABEL_FONT_DEFAULT_SIZE}px`;
+		} else if (dynamicLabelSize === "linear") {
+			return `${linearFontSizeScale(n)}px`;
+		} else if (dynamicLabelSize === "ushaped") {
+			return `${ushapedFontSizeScale(n)}px`;
 		}
 	}
 	
