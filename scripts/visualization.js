@@ -43,14 +43,24 @@ function generateChart(
 	let CHART_WIDTH = CANVAS_WIDTH - INFO_WIDTH;
 	let CHART_HEIGHT = CANVAS_HEIGHT;
 	const CHART_MARGIN = { top: 10, right: 15, bottom: 30, left: 35 };
-	const CHART_PADDING = { top: 30, right: 25, bottom: 20, left: 25 };
-
-	const TEXT_PADDING = { horizontal: 4, vertical: 3 };
+	const CHART_PADDING = { top: 35, right: 25, bottom: 20, left: 25 };
 
 	const VIEW_RANGE = viewRange;
 	// const X_AXIS_RIGHT_PADDING = CHART_WIDTH * 0.05;
 	const X_AXIS_LEFT_MARGIN = 0.5;
 	const X_AXIS_RIGHT_MARGIN = 0.25;
+
+	const TEXT_PADDING = { horizontal: 4, vertical: 3 };
+	const TITLE_FONT_SIZE = 21;
+
+	let TICK_FREQUENCY = 1;
+	if (viewRange > 100) {
+		TICK_FREQUENCY = 10;
+	} else if (viewRange > 50) {
+		TICK_FREQUENCY = 5;
+	} else if (viewRange > 15) {
+		TICK_FREQUENCY = 2;
+	}
 
 	let AXIS_TICK_SIZE = 4;
 	let AXIS_FONT_SIZE = 10;
@@ -71,11 +81,11 @@ function generateChart(
 	const titleText = svg.append("text")
 		.attr("x", CANVAS_WIDTH / 2)
 		.attr("y", CHART_PADDING.top / 2)
-		.attr("dy", "-0.2em")
+		.attr("dy", "-0.5em")
 		.attr("text-anchor", "middle")
 		.attr("dominant-baseline", "hanging")
 		.attr("font-family", "sans-serif")
-		.attr("font-size", "16px")
+		.attr("font-size", `${TITLE_FONT_SIZE}px`)
 		.text(title);
 
 	const movableChartClipPath = svg.append("clipPath")
@@ -86,19 +96,38 @@ function generateChart(
 		.attr("width", CHART_WIDTH - CHART_PADDING.left - CHART_PADDING.right)
 		.attr("height", CHART_HEIGHT)
 		.attr("fill", "white");
+	
+	const xAxisInverseStaticClipPath = svg.append("clipPath")
+		.attr("id", "xAxisInverseStaticClipPath")
+		.append("rect")
+		.attr("x", CHART_PADDING.left - 10)
+		.attr("y", -10)
+		.attr("width", CHART_WIDTH - CHART_PADDING.left - CHART_PADDING.right + 10)
+		.attr("height", CHART_HEIGHT + 10)
+		.attr("fill", "white");
 
 	const movableChartGroupContainer = svg.append("g")
 		.attr("clip-path", "url(#movableChartClipPath");
 	const movableChartGroup = movableChartGroupContainer.append("g");
 
 	const x = d3.scaleLinear()
-		.domain([X_AXIS_LEFT_MARGIN, data.length + X_AXIS_RIGHT_MARGIN])
-		.range([CHART_PADDING.left, ((CHART_WIDTH - CHART_PADDING.left - CHART_PADDING.right) / (viewRange - 1 + X_AXIS_LEFT_MARGIN + X_AXIS_RIGHT_MARGIN)) * (data.length + (X_AXIS_LEFT_MARGIN + X_AXIS_RIGHT_MARGIN)) + CHART_PADDING.left]);
+		.domain([1 - X_AXIS_LEFT_MARGIN, data.length + X_AXIS_RIGHT_MARGIN])
+		.range([CHART_PADDING.left, ((CHART_WIDTH - CHART_PADDING.left - CHART_PADDING.right) / (viewRange - X_AXIS_LEFT_MARGIN + X_AXIS_RIGHT_MARGIN)) * (data.length - X_AXIS_LEFT_MARGIN + X_AXIS_RIGHT_MARGIN) + CHART_PADDING.left]);
+
+	const tickGap = (x.range()[1] - x.range()[0]) / (data.length - X_AXIS_LEFT_MARGIN + X_AXIS_RIGHT_MARGIN);
 
 	const xAxis = customXAxis(x);
-	const xAxisGroup = movableChartGroup.append("g")
+	
+	if (XAxisInverseStatic) {
+		const xAxisGroup = svg.append("g")
+		.attr("transform", `translate(0, ${CHART_HEIGHT - CHART_PADDING.bottom})`)
+		.call(xAxis)
+		.attr("clip-path", "url(#xAxisInverseStaticClipPath");
+	} else {
+		const xAxisGroup = movableChartGroup.append("g")
 		.attr("transform", `translate(0, ${CHART_HEIGHT - CHART_PADDING.bottom})`)
 		.call(xAxis);
+	}
 
 	const y = d3.scaleLinear()
 		.domain([0, 100])
@@ -113,7 +142,28 @@ function generateChart(
 		.style("fill", "gray")
 		.style("font-size", AXIS_FONT_SIZE);
 
-	// TODO: add the grid that is separate from the moving chart
+	const gridGroup = svg.insert("g", ":first-child");
+
+	gridGroup.selectAll(".horizontal-line")
+		.data(y.ticks())
+		.join("line")
+		.attr("class", "horizontal-line")
+		.attr("x1", CHART_PADDING.left)
+		.attr("x2", CHART_WIDTH - CHART_PADDING.right)
+		.attr("y1", d => y(d))
+		.attr("y2", d => y(d))
+		.attr("stroke", "#eee");
+	
+	gridGroup.selectAll(".vertical-line")
+		.data(d3.range(1, data.length + 1, TICK_FREQUENCY).slice(0, data.length / TICK_FREQUENCY))
+		.join("line")
+		.attr("class", "vertical-line")
+		.attr("x1", d => x(d))
+		.attr("x2", d => x(d))
+		.attr("y1", CHART_PADDING.top)
+		.attr("y2", CHART_HEIGHT - CHART_PADDING.bottom)
+		.attr("stroke", "#eee")
+		.style("z-index", -1);
 	
 	const lines = movableChartGroup.append("path")
 		.datum(data)
@@ -148,7 +198,6 @@ function generateChart(
 
 	const labelGroup = svg.append("g")
 		.attr("transform", `translate(${labelXPos}, ${labelYPos})`);
-
 		
 	const linearFontSizeScale = d3.scaleLinear()
 		.domain(y.domain())
@@ -195,10 +244,24 @@ function generateChart(
 		}
 
 		rightPoint = data[currentIndex + viewRange - 1];
-		let tickDist = (x.range()[1] - x.range()[0]) / (x.ticks().length - 1);
+		let tickDist = (x.range()[1] - x.range()[0]) / (data.length - 1);
 
 		movableChartGroup.transition(anim)
-			.attr("transform", `translate(${-tickDist * currentIndex}, 0)`);
+			.attr("transform", `translate(${-tickGap * currentIndex}, 0)`);
+		
+		if (labelPosition === "follow") {
+			labelGroup.transition(anim).attr("transform", `translate(${labelXPos}, ${y(rightPoint.value)})`);
+		}
+		labelText.text(rightPoint.value)
+			.style("font-size", getDynamicFontSize(rightPoint.value));
+		
+		const textBBox = labelText.node().getBBox();
+		labelGroup.transition(anim).select("rect")
+			.attr("x", textBBox.x - TEXT_PADDING.horizontal)
+			.attr("y", textBBox.y - TEXT_PADDING.vertical)
+			.attr("width", textBBox.width + 2 * TEXT_PADDING.horizontal)
+			.attr("height", textBBox.height + 2 * TEXT_PADDING.vertical)
+			.attr("fill", getThresholdColor(rightPoint.value));
 	}
 
 	function resize() {
@@ -207,7 +270,7 @@ function generateChart(
 
 	function customXAxis(scale) {
 		const axis = d3.axisBottom(scale)
-			.tickValues(d3.range(1, data.length + 1))
+			.tickValues(d3.range(1, data.length + 1, TICK_FREQUENCY))
 			.tickFormat(showXAxisTicks ? d3.format("d") : "")
 			.tickSizeInner(showXAxisTicks ? AXIS_TICK_SIZE : 0);
 
