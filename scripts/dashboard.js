@@ -16,6 +16,7 @@ const SHOW_THRESHOLD = visOptions['vis-showThreshold'];
 const EASE_IN_OUT = visOptions['vis-easeInOut'];
 const X_AXIS_INVERSE_STATIC = visOptions['vis-xAxisInverseStatic'];
 const BACKGROUND_ENCODING = visOptions['vis-backgroundEncoding'];
+const USE_ROLLING_AVERAGE = visOptions['vis-useRollingAverage'];
 const DYNAMIC_LABEL_SIZE = visOptions['vis-dynamicLabelSize'];
 const LABEL_POSITION = visOptions['vis-labelPosition'];
 
@@ -45,12 +46,14 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 	let { width: gridWidth, height: gridHeight } = chartsContainer.node().getBoundingClientRect();
 	let cellWidth = gridWidth / COLS;
 	let cellHeight = gridHeight / ROWS;
+	console.log(gridHeight);
 
 	// Fills the titles array
 	const titles = Array.from({ length: selectedFiles.length }, (_, i) => `Machine ${i + 1}`);
 	const charts = chartsContainer.selectAll("div")
 		.data(d3.zip(datasets, titles))
 		.join("div")
+		.attr("class", LABEL_POSITION === "side" ? "chart-div-side" : "chart-div")
 		.append(([data, title]) => generateChart(
 			data = data, 
 			title = title, 
@@ -62,6 +65,7 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 			easeInOut = EASE_IN_OUT,
 			xAxisInverseStatic = X_AXIS_INVERSE_STATIC,
 			backgroundEncoding = BACKGROUND_ENCODING,
+			useRollingAverage = USE_ROLLING_AVERAGE,
 			dynamicLabelSize = DYNAMIC_LABEL_SIZE,
 			labelPosition = LABEL_POSITION
 		))

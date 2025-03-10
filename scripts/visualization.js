@@ -13,6 +13,7 @@
  * @param {boolean} [easeInOut=false] - Whether to apply ease-in-out animation.
  * @param {boolean} [XAxisInverseStatic=false] - Whether the X-axis is inversely static.
  * @param {boolean} [backgroundEncoding=false] - Whether to use background encoding.
+ * @param {boolean} [useRollingAverage=false]
  * @param {string} [dynamicLabelSize="none"] - The size of the dynamic labels. Possible options: "none", "linear", "ushaped".
  * @param {string} [labelPosition="follow"] - The position of the labels. Possible options: "follow", "fixed", "side".
  * 
@@ -28,6 +29,7 @@ function generateChart(
 	easeInOut = false,
 	XAxisInverseStatic = false,
 	backgroundEncoding = false,
+	useRollingAverage = false,
 	dynamicLabelSize = "none",
 	labelPosition = "follow"
 ) {
@@ -36,7 +38,7 @@ function generateChart(
 	let CANVAS_HEIGHT = height;
 
 	// this is the width on the right side of the plot for additional information
-	const INFO_DEFAULT_WIDTH = 150;
+	const INFO_DEFAULT_WIDTH = 125;
 	let INFO_WIDTH = (labelPosition === "side") ? INFO_DEFAULT_WIDTH : 0;
 
 	// this is the size of the chart area
@@ -86,7 +88,7 @@ function generateChart(
 		.attr("dy", "-0.4em")
 		.attr("text-anchor", "middle")
 		.attr("dominant-baseline", "hanging")
-		.attr("font-family", "sans-serif")
+		.attr("font-family", "Fira Code")
 		.attr("font-size", `${TITLE_FONT_SIZE}px`)
 		.text(title);
 
@@ -190,9 +192,10 @@ function generateChart(
 	let rightPoint = data[currentIndex + viewRange - 1];
 	let labelXPos = x(rightPoint.index);
 	let labelYPos = y(rightPoint.value);
-	
+
 	if (labelPosition === "side") {
-		labelXPos = CHART_WIDTH + INFO_WIDTH / 2;
+		// TODO: dynamic spacing
+		labelXPos = CHART_WIDTH + INFO_WIDTH / 2 - 12;
 		labelYPos = CHART_HEIGHT / 1.9;
 	} else if (labelPosition === "fixed") {
 		labelYPos = y.range()[1] - 10;
@@ -208,13 +211,16 @@ function generateChart(
 	const ushapedFontSizeScale = d3.scaleLinear()
 		.domain([y.domain()[0], (y.domain()[0] + y.domain()[1]) / 2, y.domain()[1]])
 		.range([LABEL_FONT_SIZE_RANGE[1], LABEL_FONT_SIZE_RANGE[0], LABEL_FONT_SIZE_RANGE[1]]);
+	
+	console.log(data.slice(currentIndex + viewRange - 4, currentIndex + viewRange + 1));
 
 	const labelText = labelGroup.append("text")
-		.text(rightPoint.value)
+		.text(useRollingAverage ? Math.round(d3.mean(data.slice(currentIndex + viewRange - 4, currentIndex + viewRange + 1), d => d.value)) : rightPoint.value)
 		.attr("text-anchor", "middle")
 		.attr("dominant-baseline", "middle")
-		.style("font-family", "sans-serif")
+		.style("font-family", labelPosition === "side" ? "Fira Code" : "san-serif")
 		.style("font-size", getDynamicFontSize(rightPoint.value))
+		.style("letter-spacing", labelPosition === "side" ? "-4px" : "0px")
 		.style("fill", "white");
 	
 	if (labelPosition === "side") {
@@ -254,7 +260,8 @@ function generateChart(
 		if (labelPosition === "follow") {
 			labelGroup.transition(anim).attr("transform", `translate(${labelXPos}, ${y(rightPoint.value)})`);
 		}
-		labelText.text(rightPoint.value)
+		
+		labelText.text(useRollingAverage ? Math.round(d3.mean(data.slice(currentIndex + viewRange - 4, currentIndex + viewRange + 1), d => d.value)) : rightPoint.value)
 			.style("font-size", getDynamicFontSize(rightPoint.value));
 		
 		const textBBox = labelText.node().getBBox();
@@ -277,7 +284,7 @@ function generateChart(
 			.tickSizeInner(showXAxisTicks ? AXIS_TICK_SIZE : 0);
 
 		if (XAxisInverseStatic) {
-			axis.tickFormat(showXAxisTicks ? (d, i) => (i + 1 ) : "");
+			axis.tickFormat(showXAxisTicks ? (d, i) => (i + 1 - viewRange) : "");
 		}
 
 		return function (selection) {
@@ -325,7 +332,7 @@ function generateChart(
 
 	function getDynamicFontSize(n) {
 		if (labelPosition === "side") {
-			return `54px`;
+			return `74px`;
 		}
 
 		if (dynamicLabelSize === "none") {

@@ -16,6 +16,10 @@ body {
     display: grid;
 }
 
+.chart-div-side {
+    outline: 0.2px solid #cfcfcf;
+}
+
 #buttonsContainer {
     display: flex;
     justify-content: center;
@@ -57,4 +61,8 @@ body {
 .window-container input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
+}
+
+svg {
+    display: block;
 }
