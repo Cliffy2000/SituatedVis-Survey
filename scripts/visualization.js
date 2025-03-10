@@ -43,7 +43,7 @@ function generateChart(
 	let CHART_WIDTH = CANVAS_WIDTH - INFO_WIDTH;
 	let CHART_HEIGHT = CANVAS_HEIGHT;
 	const CHART_MARGIN = { top: 10, right: 15, bottom: 30, left: 35 };
-	const CHART_PADDING = { top: 35, right: 25, bottom: 20, left: 25 };
+	const CHART_PADDING = { top: 40, right: 30, bottom: 30, left: 45 };
 
 	const VIEW_RANGE = viewRange;
 	// const X_AXIS_RIGHT_PADDING = CHART_WIDTH * 0.05;
@@ -63,11 +63,13 @@ function generateChart(
 	}
 
 	let AXIS_TICK_SIZE = 4;
-	let AXIS_FONT_SIZE = 10;
+	let AXIS_FONT_SIZE = 13;
+
+	// TODO: width / viewRange ratio
 	let POINT_SIZE = 4;
-	let LABEL_FONT_DEFAULT_SIZE = 14;
-	let LABEL_FONT_SIZE_RANGE = [8, 24];
-	// TODO: Dynamic scaling based on viewRange
+	
+	let LABEL_FONT_DEFAULT_SIZE = 17;
+	let LABEL_FONT_SIZE_RANGE = [14, 28];
 
 	const MIN_THRESHOLD = 30;
 	const MAX_THRESHOLD = 70;
@@ -81,7 +83,7 @@ function generateChart(
 	const titleText = svg.append("text")
 		.attr("x", CANVAS_WIDTH / 2)
 		.attr("y", CHART_PADDING.top / 2)
-		.attr("dy", "-0.5em")
+		.attr("dy", "-0.4em")
 		.attr("text-anchor", "middle")
 		.attr("dominant-baseline", "hanging")
 		.attr("font-family", "sans-serif")
@@ -155,7 +157,7 @@ function generateChart(
 		.attr("stroke", "#eee");
 	
 	gridGroup.selectAll(".vertical-line")
-		.data(d3.range(1, data.length + 1, TICK_FREQUENCY).slice(0, data.length / TICK_FREQUENCY))
+		.data(d3.range(1, data.length + 1, TICK_FREQUENCY).slice(0, viewRange / TICK_FREQUENCY))
 		.join("line")
 		.attr("class", "vertical-line")
 		.attr("x1", d => x(d))
@@ -236,7 +238,7 @@ function generateChart(
 
 
 	function update(step, animTime) {
-		currentIndex = step;
+		currentIndex = step - 1;
 		
 		const anim = d3.transition("transmove").duration(animTime);
 		if (easeInOut) {
@@ -275,7 +277,7 @@ function generateChart(
 			.tickSizeInner(showXAxisTicks ? AXIS_TICK_SIZE : 0);
 
 		if (XAxisInverseStatic) {
-			axis.tickFormat(showXAxisTicks ? (d, i) => (i + 1 - POINTS) : "");
+			axis.tickFormat(showXAxisTicks ? (d, i) => (i + 1 ) : "");
 		}
 
 		return function (selection) {

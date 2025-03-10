@@ -144,12 +144,12 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 	}
 
 	function animate() {
-		for (let chart of charts) {
-			chart.update(step, ANIM_DURATION);
-		}
 		step++;
 		slider.value = step;
 		numberInput.value = step;
+		for (let chart of charts) {
+			chart.update(step, ANIM_DURATION);
+		}
 	}
 
 	startAnimation();
