@@ -9,7 +9,7 @@ const COLS = parseInt(displaySliders['num-columns']);
 const ANIM_DURATION = parseInt(displaySliders['anim-duration']);
 const ANIM_DELAY = parseInt(displaySliders['anim-delay']);
 const POINTS = parseInt(displaySliders['num-points']);
-const ROLLING_AVG = parseInt(displaySliders['rolling-avg']);
+let ROLLING_AVG = parseInt(displaySliders['rolling-avg']);
 
 const visOptions = JSON.parse(sessionStorage.getItem('visualizationOptions')) || {};
 const SHOW_X_AXIS_TICKS = visOptions['vis-showXAxisTicks'];
@@ -25,9 +25,17 @@ if (selectedFiles.length > ROWS * COLS) {
     selectedFiles = selectedFiles.slice(0, ROWS * COLS);
 }
 
+ROLLING_AVG = Math.min(ROLLING_AVG, POINTS);
+
 // ==== 
 const slider = document.getElementById("window-slider");
 const numberInput = document.getElementById("window-slider-value");
+
+if (USE_ROLLING_AVERAGE) {
+	const rollingAverageDiv = document.querySelector('.rolling-average-description');
+	rollingAverageDiv.textContent = `The rolling average is considering the last ${ROLLING_AVG} points.`;
+	rollingAverageDiv.style.marginLeft = '50px'
+}
 
 
 Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then((datasets) => {

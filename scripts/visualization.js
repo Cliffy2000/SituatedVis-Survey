@@ -7,7 +7,7 @@
  * @param {number} [width=700] - The visible size of the overall chart.
  * @param {number} [height=400] - The visible size of the overall chart.
  * @param {number} [viewRange=10] - The amount of points visible at a time.
- * @param {number} [rolllingAverage=5] - The number of points considered for the rolling average.
+ * @param {number} [rollingAverage=5] - The number of points considered for the rolling average.
  * 
  * @param {boolean} [showXAxisTicks=true] - Whether to show ticks on the X-axis.
  * @param {boolean} [showThreshold=true] - Whether to show threshold lines.
@@ -25,7 +25,7 @@ function generateChart(
 	width = 700,
 	height = 400,
 	viewRange = 10,
-	rolllingAverage = 5,
+	rollingAverage = 5,
 	showXAxisTicks = true,
 	showThreshold = true,
 	easeInOut = false,
@@ -47,16 +47,15 @@ function generateChart(
 	let CHART_WIDTH = CANVAS_WIDTH - INFO_WIDTH;
 	let CHART_HEIGHT = CANVAS_HEIGHT;
 	const CHART_MARGIN = { top: 10, right: 15, bottom: 30, left: 35 };
-	const CHART_PADDING = { top: 40, right: 30, bottom: 30, left: 45 };
+	const CHART_PADDING = { top: 40, right: 20, bottom: 30, left: 40 };
 
 	const VIEW_RANGE = viewRange;
-	const ROLLING_AVERAGE_RANGE = Math.min(viewRange, rolllingAverage);
 	// const X_AXIS_RIGHT_PADDING = CHART_WIDTH * 0.05;
 	const X_AXIS_LEFT_MARGIN = 0.5;
 	const X_AXIS_RIGHT_MARGIN = 0.25;
 
 	const TEXT_PADDING = { horizontal: 4, vertical: 3 };
-	const TITLE_FONT_SIZE = 21;
+	const TITLE_FONT_SIZE = 18;
 
 	let TICK_FREQUENCY = 1;
 	if (viewRange > 100) {
@@ -91,7 +90,6 @@ function generateChart(
 		.attr("dy", "-0.4em")
 		.attr("text-anchor", "middle")
 		.attr("dominant-baseline", "hanging")
-		.attr("font-family", "Fira Code")
 		.attr("font-size", `${TITLE_FONT_SIZE}px`)
 		.text(title);
 
@@ -193,13 +191,18 @@ function generateChart(
 		.attr("fill", d => getThresholdColor(d.value));
 	
 	let rightPoint = data[currentIndex + viewRange - 1];
+	let average = Math.round(d3.mean(
+		data.slice(currentIndex + viewRange - rollingAverage + 1, currentIndex + viewRange + 1), 
+		d => d.value
+	));
+	let labelValue = useRollingAverage ? average : rightPoint.value;
 	let labelXPos = x(rightPoint.index);
-	let labelYPos = y(rightPoint.value);
+	let labelYPos = y(labelValue);
 
 	if (labelPosition === "side") {
 		// TODO: dynamic spacing
-		labelXPos = CHART_WIDTH + INFO_WIDTH / 2 - 12;
-		labelYPos = CHART_HEIGHT / 1.9;
+		labelXPos = CHART_WIDTH + INFO_WIDTH / 2 - 10;
+		labelYPos = CHART_HEIGHT / 1.85;
 	} else if (labelPosition === "fixed") {
 		labelYPos = y.range()[1] - 10;
 	}
@@ -218,17 +221,14 @@ function generateChart(
 	console.log(data.slice(currentIndex + viewRange - 4, currentIndex + viewRange + 1));
 
 	const labelText = labelGroup.append("text")
-		.text(useRollingAverage ? Math.round(d3.mean(data.slice(currentIndex + viewRange - 4, currentIndex + viewRange + 1), d => d.value)) : rightPoint.value)
+		.text(labelValue)
 		.attr("text-anchor", "middle")
 		.attr("dominant-baseline", "middle")
-		.style("font-family", labelPosition === "side" ? "Fira Code" : "san-serif")
-		.style("font-size", getDynamicFontSize(rightPoint.value))
-		.style("letter-spacing", labelPosition === "side" ? "-4px" : "0px")
-		.style("fill", "white");
+		.style("font-family", "sans-serif")
+		.style("font-size", getDynamicFontSize(labelValue))
+		.style("fill", labelPosition === "side" ? "#121212" : "white");
 	
-	if (labelPosition === "side") {
-		labelText.style("fill", "black");
-	} else {
+	if (labelPosition !== "side") {
 		labelText.transition()
 			.duration(0)
 			.on("end", function () {
@@ -239,7 +239,7 @@ function generateChart(
 					.attr("y", textBBox.y - TEXT_PADDING.vertical)
 					.attr("width", textBBox.width + 2 * TEXT_PADDING.horizontal)
 					.attr("height", textBBox.height + 2 * TEXT_PADDING.vertical)
-					.attr("fill", getThresholdColor(rightPoint.value))
+					.attr("fill", getThresholdColor(labelValue))
 					.attr("rx", 3)
 					.attr("ry", 3);
 			});
@@ -255,17 +255,21 @@ function generateChart(
 		}
 
 		rightPoint = data[currentIndex + viewRange - 1];
-		let tickDist = (x.range()[1] - x.range()[0]) / (data.length - 1);
+		average = Math.round(d3.mean(
+			data.slice(currentIndex + viewRange - rollingAverage + 1, currentIndex + viewRange + 1), 
+			d => d.value
+		));
+		labelValue = useRollingAverage ? average : rightPoint.value;
 
 		movableChartGroup.transition(anim)
 			.attr("transform", `translate(${-tickGap * currentIndex}, 0)`);
 		
 		if (labelPosition === "follow") {
-			labelGroup.transition(anim).attr("transform", `translate(${labelXPos}, ${y(rightPoint.value)})`);
+			labelGroup.transition(anim).attr("transform", `translate(${labelXPos}, ${y(labelValue)})`);
 		}
 		
-		labelText.text(useRollingAverage ? Math.round(d3.mean(data.slice(currentIndex + viewRange - 4, currentIndex + viewRange + 1), d => d.value)) : rightPoint.value)
-			.style("font-size", getDynamicFontSize(rightPoint.value));
+		labelText.text(labelValue)
+			.style("font-size", getDynamicFontSize(labelValue));
 		
 		const textBBox = labelText.node().getBBox();
 		labelGroup.transition(anim).select("rect")
@@ -273,7 +277,7 @@ function generateChart(
 			.attr("y", textBBox.y - TEXT_PADDING.vertical)
 			.attr("width", textBBox.width + 2 * TEXT_PADDING.horizontal)
 			.attr("height", textBBox.height + 2 * TEXT_PADDING.vertical)
-			.attr("fill", getThresholdColor(rightPoint.value));
+			.attr("fill", getThresholdColor(labelValue));
 	}
 
 	function resize() {
