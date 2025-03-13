@@ -7,6 +7,7 @@
  * @param {number} [width=700] - The visible size of the overall chart.
  * @param {number} [height=400] - The visible size of the overall chart.
  * @param {number} [viewRange=10] - The amount of points visible at a time.
+ * @param {number} [rolllingAverage=5] - The number of points considered for the rolling average.
  * 
  * @param {boolean} [showXAxisTicks=true] - Whether to show ticks on the X-axis.
  * @param {boolean} [showThreshold=true] - Whether to show threshold lines.
@@ -24,6 +25,7 @@ function generateChart(
 	width = 700,
 	height = 400,
 	viewRange = 10,
+	rolllingAverage = 5,
 	showXAxisTicks = true,
 	showThreshold = true,
 	easeInOut = false,
@@ -48,6 +50,7 @@ function generateChart(
 	const CHART_PADDING = { top: 40, right: 30, bottom: 30, left: 45 };
 
 	const VIEW_RANGE = viewRange;
+	const ROLLING_AVERAGE_RANGE = Math.min(viewRange, rolllingAverage);
 	// const X_AXIS_RIGHT_PADDING = CHART_WIDTH * 0.05;
 	const X_AXIS_LEFT_MARGIN = 0.5;
 	const X_AXIS_RIGHT_MARGIN = 0.25;

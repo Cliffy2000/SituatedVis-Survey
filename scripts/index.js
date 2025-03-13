@@ -86,7 +86,8 @@ function confirmationOnClick() {
 		.map(checkbox => checkbox.value);
 	sessionStorage.setItem('SituatedVisSelectedFiles', JSON.stringify(selectedFiles));
 
-	const sliders = document.querySelectorAll('.slider-container input[type="range"]');
+	// Intentionally using the number input instead as the sliders have value steps which is less accurate if the user had manual input
+	const sliders = document.querySelectorAll('.slider-container input[type="number"]');
 	const sliderValues = {};
 	sliders.forEach(slider => {
 		sliderValues[slider.name] = slider.value;
