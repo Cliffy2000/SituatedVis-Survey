@@ -18,6 +18,7 @@ const EASE_IN_OUT = visOptions['vis-easeInOut'];
 const X_AXIS_INVERSE_STATIC = visOptions['vis-xAxisInverseStatic'];
 const BACKGROUND_ENCODING = visOptions['vis-backgroundEncoding'];
 const USE_ROLLING_AVERAGE = visOptions['vis-useRollingAverage'];
+const GRID_BACKGROUND_MOVE = visOptions['vis-gridBackgroundMove'];
 const DYNAMIC_LABEL_SIZE = visOptions['vis-dynamicLabelSize'];
 const LABEL_POSITION = visOptions['vis-labelPosition'];
 
@@ -76,6 +77,7 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 			xAxisInverseStatic = X_AXIS_INVERSE_STATIC,
 			backgroundEncoding = BACKGROUND_ENCODING,
 			useRollingAverage = USE_ROLLING_AVERAGE,
+			gridBackgroundMove = GRID_BACKGROUND_MOVE,
 			dynamicLabelSize = DYNAMIC_LABEL_SIZE,
 			labelPosition = LABEL_POSITION
 		))

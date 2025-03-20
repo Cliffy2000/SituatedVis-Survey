@@ -15,6 +15,7 @@
  * @param {boolean} [XAxisInverseStatic=false] - Whether the X-axis is inversely static.
  * @param {boolean} [backgroundEncoding=false] - Whether to use background encoding.
  * @param {boolean} [useRollingAverage=false]
+ * @param {boolean} [gridBackgroundMove=false]
  * @param {string} [dynamicLabelSize="none"] - The size of the dynamic labels. Possible options: "none", "linear", "ushaped".
  * @param {string} [labelPosition="follow"] - The position of the labels. Possible options: "follow", "fixed", "side".
  * 
@@ -32,6 +33,7 @@ function generateChart(
 	XAxisInverseStatic = false,
 	backgroundEncoding = false,
 	useRollingAverage = false,
+	gridBackgroundMove = false,
 	dynamicLabelSize = "none",
 	labelPosition = "follow"
 ) {
@@ -58,11 +60,17 @@ function generateChart(
 	const TITLE_FONT_SIZE = 18;
 
 	let TICK_FREQUENCY = 1;
-	if (viewRange > 100) {
+	if (viewRange > 120) {
 		TICK_FREQUENCY = 10;
-	} else if (viewRange > 50) {
+	} else if (viewRange > 100) {
+		TICK_FREQUENCY = 8;
+	} else if (viewRange > 60) {
 		TICK_FREQUENCY = 5;
-	} else if (viewRange > 15) {
+	} else if (viewRange > 50) {
+		TICK_FREQUENCY = 4;
+	} else if (viewRange > 30) {
+		TICK_FREQUENCY = 3;
+	} else if (viewRange > 16) {
 		TICK_FREQUENCY = 2;
 	}
 
@@ -122,14 +130,14 @@ function generateChart(
 	const tickGap = (x.range()[1] - x.range()[0]) / (data.length - X_AXIS_LEFT_MARGIN + X_AXIS_RIGHT_MARGIN);
 
 	const xAxis = customXAxis(x);
-	
+	let xAxisGroup;
 	if (XAxisInverseStatic) {
-		const xAxisGroup = svg.append("g")
+		xAxisGroup = svg.append("g")
 		.attr("transform", `translate(0, ${CHART_HEIGHT - CHART_PADDING.bottom})`)
 		.call(xAxis)
 		.attr("clip-path", "url(#xAxisInverseStaticClipPath");
 	} else {
-		const xAxisGroup = movableChartGroup.append("g")
+		xAxisGroup = movableChartGroup.append("g")
 		.attr("transform", `translate(0, ${CHART_HEIGHT - CHART_PADDING.bottom})`)
 		.call(xAxis);
 	}
@@ -147,20 +155,30 @@ function generateChart(
 		.style("fill", "gray")
 		.style("font-size", AXIS_FONT_SIZE);
 
-	const gridGroup = svg.insert("g", ":first-child");
+
+	const gridGroup = (gridBackgroundMove ? movableChartGroup : svg).insert("g", ":first-child");
 
 	gridGroup.selectAll(".horizontal-line")
 		.data(y.ticks())
 		.join("line")
 		.attr("class", "horizontal-line")
 		.attr("x1", CHART_PADDING.left)
-		.attr("x2", CHART_WIDTH - CHART_PADDING.right)
+		.attr("x2", CHART_WIDTH - CHART_PADDING.right + (gridBackgroundMove ? (tickGap * (data.length - 1)) : 0))
 		.attr("y1", d => y(d))
 		.attr("y2", d => y(d))
 		.attr("stroke", "#eee");
-	
+
+	let verticalLineData = d3.range(1, data.length + 1, TICK_FREQUENCY);
+	if (XAxisInverseStatic) {
+		verticalLineData = d3.range(viewRange % TICK_FREQUENCY || TICK_FREQUENCY, data.length + 1, TICK_FREQUENCY);
+	}
+
+	if (!gridBackgroundMove) {
+		verticalLineData = verticalLineData.slice(0, Math.ceil(viewRange / TICK_FREQUENCY));
+	}
+
 	gridGroup.selectAll(".vertical-line")
-		.data(d3.range(1, data.length + 1, TICK_FREQUENCY).slice(0, viewRange / TICK_FREQUENCY))
+		.data(verticalLineData)
 		.join("line")
 		.attr("class", "vertical-line")
 		.attr("x1", d => x(d))
@@ -218,15 +236,13 @@ function generateChart(
 		.domain([y.domain()[0], (y.domain()[0] + y.domain()[1]) / 2, y.domain()[1]])
 		.range([LABEL_FONT_SIZE_RANGE[1], LABEL_FONT_SIZE_RANGE[0], LABEL_FONT_SIZE_RANGE[1]]);
 	
-	console.log(data.slice(currentIndex + viewRange - 4, currentIndex + viewRange + 1));
-
 	const labelText = labelGroup.append("text")
 		.text(labelValue)
 		.attr("text-anchor", "middle")
 		.attr("dominant-baseline", "middle")
 		.style("font-family", "sans-serif")
 		.style("font-size", getDynamicFontSize(labelValue))
-		.style("fill", labelPosition === "side" ? "#121212" : "white");
+		.style("fill", labelPosition === "side" ? getSideFontColor(labelValue) : "white");
 	
 	if (labelPosition !== "side") {
 		labelText.transition()
@@ -263,7 +279,7 @@ function generateChart(
 
 		movableChartGroup.transition(anim)
 			.attr("transform", `translate(${-tickGap * currentIndex}, 0)`);
-		
+				
 		if (labelPosition === "follow") {
 			labelGroup.transition(anim).attr("transform", `translate(${labelXPos}, ${y(labelValue)})`);
 		}
@@ -285,13 +301,20 @@ function generateChart(
 	}
 
 	function customXAxis(scale) {
+		let tickVals = d3.range(1, data.length + 1, TICK_FREQUENCY);
+		if (XAxisInverseStatic) {
+			tickVals = d3.range(viewRange % TICK_FREQUENCY || TICK_FREQUENCY, viewRange + 1, TICK_FREQUENCY);
+		}
+
+		console.log(tickVals);
 		const axis = d3.axisBottom(scale)
-			.tickValues(d3.range(1, data.length + 1, TICK_FREQUENCY))
+			.tickValues(tickVals)
 			.tickFormat(showXAxisTicks ? d3.format("d") : "")
 			.tickSizeInner(showXAxisTicks ? AXIS_TICK_SIZE : 0);
 
+		console.log(Math.min(viewRange, Math.floor((viewRange + 1) / TICK_FREQUENCY)));
 		if (XAxisInverseStatic) {
-			axis.tickFormat(showXAxisTicks ? (d, i) => (i + 1 - viewRange) : "");
+			axis.tickFormat(showXAxisTicks ? (d, i) => (d - viewRange) : "");
 		}
 
 		return function (selection) {
@@ -348,6 +371,20 @@ function generateChart(
 			return `${linearFontSizeScale(n)}px`;
 		} else if (dynamicLabelSize === "ushaped") {
 			return `${ushapedFontSizeScale(n)}px`;
+		}
+	}
+
+	function getSideFontColor(n) {
+		if (!showThreshold) {
+			return "#121212";
+		}
+
+		if (n > MAX_THRESHOLD) {
+			return "#FF7F50";
+		} else if (n < MIN_THRESHOLD) {
+			return "#00B2EE";
+		} else {
+			return "#121212";
 		}
 	}
 	

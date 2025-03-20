@@ -5,7 +5,7 @@ fetch('data/files.json')
 		csvFiles.forEach(fileName => {
 			const row = document.createElement('div');
 			row.className = 'dataset-row';
-			row.innerHTML = `<label><input type="checkbox" value="${fileName}"> ${fileName}</label>`;
+			row.innerHTML = `<label><input type="checkbox" value="${fileName}" checked> ${fileName}</label>`;
 			datasetsList.appendChild(row);
 		});
 	})
