@@ -17,6 +17,7 @@
  * @param {boolean} [useRollingAverage=false]
  * @param {boolean} [gridBackgroundMove=false]
  * @param {boolean} [showThresholdBand=false]
+ * @param {boolean} [showVerticalBar=false]
  * @param {string} [dynamicLabelSize="none"] - The size of the dynamic labels. Possible options: "none", "linear", "ushaped".
  * @param {string} [labelPosition="integrated"] - The position of the labels. Possible options: "integrated", "separated", "side".
  * 
@@ -36,6 +37,7 @@ function generateChart(
 	useRollingAverage = false,
 	gridBackgroundMove = false,
 	showThresholdBand = false,
+	showVerticalBar = false,
 	dynamicLabelSize = "none",
 	labelPosition = "integrated"
 ) {
@@ -80,10 +82,11 @@ function generateChart(
 	let AXIS_FONT_SIZE = 13;
 
 	// TODO: width / viewRange ratio
-	let POINT_SIZE = 3.4;
+	let POINT_SIZE = 4;
 	
 	let LABEL_FONT_DEFAULT_SIZE = 17;
 	let LABEL_FONT_SIZE_RANGE = [14, 40];
+	let VERTICAL_BAR_WIDTH = 20;
 
 	const MIN_THRESHOLD = 30;
 	const MAX_THRESHOLD = 70;
@@ -101,7 +104,7 @@ function generateChart(
 		.attr("text-anchor", "middle")
 		.attr("dominant-baseline", "hanging")
 		.attr("font-size", `${TITLE_FONT_SIZE}px`)
-		.text("Machine 16");
+		.text(title);
 
 	const movableChartClipPath = svg.append("clipPath")
 		.attr("id", "movableChartClipPath")
@@ -240,6 +243,17 @@ function generateChart(
 	let labelXPos = x(rightPoint.index);
 	let labelYPos = y(labelValue);
 
+	let verticalBar;
+	if (showVerticalBar) {
+		verticalBar = svg.insert("rect")
+			.attr("x", labelXPos - Math.min(tickGap / 2, VERTICAL_BAR_WIDTH) / 2)
+			.attr("y", labelYPos)
+			.attr("width", Math.min(tickGap / 2, VERTICAL_BAR_WIDTH))
+			.attr("height", y(0) - labelYPos)
+			.attr("fill", getThresholdColor(labelValue))
+	}
+
+
 	if (labelPosition === "side") {
 		// TODO: dynamic spacing
 		labelXPos = CHART_WIDTH + INFO_WIDTH / 2 - 10;
@@ -302,6 +316,14 @@ function generateChart(
 
 		movableChartGroup.transition(anim)
 			.attr("transform", `translate(${-tickGap * currentIndex}, 0)`);
+
+
+		if (showVerticalBar) {
+			verticalBar.transition(anim)
+				.attr("y", y(labelValue))
+				.attr("height", y(0) - y(labelValue))
+				.attr("fill", getThresholdColor(labelValue))
+		}
 				
 		if (labelPosition === "integrated") {
 			labelGroup.transition(anim).attr("transform", `translate(${labelXPos}, ${y(labelValue)})`);

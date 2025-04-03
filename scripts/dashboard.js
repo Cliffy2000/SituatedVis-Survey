@@ -20,6 +20,7 @@ const BACKGROUND_ENCODING = visOptions['vis-backgroundEncoding'];
 const USE_ROLLING_AVERAGE = visOptions['vis-useRollingAverage'];
 const GRID_BACKGROUND_MOVE = visOptions['vis-gridBackgroundMove'];
 const SHOW_THRESHOLD_BAND = visOptions['vis-showThresholdBand'];
+const SHOW_VERTICAL_BAR = visOptions['vis-showVerticalBar'];
 const DYNAMIC_LABEL_SIZE = visOptions['vis-dynamicLabelSize'];
 const LABEL_POSITION = visOptions['vis-labelPosition'];
 
@@ -80,6 +81,7 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 			useRollingAverage = USE_ROLLING_AVERAGE,
 			gridBackgroundMove = GRID_BACKGROUND_MOVE,
 			showThresholdBand = SHOW_THRESHOLD_BAND,
+			showVerticalBar = SHOW_VERTICAL_BAR,
 			dynamicLabelSize = DYNAMIC_LABEL_SIZE,
 			labelPosition = LABEL_POSITION
 		))
