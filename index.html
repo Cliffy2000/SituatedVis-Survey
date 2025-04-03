@@ -63,12 +63,13 @@
             
             <div class="visualization-options-panel">
                 <label><input type="checkbox" name="vis-showXAxisTicks" checked>Show X axis ticks in plots</label>
-                <label><input type="checkbox" name="vis-showThreshold" checked>Show threshold encodings</label>
+                <label><input type="checkbox" name="vis-useThresholdColors" checked>Color encoding for threshold</label>
                 <label><input type="checkbox" name="vis-easeInOut" checked>Use ease in and out in animations</label>
                 <label><input type="checkbox" name="vis-xAxisInverseStatic">X axis is inverted and fixed</label>
                 <label><input type="checkbox" name="vis-backgroundEncoding" disabled>Background color is used for threshold</label>
                 <label><input type="checkbox" name="vis-useRollingAverage">Use rolling average instead of last point</label>
                 <label><input type="checkbox" name="vis-gridBackgroundMove">Grid background moves with chart</label>
+                <label><input type="checkbox" name="vis-showThresholdBand">Show threshold band</label>
                 <div class="dropdown-container">
                     <label for="dropdown">Dynamic Label Size</label>
                     <select id="dropdown" name="vis-dynamicLabelSize">
@@ -80,8 +81,8 @@
                 <div class="dropdown-container">
                     <label for="dropdown">Label Position</label>
                     <select id="dropdown" name="vis-labelPosition">
-                        <option value="follow" selected>Follow</option>
-                        <option value="fixed">Fixed</option>
+                        <option value="integrated" selected>Integrated</option>
+                        <option value="separated">Separated</option>
                         <option value="side">Side</option>
                     </select>
                 </div>

@@ -10,14 +10,15 @@
  * @param {number} [rollingAverage=5] - The number of points considered for the rolling average.
  * 
  * @param {boolean} [showXAxisTicks=true] - Whether to show ticks on the X-axis.
- * @param {boolean} [showThreshold=true] - Whether to show threshold lines.
+ * @param {boolean} [useThresholdColors=true] - Whether to use threshold color encoding.
  * @param {boolean} [easeInOut=false] - Whether to apply ease-in-out animation.
  * @param {boolean} [XAxisInverseStatic=false] - Whether the X-axis is inversely static.
  * @param {boolean} [backgroundEncoding=false] - Whether to use background encoding.
  * @param {boolean} [useRollingAverage=false]
  * @param {boolean} [gridBackgroundMove=false]
+ * @param {boolean} [showThresholdBand=false]
  * @param {string} [dynamicLabelSize="none"] - The size of the dynamic labels. Possible options: "none", "linear", "ushaped".
- * @param {string} [labelPosition="follow"] - The position of the labels. Possible options: "follow", "fixed", "side".
+ * @param {string} [labelPosition="integrated"] - The position of the labels. Possible options: "integrated", "separated", "side".
  * 
  */
 function generateChart(
@@ -28,21 +29,22 @@ function generateChart(
 	viewRange = 10,
 	rollingAverage = 5,
 	showXAxisTicks = true,
-	showThreshold = true,
+	useThresholdColors = true,
 	easeInOut = false,
 	XAxisInverseStatic = false,
 	backgroundEncoding = false,
 	useRollingAverage = false,
 	gridBackgroundMove = false,
+	showThresholdBand = false,
 	dynamicLabelSize = "none",
-	labelPosition = "follow"
+	labelPosition = "integrated"
 ) {
 	// this is the size of the visible chart
 	let CANVAS_WIDTH = width;
 	let CANVAS_HEIGHT = height;
 
 	// this is the width on the right side of the plot for additional information
-	const INFO_DEFAULT_WIDTH = 125;
+	const INFO_DEFAULT_WIDTH = 150;
 	let INFO_WIDTH = (labelPosition === "side") ? INFO_DEFAULT_WIDTH : 0;
 
 	// this is the size of the chart area
@@ -78,10 +80,10 @@ function generateChart(
 	let AXIS_FONT_SIZE = 13;
 
 	// TODO: width / viewRange ratio
-	let POINT_SIZE = 4;
+	let POINT_SIZE = 3.4;
 	
 	let LABEL_FONT_DEFAULT_SIZE = 17;
-	let LABEL_FONT_SIZE_RANGE = [14, 28];
+	let LABEL_FONT_SIZE_RANGE = [14, 40];
 
 	const MIN_THRESHOLD = 30;
 	const MAX_THRESHOLD = 70;
@@ -99,7 +101,7 @@ function generateChart(
 		.attr("text-anchor", "middle")
 		.attr("dominant-baseline", "hanging")
 		.attr("font-size", `${TITLE_FONT_SIZE}px`)
-		.text(title);
+		.text("Machine 16");
 
 	const movableChartClipPath = svg.append("clipPath")
 		.attr("id", "movableChartClipPath")
@@ -114,13 +116,13 @@ function generateChart(
 		.attr("id", "xAxisInverseStaticClipPath")
 		.append("rect")
 		.attr("x", CHART_PADDING.left - 10)
-		.attr("y", -10)
+		.attr("y", 0)
 		.attr("width", CHART_WIDTH - CHART_PADDING.left - CHART_PADDING.right + 10)
-		.attr("height", CHART_HEIGHT + 10)
+		.attr("height", CHART_HEIGHT)
 		.attr("fill", "white");
 
 	const movableChartGroupContainer = svg.append("g")
-		.attr("clip-path", "url(#movableChartClipPath");
+		.attr("clip-path", "url(#movableChartClipPath)");
 	const movableChartGroup = movableChartGroupContainer.append("g");
 
 	const x = d3.scaleLinear()
@@ -135,7 +137,7 @@ function generateChart(
 		xAxisGroup = svg.append("g")
 		.attr("transform", `translate(0, ${CHART_HEIGHT - CHART_PADDING.bottom})`)
 		.call(xAxis)
-		.attr("clip-path", "url(#xAxisInverseStaticClipPath");
+		.attr("clip-path", "url(#xAxisInverseStaticClipPath)");
 	} else {
 		xAxisGroup = movableChartGroup.append("g")
 		.attr("transform", `translate(0, ${CHART_HEIGHT - CHART_PADDING.bottom})`)
@@ -154,7 +156,6 @@ function generateChart(
 	yAxisGroup.selectAll(".tick text")
 		.style("fill", "gray")
 		.style("font-size", AXIS_FONT_SIZE);
-
 
 	const gridGroup = (gridBackgroundMove ? movableChartGroup : svg).insert("g", ":first-child");
 
@@ -207,6 +208,28 @@ function generateChart(
 		.attr("cy", d => y(d.value))
 		.attr("r", POINT_SIZE)
 		.attr("fill", d => getThresholdColor(d.value));
+
+	if (showThresholdBand) {
+		let thresholdBand;
+		if (gridBackgroundMove) {
+			thresholdBand = movableChartGroup.insert("rect", () => lines.node())
+				.attr("x", x(0))
+				.attr("y", y(MAX_THRESHOLD))
+				.attr("width", x(data.length) - x(0))
+				.attr("height", y(MIN_THRESHOLD) - y(MAX_THRESHOLD))
+				.attr("fill", "gray")
+		} else {
+			thresholdBand = svg.insert("rect", () => movableChartGroupContainer.node())
+				.attr("x", CHART_PADDING.left)
+				.attr("y", y(MAX_THRESHOLD))
+				.attr("width", CHART_WIDTH - CHART_PADDING.left - CHART_PADDING.right)
+				.attr("height", y(MIN_THRESHOLD) - y(MAX_THRESHOLD))
+				.attr("fill", "gray")
+		}
+		thresholdBand.attr("fill", "gray")
+			.attr("opacity", 0.15)
+	}
+
 	
 	let rightPoint = data[currentIndex + viewRange - 1];
 	let average = Math.round(d3.mean(
@@ -221,7 +244,7 @@ function generateChart(
 		// TODO: dynamic spacing
 		labelXPos = CHART_WIDTH + INFO_WIDTH / 2 - 10;
 		labelYPos = CHART_HEIGHT / 1.85;
-	} else if (labelPosition === "fixed") {
+	} else if (labelPosition === "separated") {
 		labelYPos = y.range()[1] - 10;
 	}
 
@@ -280,7 +303,7 @@ function generateChart(
 		movableChartGroup.transition(anim)
 			.attr("transform", `translate(${-tickGap * currentIndex}, 0)`);
 				
-		if (labelPosition === "follow") {
+		if (labelPosition === "integrated") {
 			labelGroup.transition(anim).attr("transform", `translate(${labelXPos}, ${y(labelValue)})`);
 		}
 		
@@ -294,6 +317,10 @@ function generateChart(
 			.attr("width", textBBox.width + 2 * TEXT_PADDING.horizontal)
 			.attr("height", textBBox.height + 2 * TEXT_PADDING.vertical)
 			.attr("fill", getThresholdColor(labelValue));
+		
+		if (labelPosition === "side") {
+			labelText.style("fill", getSideFontColor(labelValue));
+		}
 	}
 
 	function resize() {
@@ -306,13 +333,11 @@ function generateChart(
 			tickVals = d3.range(viewRange % TICK_FREQUENCY || TICK_FREQUENCY, viewRange + 1, TICK_FREQUENCY);
 		}
 
-		console.log(tickVals);
 		const axis = d3.axisBottom(scale)
 			.tickValues(tickVals)
 			.tickFormat(showXAxisTicks ? d3.format("d") : "")
 			.tickSizeInner(showXAxisTicks ? AXIS_TICK_SIZE : 0);
 
-		console.log(Math.min(viewRange, Math.floor((viewRange + 1) / TICK_FREQUENCY)));
 		if (XAxisInverseStatic) {
 			axis.tickFormat(showXAxisTicks ? (d, i) => (d - viewRange) : "");
 		}
@@ -332,7 +357,7 @@ function generateChart(
 	}
 
 	function getThresholdColor(n) {
-		if (!showThreshold) {
+		if (!useThresholdColors) {
 			return "#8C8C8C";
 		}
 
@@ -375,7 +400,7 @@ function generateChart(
 	}
 
 	function getSideFontColor(n) {
-		if (!showThreshold) {
+		if (!useThresholdColors) {
 			return "#121212";
 		}
 

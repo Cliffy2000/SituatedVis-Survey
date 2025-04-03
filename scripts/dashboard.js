@@ -13,12 +13,13 @@ let ROLLING_AVG = parseInt(displaySliders['rolling-avg']);
 
 const visOptions = JSON.parse(sessionStorage.getItem('visualizationOptions')) || {};
 const SHOW_X_AXIS_TICKS = visOptions['vis-showXAxisTicks'];
-const SHOW_THRESHOLD = visOptions['vis-showThreshold'];
+const USE_THRESHOLD_COLORS = visOptions['vis-useThresholdColors'];
 const EASE_IN_OUT = visOptions['vis-easeInOut'];
 const X_AXIS_INVERSE_STATIC = visOptions['vis-xAxisInverseStatic'];
 const BACKGROUND_ENCODING = visOptions['vis-backgroundEncoding'];
 const USE_ROLLING_AVERAGE = visOptions['vis-useRollingAverage'];
 const GRID_BACKGROUND_MOVE = visOptions['vis-gridBackgroundMove'];
+const SHOW_THRESHOLD_BAND = visOptions['vis-showThresholdBand'];
 const DYNAMIC_LABEL_SIZE = visOptions['vis-dynamicLabelSize'];
 const LABEL_POSITION = visOptions['vis-labelPosition'];
 
@@ -72,12 +73,13 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 			viewRange = POINTS, 
 			rollingAverage = ROLLING_AVG,
 			showXAxisTicks = SHOW_X_AXIS_TICKS, 
-			showThreshold = SHOW_THRESHOLD,
+			useThresholdColors = USE_THRESHOLD_COLORS,
 			easeInOut = EASE_IN_OUT,
 			xAxisInverseStatic = X_AXIS_INVERSE_STATIC,
 			backgroundEncoding = BACKGROUND_ENCODING,
 			useRollingAverage = USE_ROLLING_AVERAGE,
 			gridBackgroundMove = GRID_BACKGROUND_MOVE,
+			showThresholdBand = SHOW_THRESHOLD_BAND,
 			dynamicLabelSize = DYNAMIC_LABEL_SIZE,
 			labelPosition = LABEL_POSITION
 		))
