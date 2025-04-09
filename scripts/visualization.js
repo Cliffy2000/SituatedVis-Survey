@@ -14,10 +14,10 @@
  * @param {boolean} [easeInOut=false] - Whether to apply ease-in-out animation.
  * @param {boolean} [XAxisInverseStatic=false] - Whether the X-axis is inversely static.
  * @param {boolean} [backgroundEncoding=false] - Whether to use background encoding.
- * @param {boolean} [useRollingAverage=false]
- * @param {boolean} [gridBackgroundMove=false]
- * @param {boolean} [showThresholdBand=false]
- * @param {boolean} [showVerticalBar=false]
+ * @param {boolean} [useRollingAverage=false] - Determines if the label value is using the rightmost value or the average of the last n values visible
+ * @param {boolean} [gridBackgroundMove=false] - If the grid background shifts left along with the line
+ * @param {boolean} [showThresholdBand=false] - Whether to show a gray band that marks the area within the min and max threshold
+ * @param {boolean} [showVerticalBar=false] - Whether to show a vertical bar under the integrated label position
  * @param {string} [dynamicLabelSize="none"] - The size of the dynamic labels. Possible options: "none", "linear", "ushaped".
  * @param {string} [labelPosition="integrated"] - The position of the labels. Possible options: "integrated", "separated", "side".
  * 
@@ -81,8 +81,14 @@ function generateChart(
 	let AXIS_TICK_SIZE = 4;
 	let AXIS_FONT_SIZE = 13;
 
-	// TODO: width / viewRange ratio
+	// slightly reduce the point size so that there is sufficient space between points
+	// point size is representing radius
 	let POINT_SIZE = 4;
+	let totalPointWidth = 2 * POINT_SIZE * viewRange;
+	while (totalPointWidth > CHART_WIDTH * 0.75) {
+		POINT_SIZE -= 0.2;
+		totalPointWidth = 2 * POINT_SIZE * viewRange;
+	}
 	
 	let LABEL_FONT_DEFAULT_SIZE = 17;
 	let LABEL_FONT_SIZE_RANGE = [14, 40];
@@ -91,7 +97,8 @@ function generateChart(
 	const MIN_THRESHOLD = 30;
 	const MAX_THRESHOLD = 70;
 
-	let currentIndex = 0; // this is not the exact current x value
+	// this is not the exact current x index, i.e. the index value from the data file starts at index 1
+	let currentIndex = 0;
 
 	const svg = d3.create("svg")
 		.attr("width", CANVAS_WIDTH)
@@ -100,7 +107,7 @@ function generateChart(
 	const titleText = svg.append("text")
 		.attr("x", CANVAS_WIDTH / 2)
 		.attr("y", CHART_PADDING.top / 2)
-		.attr("dy", "-0.4em")
+		.attr("dy", "-0.4em")	// makes sure the alignment is working on the vertical center
 		.attr("text-anchor", "middle")
 		.attr("dominant-baseline", "hanging")
 		.attr("font-size", `${TITLE_FONT_SIZE}px`)
@@ -124,14 +131,19 @@ function generateChart(
 		.attr("height", CHART_HEIGHT)
 		.attr("fill", "white");
 
+	// The movableChartGroup and its wrapping container contains all the element that is moving in sync with the line in the chart.
+	// This includes the line, points and the gridBackgound and xAxis if they are set to move. 
+	// The container is necessary for the clipPath to work properly on the group. 
 	const movableChartGroupContainer = svg.append("g")
 		.attr("clip-path", "url(#movableChartClipPath)");
 	const movableChartGroup = movableChartGroupContainer.append("g");
 
+	// Calculates the actual positional range of the x axis based on the viewRange and the CHART_WIDTH
 	const x = d3.scaleLinear()
 		.domain([1 - X_AXIS_LEFT_MARGIN, data.length + X_AXIS_RIGHT_MARGIN])
 		.range([CHART_PADDING.left, ((CHART_WIDTH - CHART_PADDING.left - CHART_PADDING.right) / (viewRange - X_AXIS_LEFT_MARGIN + X_AXIS_RIGHT_MARGIN)) * (data.length - X_AXIS_LEFT_MARGIN + X_AXIS_RIGHT_MARGIN) + CHART_PADDING.left]);
 
+	// The horizontal distance between two ticks on the x axis
 	const tickGap = (x.range()[1] - x.range()[0]) / (data.length - X_AXIS_LEFT_MARGIN + X_AXIS_RIGHT_MARGIN);
 
 	const xAxis = customXAxis(x);
@@ -160,6 +172,7 @@ function generateChart(
 		.style("fill", "gray")
 		.style("font-size", AXIS_FONT_SIZE);
 
+	// gridGroup is for the light gray grid background
 	const gridGroup = (gridBackgroundMove ? movableChartGroup : svg).insert("g", ":first-child");
 
 	gridGroup.selectAll(".horizontal-line")
@@ -281,6 +294,7 @@ function generateChart(
 		.style("font-size", getDynamicFontSize(labelValue))
 		.style("fill", labelPosition === "side" ? getSideFontColor(labelValue) : "white");
 	
+	// adjust the position of the label to match its value
 	if (labelPosition !== "side") {
 		labelText.transition()
 			.duration(0)
@@ -366,6 +380,8 @@ function generateChart(
 
 		return function (selection) {
 			selection.call(axis);
+
+			// This portion of the code uses regular expressions to remove the right outer tick of the x axis
 			// selection.selectAll(".domain")
 			// 	.attr("d", d => {
 			// 		const old = d3.select(selection.node()).select(".domain").attr("d");
@@ -405,7 +421,6 @@ function generateChart(
 			return "white";
 		}
 	}
-
 
 	function getDynamicFontSize(n) {
 		if (labelPosition === "side") {
