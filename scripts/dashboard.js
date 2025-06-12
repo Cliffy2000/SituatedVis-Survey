@@ -68,6 +68,9 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 		.join("div")
 			.attr("class", LABEL_POSITION === "side" ? "chart-div-side" : "chart-div")
 			.on("click", (event, [data, title]) => clickLog.push([title, Date.now(), Date()]))
+			.on("mousedown", event => d3.select(event.currentTarget).style("box-shadow", "inset 0 0 0 2px black"))
+			.on("mouseup", event => d3.select(event.currentTarget).style("box-shadow", null))
+			.on("mouseleave", event => d3.select(event.currentTarget).style("box-shadow", null))
 		.append(([data, title]) => generateChart(
 			data = data, 
 			title = title, 
@@ -141,7 +144,7 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 		const minute = pad(now.getMinutes());
 		const second = pad(now.getSeconds());
 		return `${year}${month}${day}_${hour}${minute}${second}`;
-	  }
+	}
 
 	function onExportClick() {
 		const blob = new Blob([JSON.stringify(clickLog)], {type: 'application/json'});
