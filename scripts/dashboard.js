@@ -40,6 +40,7 @@ if (USE_ROLLING_AVERAGE) {
 	rollingAverageDiv.style.marginLeft = '50px'
 }
 
+let clickLog = [];
 
 Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then((datasets) => {
 
@@ -65,7 +66,8 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 	const charts = chartsContainer.selectAll("div")
 		.data(d3.zip(datasets, titles))
 		.join("div")
-		.attr("class", LABEL_POSITION === "side" ? "chart-div-side" : "chart-div")
+			.attr("class", LABEL_POSITION === "side" ? "chart-div-side" : "chart-div")
+			.on("click", (event, [data, title]) => clickLog.push([title, Date.now(), Date()]))
 		.append(([data, title]) => generateChart(
 			data = data, 
 			title = title, 
@@ -88,6 +90,8 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 		.nodes();
 
 
+	const buttonExport = d3.select("#buttonsContainer").select("#export")
+		.on("click", onExportClick);
 	const buttonPause = d3.select("#buttonsContainer").select("#pause")
 		.on("click", onPauseClick);
 	const buttonRestart = d3.select("#buttonsContainer").select("#restart")
@@ -126,6 +130,29 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 			numberInput.blur();
 		}
 	});
+
+	function getTimestamp() {
+		const now = new Date();
+		const pad = n => String(n).padStart(2, '0');
+		const year   = now.getFullYear();
+		const month  = pad(now.getMonth() + 1);
+		const day    = pad(now.getDate());
+		const hour   = pad(now.getHours());
+		const minute = pad(now.getMinutes());
+		const second = pad(now.getSeconds());
+		return `${year}${month}${day}_${hour}${minute}${second}`;
+	  }
+
+	function onExportClick() {
+		const blob = new Blob([JSON.stringify(clickLog)], {type: 'application/json'});
+		const a = document.createElement('a');
+		a.href = URL.createObjectURL(blob);
+		a.download = `SituatedVisLog_${getTimestamp()}.json`;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		URL.revokeObjectURL(a.href);
+	}
 
 	function onPauseClick() {
 		if (flag_running) {
