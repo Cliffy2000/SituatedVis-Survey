@@ -59,7 +59,6 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 	let { width: gridWidth, height: gridHeight } = chartsContainer.node().getBoundingClientRect();
 	let cellWidth = gridWidth / COLS;
 	let cellHeight = gridHeight / ROWS;
-	console.log(gridHeight);
 
 	// Fills the titles array
 	const titles = Array.from({ length: selectedFiles.length }, (_, i) => `Machine ${i + 1}`);
@@ -156,6 +155,7 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 		document.body.removeChild(a);
 		URL.revokeObjectURL(a.href);
 	}
+
 
 	function onPauseClick() {
 		if (flag_running) {

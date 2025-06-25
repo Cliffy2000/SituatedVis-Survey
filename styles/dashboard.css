@@ -16,6 +16,10 @@ body {
     display: grid;
 }
 
+.chart-div {
+    background-color: white;
+}
+
 .chart-div-side {
     outline: 0.2px solid #cfcfcf;
 }
