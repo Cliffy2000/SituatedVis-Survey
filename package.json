@@ -1,0 +1,19 @@
+{
+  "name": "situatedvis",
+  "version": "1.0.0",
+  "description": "Run `server.py` and use `localhost:8000` to open the site.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer": "^24.11.2"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.3.0",
+    "http-server": "^14.1.1"
+  }
+}
