@@ -1,0 +1,35 @@
+{
+    "setup1": {
+        "files": [
+            "Trial1Machine1.csv",
+            "Trial1Machine2.csv",
+            "Trial1Machine3.csv",
+            "Trial1Machine4.csv",
+            "Trial1Machine5.csv",
+            "Trial1Machine6.csv",
+            "Trial1Machine7.csv",
+            "Trial1Machine8.csv",
+            "Trial1Machine9.csv",
+            "Trial1Machine10.csv",
+            "Trial1Machine11.csv",
+            "Trial1Machine12.csv"
+        ],
+        "num-rows": 3,
+        "num-columns": 5,
+        "anim-duration": 250,
+        "anim-delay": 100,
+        "num-points": 10,
+        "rolling-avg": 5,
+        "vis-showXAxisTicks": true,
+        "vis-xAxisInverseStatic": false,
+        "vis-useThresholdColors": true,
+        "vis-showThresholdBand": false,
+        "vis-backgroundEncoding": false,
+        "vis-gridBackgroundMove": false,
+        "vis-showVerticalBar": false,
+        "vis-useRollingAverage": false,
+        "vis-easeInOut": true,
+        "vis-dynamicLabelSize": "none",
+        "vis-labelPosition": "integrated"
+    }
+}

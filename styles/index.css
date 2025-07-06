@@ -156,6 +156,15 @@
 }
 
 
+.text-entry-container {
+    display: grid;
+    grid-template-columns: 7fr 10fr;
+    gap: 5px;
+    margin-top: 30px;
+    height: 25px;
+}
+
+
 .visualization-options-panel {
     display: grid;
     row-gap: 7px;

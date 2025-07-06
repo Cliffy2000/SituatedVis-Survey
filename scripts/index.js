@@ -8,6 +8,11 @@ fetch('data/files.json')
 			row.innerHTML = `<label><input type="checkbox" value="${fileName}" checked> ${fileName}</label>`;
 			datasetsList.appendChild(row);
 		});
+		
+		// Apply preset file selection after files are loaded
+		if (window.applyPresetFileSelection) {
+			window.applyPresetFileSelection();
+		}
 	})
 	.catch(error => console.error('Error fetching files.json:', error));
 
@@ -85,6 +90,12 @@ function confirmationOnClick() {
 	const selectedFiles = Array.from(document.querySelectorAll('#dataset-scroll-pane input[type="checkbox"]:checked'))
 		.map(checkbox => checkbox.value);
 	sessionStorage.setItem('SituatedVisSelectedFiles', JSON.stringify(selectedFiles));
+
+	const userName = document.querySelector('input[name="user-name"]').value || 'Unknown';
+	sessionStorage.setItem('SituatedVisUserName', userName);
+
+	const currentTime = new Date().toISOString();
+	sessionStorage.setItem('SituatedVisConfirmationTime', currentTime);
 
 	// Intentionally using the number input instead as the sliders have value steps which is less accurate if the user had manual input
 	const sliders = document.querySelectorAll('.slider-container input[type="number"]');

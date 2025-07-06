@@ -4,12 +4,15 @@
   "description": "Run `server.py` and use `localhost:8000` to open the site.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "jsdom": "^26.1.0",
     "puppeteer": "^24.11.2"
   },
   "devDependencies": {

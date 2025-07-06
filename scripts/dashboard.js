@@ -146,7 +146,25 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 	}
 
 	function onExportClick() {
-		const blob = new Blob([JSON.stringify(clickLog)], {type: 'application/json'});
+		const userName = sessionStorage.getItem('SituatedVisUserName') || 'Unknown';
+		const startTime = sessionStorage.getItem('SituatedVisConfirmationTime') || new Date().toISOString();
+		const exportTime = new Date().toISOString();
+		
+		const exportData = {
+			metadata: {
+				userName: userName,
+				startTime: startTime,
+				exportTime: exportTime,
+				selectedFiles: selectedFiles,
+				configurations: {
+					displaySliders: displaySliders,
+					visualizationOptions: visOptions
+				}
+			},
+			clickLog: clickLog
+		};
+		
+		const blob = new Blob([JSON.stringify(exportData, null, 2)], {type: 'application/json'});
 		const a = document.createElement('a');
 		a.href = URL.createObjectURL(blob);
 		a.download = `SituatedVisLog_${getTimestamp()}.json`;
