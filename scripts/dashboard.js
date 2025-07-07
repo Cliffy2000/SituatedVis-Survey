@@ -98,6 +98,8 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 		.on("click", onPauseClick);
 	const buttonRestart = d3.select("#buttonsContainer").select("#restart")
 		.on("click", onRestartClick);
+	const buttonNext = d3.select("#buttonsContainer").select("#next")
+		.on("click", onNextClick);
 
 	slider.addEventListener("input", () => {
 		numberInput.value = slider.value;
@@ -200,6 +202,28 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 		if (flag_running) {
 			animate();
 			startAnimation();
+		}
+	}
+
+	function onNextClick() {
+		if (confirm('Launch next setup in sequence?')) {
+			fetch('/trigger-next', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					console.log(`Triggered next preset: ${data.preset}`);
+				} else {
+					console.log('Error:', data.error);
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error);
+			});
 		}
 	}
 
