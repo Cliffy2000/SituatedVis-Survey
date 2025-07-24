@@ -57,6 +57,13 @@
         if (datasetInput) {
             datasetInput.disabled = true;
         }
+
+        // Disable and populate sound steps input
+        const soundInput = document.querySelector('input[name="sound-steps"]');
+        if (soundInput) {
+            soundInput.disabled = true;
+            soundInput.value = preset.sound ? preset.sound.join(', ') : '';
+        }
     }
 
     function applyFileSelection() {

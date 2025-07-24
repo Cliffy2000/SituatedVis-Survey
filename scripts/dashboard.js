@@ -24,6 +24,8 @@ const SHOW_VERTICAL_BAR = visOptions['vis-showVerticalBar'];
 const DYNAMIC_LABEL_SIZE = visOptions['vis-dynamicLabelSize'];
 const LABEL_POSITION = visOptions['vis-labelPosition'];
 
+const soundSteps = JSON.parse(sessionStorage.getItem('SituatedVisSoundSteps')) || [];
+
 if (selectedFiles.length > ROWS * COLS) {
     selectedFiles = selectedFiles.slice(0, ROWS * COLS);
 }
@@ -235,10 +237,20 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 		clearInterval(INTERVAL_ID);
 	}
 
+	function playSound() {
+		const audio = new Audio('beep.mp3');
+		audio.play().catch(err => console.log('Audio play failed:', err));
+	}
+
 	function animate() {
 		step++;
 		slider.value = step;
 		numberInput.value = step;
+
+		if (soundSteps.includes(step)) {
+			playSound();
+		}
+
 		for (let chart of charts) {
 			chart.update(step, ANIM_DURATION);
 		}

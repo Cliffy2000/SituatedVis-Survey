@@ -114,5 +114,11 @@ function confirmationOnClick() {
 	});
 	sessionStorage.setItem('visualizationOptions', JSON.stringify(options));
 
+	// Store sound steps
+	const soundStepsInput = document.querySelector('input[name="sound-steps"]');
+	const soundStepsValue = soundStepsInput.value || '';
+	const soundSteps = soundStepsValue.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+	sessionStorage.setItem('SituatedVisSoundSteps', JSON.stringify(soundSteps));
+
 	window.location.href = 'dashboard.html';
 }
