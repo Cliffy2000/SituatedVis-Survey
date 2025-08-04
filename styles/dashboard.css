@@ -7,11 +7,11 @@ body {
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: calc(100% - 50px);
+    height: 100%
 }
 
 #chartsContainer {
-    width: 100%;
+    width: 75%;
     height: 100%;
     display: grid;
 }
@@ -77,4 +77,10 @@ body {
 
 svg {
     display: block;
+}
+
+
+#sidePanel {
+    width: 25%;
+    height: 100%;
 }

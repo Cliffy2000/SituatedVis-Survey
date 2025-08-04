@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,8 +9,9 @@
     <link rel="icon" href="logo.svg" type="image/svg+xml">
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="styles/index.css">
-    <script src="scripts/index.js" type="text/javascript" defer></script>   
+    <script src="scripts/index.js" type="text/javascript" defer></script>
 </head>
+
 <body>
     <div class="page-container">
         <div class="header-row">
@@ -18,90 +20,23 @@
         </div>
 
         <div class="options-row">
-            <div class="dataset-panel">
-                <input type="text" id="dataset-input" placeholder="Search datasets..." />
-                <div id="dataset-scroll-pane"></div>
-                <div class="dataset-buttons-row">
-                    <button class="dataset-button-visible" onclick="datasetSelectVisible()">Select Visible</button>
-                    <button class="dataset-button-all" onclick="datasetToggleAll(true)">Select All</button>
-                    <button class="dataset-button-clear" onclick="datasetToggleAll(false)">Clear</button>
-                </div>
-            </div>
-
             <div class="display-options-panel">
-                <div class="slider-container">
-                    <label for="slider1">Num. Rows</label>
-                    <input type="range" id="slider1" name="num-rows" min="1" max="4" value="4">
-                    <input type="number" id="slider1-value" name="num-rows" min="1" max="4" value="4">
-                </div>
-                <div class="slider-container">
-                    <label for="slider2">Num. Columns</label>
-                    <input type="range" id="slider2" name="num-columns" min="1" max="5" value="5">
-                    <input type="number" id="slider2-value" name="num-columns" min="1" max="5" value="5">
-                </div>
-                <div class="slider-container">
-                    <label for="slider3">Anim. Duration</label>
-                    <input type="range" id="slider3" name="anim-duration" min="100" max="1500" step="50" value="250">
-                    <input type="number" id="slider3-value" name="anim-duration" min="100" max="1500" value="250">
-                </div>
-                <div class="slider-container">
-                    <label for="slider4">Anim. Delay</label>
-                    <input type="range" id="slider4" name="anim-delay" min="0" max="2000" step="100" value="100">
-                    <input type="number" id="slider4-value" name="anim-delay" min="0" max="2000" value="100">
-                </div>
-                <div class="slider-container">
-                    <label for="slider5">Num. Points</label>
-                    <input type="range" id="slider5" name="num-points" min="2" max="100" value="10">
-                    <input type="number" id="slider5-value" name="num-points" min="2" max="100" value="10">
-                </div>
-                <div class="slider-container">
-                    <label for="slider6">Rolling Avg.</label>
-                    <input type="range" id="slider6" name="rolling-avg" min="5" max="100" step="5" value="5">
-                    <input type="number" id="slider6-value" name="rolling-avg" min="5" max="100" value="5">
-                </div>
                 <div class="text-entry-container">
                     <label for="user-name">User Name</label>
                     <input type="text" id="user-name" name="user-name" placeholder="Enter your name...">
                 </div>
                 <div class="text-entry-container">
-                    <label for="sound-steps">Sound Steps</label>
-                    <input type="text" id="sound-steps" name="sound-steps" placeholder="Enter step numbers...">
+                    <text>Trial</text>
+                    <text class="setup-name"></text>
                 </div>
             </div>
-            
-            <div class="visualization-options-panel">
-                <label><input type="checkbox" name="vis-showXAxisTicks" checked>Show X axis ticks in plots</label>
-                <label><input type="checkbox" name="vis-xAxisInverseStatic">X axis is inverted and fixed</label>
-                <label><input type="checkbox" name="vis-useThresholdColors" checked>Color encoding for threshold</label>
-                <label><input type="checkbox" name="vis-showThresholdBand">Show threshold band</label>
-                <label><input type="checkbox" name="vis-backgroundEncoding" disabled>Background color is used for threshold</label>
-                <label><input type="checkbox" name="vis-gridBackgroundMove">Grid background moves with chart</label>
-                <label><input type="checkbox" name="vis-showVerticalBar">Show vertical bar</label>
-                <label><input type="checkbox" name="vis-useRollingAverage">Use rolling average instead of last point</label>
-                <label><input type="checkbox" name="vis-easeInOut" checked>Use ease in and out in animations</label>
-                <div class="dropdown-container">
-                    <label for="dropdown">Label dynamic size</label>
-                    <select id="dropdown" name="vis-dynamicLabelSize">
-                        <option value="none" selected>None</option>
-                        <option value="linear">Linear</option>
-                        <option value="ushaped">U shaped</option>
-                    </select>
-                </div>
-                <div class="dropdown-container">
-                    <label for="dropdown">Label position</label>
-                    <select id="dropdown" name="vis-labelPosition">
-                        <option value="integrated" selected>Integrated</option>
-                        <option value="separated">Separated</option>
-                        <option value="side">Side</option>
-                    </select>
-                </div>
-                <div class="confirmation-container">
-                    <button class="confirmation-button" onclick="confirmationOnClick()">Confirm Settings</button>
-                </div>
+            <div>
+                <button class="startTrialButton" onclick="startTrial()">Start</button>
             </div>
         </div>
 
-
+        
     </div>
 </body>
+
 </html>

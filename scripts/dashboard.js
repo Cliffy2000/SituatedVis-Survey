@@ -1,30 +1,36 @@
 /** This is for d3.js intelliSense */
 /** @type {import("d3")} */
 
-let selectedFiles = JSON.parse(sessionStorage.getItem('SituatedVisSelectedFiles')) || [];
+const params = new URLSearchParams(window.location.search);
+const setupParam = params.get('setup');
+const setupIndex = setupParam !== null ? parseInt(setupParam) - 1 : 0;
 
-const displaySliders = JSON.parse(sessionStorage.getItem('SituatedVisDisplaySliders')) || {};
-const ROWS = parseInt(displaySliders['num-rows']);
-const COLS = parseInt(displaySliders['num-columns']);
-const ANIM_DURATION = parseInt(displaySliders['anim-duration']);
-const ANIM_DELAY = parseInt(displaySliders['anim-delay']);
-const POINTS = parseInt(displaySliders['num-points']);
-let ROLLING_AVG = parseInt(displaySliders['rolling-avg']);
+// Get config and current setup
+const config = JSON.parse(sessionStorage.getItem('SituatedVisConfig'));
+const currentSetup = config[setupIndex];
 
-const visOptions = JSON.parse(sessionStorage.getItem('visualizationOptions')) || {};
-const SHOW_X_AXIS_TICKS = visOptions['vis-showXAxisTicks'];
-const USE_THRESHOLD_COLORS = visOptions['vis-useThresholdColors'];
-const EASE_IN_OUT = visOptions['vis-easeInOut'];
-const X_AXIS_INVERSE_STATIC = visOptions['vis-xAxisInverseStatic'];
-const BACKGROUND_ENCODING = visOptions['vis-backgroundEncoding'];
-const USE_ROLLING_AVERAGE = visOptions['vis-useRollingAverage'];
-const GRID_BACKGROUND_MOVE = visOptions['vis-gridBackgroundMove'];
-const SHOW_THRESHOLD_BAND = visOptions['vis-showThresholdBand'];
-const SHOW_VERTICAL_BAR = visOptions['vis-showVerticalBar'];
-const DYNAMIC_LABEL_SIZE = visOptions['vis-dynamicLabelSize'];
-const LABEL_POSITION = visOptions['vis-labelPosition'];
+// Extract all values from current setup
+let selectedFiles = currentSetup['files'];
+const ROWS = currentSetup['num-rows'];
+const COLS = currentSetup['num-columns'];
+const ANIM_DURATION = currentSetup['anim-duration'];
+const ANIM_DELAY = currentSetup['anim-delay'];
+const POINTS = currentSetup['num-points'];
+let ROLLING_AVG = currentSetup['rolling-avg'];
 
-const soundSteps = JSON.parse(sessionStorage.getItem('SituatedVisSoundSteps')) || [];
+const SHOW_X_AXIS_TICKS = currentSetup['vis-showXAxisTicks'];
+const USE_THRESHOLD_COLORS = currentSetup['vis-useThresholdColors'];
+const EASE_IN_OUT = currentSetup['vis-easeInOut'];
+const X_AXIS_INVERSE_STATIC = currentSetup['vis-xAxisInverseStatic'];
+const BACKGROUND_ENCODING = currentSetup['vis-backgroundEncoding'];
+const USE_ROLLING_AVERAGE = currentSetup['vis-useRollingAverage'];
+const GRID_BACKGROUND_MOVE = currentSetup['vis-gridBackgroundMove'];
+const SHOW_THRESHOLD_BAND = currentSetup['vis-showThresholdBand'];
+const SHOW_VERTICAL_BAR = currentSetup['vis-showVerticalBar'];
+const DYNAMIC_LABEL_SIZE = currentSetup['vis-dynamicLabelSize'];
+const LABEL_POSITION = currentSetup['vis-labelPosition'];
+
+const soundSteps = currentSetup['sound'];
 
 if (selectedFiles.length > ROWS * COLS) {
     selectedFiles = selectedFiles.slice(0, ROWS * COLS);
@@ -94,48 +100,7 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 		.nodes();
 
 
-	const buttonExport = d3.select("#buttonsContainer").select("#export")
-		.on("click", onExportClick);
-	const buttonPause = d3.select("#buttonsContainer").select("#pause")
-		.on("click", onPauseClick);
-	const buttonRestart = d3.select("#buttonsContainer").select("#restart")
-		.on("click", onRestartClick);
-	const buttonNext = d3.select("#buttonsContainer").select("#next")
-		.on("click", onNextClick);
-
-	slider.addEventListener("input", () => {
-		numberInput.value = slider.value;
-		step = parseInt(slider.value, 10);
-		for (const chart of charts) {
-			chart.update(step, ANIM_DURATION);
-		}
-	});
-
-	numberInput.addEventListener("blur", () => {
-		let value = parseInt(numberInput.value, 10);
-		let min = parseInt(slider.min);
-		let max = parseInt(slider.max);
-
-		if (isNaN(value) || value < min) {
-			value = min;
-		} else if (value > max) {
-			value = max;
-		}
-
-		slider.value = value;
-		numberInput.value = value;
-		step = value;
-
-		for (const chart of charts) {
-			chart.update(step, ANIM_DURATION);
-		}
-	});
-
-	numberInput.addEventListener("keydown", (event) => {
-		if (event.key === "Enter") {
-			numberInput.blur();
-		}
-	});
+	
 
 	function getTimestamp() {
 		const now = new Date();
@@ -149,7 +114,7 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 		return `${year}${month}${day}_${hour}${minute}${second}`;
 	}
 
-	function onExportClick() {
+	function exportFile() {
 		const userName = sessionStorage.getItem('SituatedVisUserName') || 'Unknown';
 		const startTime = sessionStorage.getItem('SituatedVisConfirmationTime') || new Date().toISOString();
 		const exportTime = new Date().toISOString();
@@ -178,7 +143,7 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 		URL.revokeObjectURL(a.href);
 	}
 
-
+	/*
 	function onPauseClick() {
 		if (flag_running) {
 			stopAnimation();
@@ -206,27 +171,68 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 			startAnimation();
 		}
 	}
+	*/
 
 	function onNextClick() {
-		if (confirm('Launch next setup in sequence?')) {
-			fetch('/trigger-next', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				}
-			})
-			.then(response => response.json())
-			.then(data => {
-				if (data.success) {
-					console.log(`Triggered next preset: ${data.preset}`);
-				} else {
-					console.log('Error:', data.error);
-				}
-			})
-			.catch(error => {
-				console.error('Error:', error);
+
+	}
+
+	const questions = currentSetup['questions'] || [];
+	const questionResponses = {};
+	const shownQuestions = new Set();
+
+	// Initialize side panel
+	const sidePanel = document.querySelector('#sidePanel');
+	if (sidePanel && questions.length > 0) {
+		sidePanel.innerHTML = '<h3>Questions</h3><div id="questionContainer"></div>';
+	}
+
+	// Display question in side panel
+	function showQuestion(question) {
+		const container = document.getElementById('questionContainer');
+		if (!container) return;
+		
+		const questionDiv = document.createElement('div');
+		questionDiv.className = 'question-item';
+		questionDiv.innerHTML = `<p class="question-prompt">${question.prompt}</p>`;
+		
+		if (question.type === 'radio') {
+			question.options.forEach(option => {
+				const label = document.createElement('label');
+				label.innerHTML = `
+					<input type="radio" name="${question.id}" value="${option}">
+					${option}
+				`;
+				questionDiv.appendChild(label);
+			});
+		} else if (question.type === 'checkbox') {
+			question.options.forEach(option => {
+				const label = document.createElement('label');
+				label.innerHTML = `
+					<input type="checkbox" name="${question.id}" value="${option}">
+					${option}
+				`;
+				questionDiv.appendChild(label);
 			});
 		}
+		
+		container.appendChild(questionDiv);
+		
+		// Track responses
+		questionDiv.addEventListener('change', (e) => {
+			if (question.type === 'radio') {
+				questionResponses[question.id] = e.target.value;
+			} else if (question.type === 'checkbox') {
+				if (!questionResponses[question.id]) {
+					questionResponses[question.id] = [];
+				}
+				if (e.target.checked) {
+					questionResponses[question.id].push(e.target.value);
+				} else {
+					questionResponses[question.id] = questionResponses[question.id].filter(v => v !== e.target.value);
+				}
+			}
+		});
 	}
 
 	function startAnimation() {
@@ -244,8 +250,17 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 
 	function animate() {
 		step++;
-		slider.value = step;
-		numberInput.value = step;
+		// slider.value = step;
+		// numberInput.value = step;
+
+		// TODO: potentially update for more efficient implementation
+
+		questions.forEach((question, index) => {
+			if (step >= question.step && !shownQuestions.has(index)) {
+				showQuestion(question);
+				shownQuestions.add(index);
+			}
+		});
 
 		if (soundSteps.includes(step)) {
 			playSound();
