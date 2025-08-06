@@ -84,3 +84,17 @@ svg {
     width: 25%;
     height: 100%;
 }
+
+#buttonContainer {
+    position: absolute;
+    bottom: 25px;
+    right: 25px;
+}
+
+#nextButton {
+    font-family: inherit;
+    padding: 20px 30px;
+    font-size: 20px;
+    border-radius: 10px;
+}
+

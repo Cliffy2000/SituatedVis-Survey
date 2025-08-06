@@ -61,6 +61,12 @@
                 "step": 30,
                 "type": "checkbox",
                 "options": ["a", "b", "c", "d", "e"]
+            },
+            {
+                "id": "q5",
+                "prompt": "question 5",
+                "step": 45,
+                "type": "text"
             }
         ]
     },

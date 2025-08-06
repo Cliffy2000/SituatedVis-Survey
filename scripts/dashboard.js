@@ -114,6 +114,7 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 		return `${year}${month}${day}_${hour}${minute}${second}`;
 	}
 
+	/*
 	function exportFile() {
 		const userName = sessionStorage.getItem('SituatedVisUserName') || 'Unknown';
 		const startTime = sessionStorage.getItem('SituatedVisConfirmationTime') || new Date().toISOString();
@@ -143,7 +144,7 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 		URL.revokeObjectURL(a.href);
 	}
 
-	/*
+
 	function onPauseClick() {
 		if (flag_running) {
 			stopAnimation();
@@ -173,24 +174,14 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 	}
 	*/
 
-	function onNextClick() {
-
-	}
-
 	const questions = currentSetup['questions'] || [];
 	const questionResponses = {};
-	const shownQuestions = new Set();
-
-	// Initialize side panel
-	const sidePanel = document.querySelector('#sidePanel');
-	if (sidePanel && questions.length > 0) {
-		sidePanel.innerHTML = '<h3>Questions</h3><div id="questionContainer"></div>';
-	}
 
 	// Display question in side panel
 	function showQuestion(question) {
 		const container = document.getElementById('questionContainer');
 		if (!container) return;
+
 		
 		const questionDiv = document.createElement('div');
 		questionDiv.className = 'question-item';
@@ -215,6 +206,13 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 				questionDiv.appendChild(label);
 			});
 		}
+		else if (question.type === 'text') {
+			const input = document.createElement('input');
+			input.type = 'text';
+			input.name = question.id;
+			input.className = 'text-input';
+			questionDiv.appendChild(input);
+		}
 		
 		container.appendChild(questionDiv);
 		
@@ -231,6 +229,62 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 				} else {
 					questionResponses[question.id] = questionResponses[question.id].filter(v => v !== e.target.value);
 				}
+			} else if (question.type === 'text') {
+				questionResponses[question.id] = e.target.value;
+			}
+		});
+
+		if (question.type === 'text') {
+			const textInput = questionDiv.querySelector('input[type="text"]');
+			textInput.addEventListener('input', (e) => {
+				questionResponses[question.id] = e.target.value;
+			});
+		}
+	}
+
+	const buttonNext = d3.select("#buttonContainer").select("#nextButton")
+		.on("click", onNextClick);
+	
+	function onNextClick() {
+		console.log("clicked");
+		// Prepare export data
+		const userName = sessionStorage.getItem('username') || 'Unknown';
+		const timestamp = new Date().toISOString();
+		
+		const exportData = {
+			metadata: {
+				userName: userName,
+				setupName: currentSetup['setup'],
+				setupIndex: setupIndex,
+				timestamp: timestamp
+			},
+			configuration: currentSetup,
+			responses: questionResponses,
+			clickLog: clickLog
+		};
+		
+		// Download JSON file
+		const blob = new Blob([JSON.stringify(exportData, null, 2)], {type: 'application/json'});
+		const a = document.createElement('a');
+		a.href = URL.createObjectURL(blob);
+		a.download = `SituatedVis_${userName}_${currentSetup['setup']}_${getTimestamp()}.json`;
+		document.body.appendChild(a);
+		a.click();
+
+		requestAnimationFrame(() => {
+			document.body.removeChild(a);
+			URL.revokeObjectURL(a.href);
+			
+			// Check if there's a next setup
+			const nextIndex = setupIndex + 1;
+			if (nextIndex < config.length) {
+				// Navigate to next setup
+				window.location.href = `index.html?setup=${nextIndex + 1}`;
+			} else {
+				// All setups completed
+				alert('Study completed! Thank you for participating.');
+				sessionStorage.clear();
+				window.location.href = 'index.html';
 			}
 		});
 	}
@@ -250,22 +304,28 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 
 	function animate() {
 		step++;
-		// slider.value = step;
-		// numberInput.value = step;
-
-		// TODO: potentially update for more efficient implementation
-
-		questions.forEach((question, index) => {
-			if (step >= question.step && !shownQuestions.has(index)) {
-				showQuestion(question);
-				shownQuestions.add(index);
+		
+		// Group questions by their step
+		const questionsAtCurrentStep = questions.filter(q => q.step === step);
+		
+		// If there are questions at this step, clear previous and show new ones
+		if (questionsAtCurrentStep.length > 0) {
+			// Clear the question container
+			const container = document.getElementById('questionContainer');
+			if (container) {
+				container.innerHTML = '';
 			}
-		});
-
+			
+			// Show all questions for this step
+			questionsAtCurrentStep.forEach((question, index) => {
+				showQuestion(question);
+			});
+		}
+		
 		if (soundSteps.includes(step)) {
 			playSound();
 		}
-
+		
 		for (let chart of charts) {
 			chart.update(step, ANIM_DURATION);
 		}
