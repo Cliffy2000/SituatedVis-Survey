@@ -364,6 +364,7 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 
 	function playSound() {
 		const audio = new Audio('beep.mp3');
+		audio.volume = 0.03;
 		audio.play().catch(err => console.log('Audio play failed:', err));
 	}
 

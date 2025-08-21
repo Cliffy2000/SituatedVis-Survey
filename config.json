@@ -22,7 +22,7 @@
         "anim-delay": 250,
         "num-points": 10,
         "rolling-avg": 5,
-        "sound": [2, 3, 4, 5, 15, 25],
+        "sound": [5, 20, 40, 60, 80],
         "vis-showXAxisTicks": true,
         "vis-xAxisInverseStatic": false,
         "vis-useThresholdColors": true,
