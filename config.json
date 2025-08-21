@@ -15,8 +15,9 @@
             "Trial1Machine11.csv",
             "Trial1Machine12.csv"
         ],
+        "setup-length": 100,
         "num-rows": 3,
-        "num-columns": 5,
+        "num-columns": 4,
         "anim-duration": 400,
         "anim-delay": 250,
         "num-points": 10,
@@ -36,37 +37,58 @@
         "questions": [
             {
                 "id": "q1",
-                "prompt": "question 1",
+                "prompt": "which machine has the highest output right now?",
                 "step": 5,
                 "type": "radio",
-                "options": ["a", "b", "c", "d"]
+                "options": [
+                    "Machine 1", "Machine 2", "Machine 3", "Machine 4",
+                    "Machine 5", "Machine 6", "Machine 7", "Machine 8",
+                    "Machine 9", "Machine 10", "Machine 11", "Machine 12"
+                ]
             },
             {
                 "id": "q2",
-                "prompt": "question 2",
+                "prompt": "which machine has the lowest output right now?",
                 "step": 20,
-                "type": "checkbox",
-                "options": ["a", "b", "c", "d", "e"]
+                "type": "radio",
+                "options": [
+                    "Machine 1", "Machine 2", "Machine 3", "Machine 4",
+                    "Machine 5", "Machine 6", "Machine 7", "Machine 8",
+                    "Machine 9", "Machine 10", "Machine 11", "Machine 12"
+                ]
             },
             {
                 "id": "q3",
-                "prompt": "question 3",
-                "step": 30,
+                "prompt": "Find 3 plots that have most increased output over time.",
+                "step": 40,
                 "type": "checkbox",
-                "options": ["a", "b", "c", "d", "e"]
+                "options": [
+                    "Machine 1", "Machine 2", "Machine 3", "Machine 4",
+                    "Machine 5", "Machine 6", "Machine 7", "Machine 8",
+                    "Machine 9", "Machine 10", "Machine 11", "Machine 12"
+                ]
             },
             {
                 "id": "q4",
-                "prompt": "question 4",
-                "step": 30,
+                "prompt": "Find 3 plots that have most decreased output over time.",
+                "step": 60,
                 "type": "checkbox",
-                "options": ["a", "b", "c", "d", "e"]
+                "options": [
+                    "Machine 1", "Machine 2", "Machine 3", "Machine 4",
+                    "Machine 5", "Machine 6", "Machine 7", "Machine 8",
+                    "Machine 9", "Machine 10", "Machine 11", "Machine 12"
+                ]
             },
             {
                 "id": "q5",
-                "prompt": "question 5",
-                "step": 50,
-                "type": "text"
+                "prompt": "Is the overall output of Machine 1 increasing, decreasing or staying the same?",
+                "step": 80,
+                "type": "radio",
+                "options": [
+                    "increasing",
+                    "same",
+                    "decreasing"
+                ]
             }
         ]
     },

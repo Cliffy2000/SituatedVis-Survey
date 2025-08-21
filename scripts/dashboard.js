@@ -11,6 +11,7 @@ const currentSetup = config[setupIndex];
 
 // Extract all values from current setup
 let selectedFiles = currentSetup['files'];
+const SETUP_LENGTH = currentSetup['setup-length'];
 const ROWS = currentSetup['num-rows'];
 const COLS = currentSetup['num-columns'];
 const ANIM_DURATION = currentSetup['anim-duration'];
@@ -143,7 +144,7 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 		document.body.removeChild(a);
 		URL.revokeObjectURL(a.href);
 	}
-
+*/
 
 	function onPauseClick() {
 		if (flag_running) {
@@ -172,7 +173,7 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 			startAnimation();
 		}
 	}
-	*/
+	
 
 	const questions = currentSetup['questions'] || [];
 	const questionResponses = {};
@@ -181,65 +182,129 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 	function showQuestion(question) {
 		const container = document.getElementById('questionContainer');
 		if (!container) return;
-
 		
 		const questionDiv = document.createElement('div');
 		questionDiv.className = 'question-item';
 		questionDiv.innerHTML = `<p class="question-prompt">${question.prompt}</p>`;
 		
+		const optionsContainer = document.createElement('div');
+		optionsContainer.className = 'question-options-container';
+		
+		// Check if options match machine count and should use grid
+		const machineOptions = question.options.filter(opt => opt.startsWith('Machine'));
+		const useGrid = machineOptions.length === selectedFiles.length && selectedFiles.length > 3;
+		
+		// Check if this is a "find 3" question (checkbox + grid)
+		const isFind3Question = question.type === 'checkbox' && useGrid;
+		
+		// Record when question is shown
+		const questionStartTime = Date.now();
+		
+		if (useGrid) {
+			// Apply same grid layout as charts
+			optionsContainer.style.display = 'grid';
+			optionsContainer.style.gridTemplateRows = `repeat(${ROWS}, 1fr)`;
+			optionsContainer.style.gridTemplateColumns = `repeat(${COLS}, 1fr)`;
+			optionsContainer.style.gap = '5px';
+		}
+		
+		// Add submit button
+		const submitButton = document.createElement('button');
+		submitButton.className = 'question-submit-button';
+		submitButton.textContent = 'Submit';
+		submitButton.disabled = true;
+		submitButton.dataset.questionId = question.id;
+		
 		if (question.type === 'radio') {
-			question.options.forEach(option => {
+			question.options.forEach((option, index) => {
 				const label = document.createElement('label');
+				label.className = useGrid ? 'question-grid-option' : 'question-vertical-option';
 				label.innerHTML = `
 					<input type="radio" name="${question.id}" value="${option}">
-					${option}
+					<span>${option}</span>
 				`;
-				questionDiv.appendChild(label);
+				optionsContainer.appendChild(label);
 			});
+			
+			// Enable submit when radio is selected
+			optionsContainer.addEventListener('change', () => {
+				submitButton.disabled = false;
+			});
+			
 		} else if (question.type === 'checkbox') {
-			question.options.forEach(option => {
+			const checkboxes = [];
+			question.options.forEach((option, index) => {
 				const label = document.createElement('label');
-				label.innerHTML = `
-					<input type="checkbox" name="${question.id}" value="${option}">
-					${option}
-				`;
-				questionDiv.appendChild(label);
+				label.className = useGrid ? 'question-grid-option' : 'question-vertical-option';
+				const checkbox = document.createElement('input');
+				checkbox.type = 'checkbox';
+				checkbox.name = question.id;
+				checkbox.value = option;
+				checkboxes.push(checkbox);
+				
+				label.appendChild(checkbox);
+				label.appendChild(document.createElement('span')).textContent = option;
+				optionsContainer.appendChild(label);
 			});
-		}
-		else if (question.type === 'text') {
-			const input = document.createElement('input');
-			input.type = 'text';
-			input.name = question.id;
-			input.className = 'text-input';
-			questionDiv.appendChild(input);
+			
+			// Handle checkbox logic
+			optionsContainer.addEventListener('change', () => {
+				const checkedCount = checkboxes.filter(cb => cb.checked).length;
+				
+				if (isFind3Question) {
+					// For checkbox + grid questions
+					if (checkedCount === 3) {
+						// Disable unchecked checkboxes
+						checkboxes.forEach(cb => {
+							if (!cb.checked) cb.disabled = true;
+						});
+						submitButton.disabled = false;
+					} else {
+						// Enable all checkboxes
+						checkboxes.forEach(cb => cb.disabled = false);
+						submitButton.disabled = true;
+					}
+				} else {
+					// For regular checkbox questions
+					submitButton.disabled = checkedCount === 0;
+				}
+			});
 		}
 		
+		questionDiv.appendChild(optionsContainer);
+		questionDiv.appendChild(submitButton);
 		container.appendChild(questionDiv);
 		
-		// Track responses
-		questionDiv.addEventListener('change', (e) => {
+		// Track responses on submit
+		submitButton.addEventListener('click', () => {
+			const responseTime = Date.now() - questionStartTime;
+			
 			if (question.type === 'radio') {
-				questionResponses[question.id] = e.target.value;
+				const selected = optionsContainer.querySelector(`input[name="${question.id}"]:checked`);
+				if (selected) {
+					questionResponses[question.id] = {
+						response: selected.value,
+						responseTime: responseTime,
+						timestamp: new Date().toISOString()
+					};
+				}
 			} else if (question.type === 'checkbox') {
-				if (!questionResponses[question.id]) {
-					questionResponses[question.id] = [];
-				}
-				if (e.target.checked) {
-					questionResponses[question.id].push(e.target.value);
-				} else {
-					questionResponses[question.id] = questionResponses[question.id].filter(v => v !== e.target.value);
-				}
-			} else if (question.type === 'text') {
-				questionResponses[question.id] = e.target.value;
+				const selected = Array.from(optionsContainer.querySelectorAll(`input[name="${question.id}"]:checked`))
+					.map(cb => cb.value);
+				questionResponses[question.id] = {
+					response: selected,
+					responseTime: responseTime,
+					timestamp: new Date().toISOString()
+				};
 			}
+			
+			// Disable submit after clicking
+			submitButton.disabled = true;
+			submitButton.textContent = 'Submitted';
+			
+			// Disable all inputs for this question
+			optionsContainer.querySelectorAll('input').forEach(input => input.disabled = true);
 		});
-
-		if (question.type === 'text') {
-			const textInput = questionDiv.querySelector('input[type="text"]');
-			textInput.addEventListener('input', (e) => {
-				questionResponses[question.id] = e.target.value;
-			});
-		}
 	}
 
 	const buttonNext = d3.select("#buttonContainer").select("#nextButton")
@@ -302,9 +367,14 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 		audio.play().catch(err => console.log('Audio play failed:', err));
 	}
 
+	const nextButton = document.getElementById('nextButton');
+	if (nextButton) {
+		nextButton.disabled = true;
+	}
+
 	function animate() {
 		step++;
-		
+
 		// Group questions by their step
 		const questionsAtCurrentStep = questions.filter(q => q.step === step);
 		
@@ -328,6 +398,14 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 		
 		for (let chart of charts) {
 			chart.update(step, ANIM_DURATION);
+		}
+
+		console.log(step + POINTS - 1);
+		if (step + POINTS - 1 >= SETUP_LENGTH) {
+			stopAnimation();
+			if (nextButton) {
+				nextButton.disabled = false;
+			}
 		}
 	}
 

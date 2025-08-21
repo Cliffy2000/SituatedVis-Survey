@@ -98,3 +98,92 @@ svg {
     border-radius: 10px;
 }
 
+
+/* Question container styles */
+.question-item {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.question-prompt {
+    font-weight: 600;
+    margin-bottom: 15px;
+    font-size: 16px;
+    color: #333;
+}
+
+/* Options container */
+.question-options-container {
+    margin-bottom: 15px;
+}
+
+/* Vertical layout for options */
+.question-vertical-option {
+    display: block;
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+
+.question-vertical-option input {
+    margin-right: 8px;
+}
+
+/* Grid layout for options */
+.question-grid-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    text-align: center;
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+
+.question-grid-option:hover {
+    background-color: #e8e8e8;
+}
+
+.question-grid-option input {
+    margin-right: 5px;
+}
+
+.question-grid-option span {
+    font-size: 13px;
+}
+
+/* Disabled state for checkboxes */
+.question-grid-option input:disabled,
+.question-vertical-option input:disabled {
+    cursor: not-allowed;
+}
+
+.question-grid-option input:disabled + span,
+.question-vertical-option input:disabled + span {
+    opacity: 0.5;
+}
+
+/* Submit button */
+.question-submit-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.question-submit-button:hover:not(:disabled) {
+    background-color: #45a049;
+}
+
+.question-submit-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
