@@ -40,10 +40,11 @@
                 "prompt": "which machine has the highest output right now?",
                 "step": 5,
                 "type": "radio",
+                "area": "machine",
                 "options": [
-                    "Machine 1", "Machine 2", "Machine 3", "Machine 4",
-                    "Machine 5", "Machine 6", "Machine 7", "Machine 8",
-                    "Machine 9", "Machine 10", "Machine 11", "Machine 12"
+                    "Mach. 1", "Mach. 2", "Mach. 3", "Mach. 4",
+                    "Mach. 5", "Mach. 6", "Mach. 7", "Mach. 8",
+                    "Mach. 9", "Mach. 10", "Mach. 11", "Mach. 12"
                 ]
             },
             {
@@ -51,6 +52,7 @@
                 "prompt": "which machine has the lowest output right now?",
                 "step": 20,
                 "type": "radio",
+                "area": "machine",
                 "options": [
                     "Machine 1", "Machine 2", "Machine 3", "Machine 4",
                     "Machine 5", "Machine 6", "Machine 7", "Machine 8",
@@ -62,6 +64,7 @@
                 "prompt": "Find 3 plots that have most increased output over time.",
                 "step": 40,
                 "type": "checkbox",
+                "area": "machine",
                 "options": [
                     "Machine 1", "Machine 2", "Machine 3", "Machine 4",
                     "Machine 5", "Machine 6", "Machine 7", "Machine 8",
@@ -73,6 +76,7 @@
                 "prompt": "Find 3 plots that have most decreased output over time.",
                 "step": 60,
                 "type": "checkbox",
+                "area": "machine",
                 "options": [
                     "Machine 1", "Machine 2", "Machine 3", "Machine 4",
                     "Machine 5", "Machine 6", "Machine 7", "Machine 8",
@@ -84,6 +88,7 @@
                 "prompt": "Is the overall output of Machine 1 increasing, decreasing or staying the same?",
                 "step": 80,
                 "type": "radio",
+                "area": "other",
                 "options": [
                     "increasing",
                     "same",

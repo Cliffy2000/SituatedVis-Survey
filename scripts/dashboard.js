@@ -1,12 +1,19 @@
 /** This is for d3.js intelliSense */
 /** @type {import("d3")} */
 
-const params = new URLSearchParams(window.location.search);
-const setupParam = params.get('setup');
-const setupIndex = setupParam !== null ? parseInt(setupParam) - 1 : 0;
+let stop;
 
-// Get config and current setup
+// Replace the URL parameter reading with:
+const setupIndex = parseInt(sessionStorage.getItem("SituatedVisCurrentIndex") || "0");
+
+// Get config from storage
 const config = JSON.parse(sessionStorage.getItem('SituatedVisConfig'));
+if (!config || setupIndex >= config.length) {
+    // Invalid state, redirect to start
+    sessionStorage.clear();
+    window.location.replace('index.html');
+}
+
 const currentSetup = config[setupIndex];
 
 // Extract all values from current setup
@@ -191,8 +198,9 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 		optionsContainer.className = 'question-options-container';
 		
 		// Check if options match machine count and should use grid
-		const machineOptions = question.options.filter(opt => opt.startsWith('Machine'));
-		const useGrid = machineOptions.length === selectedFiles.length && selectedFiles.length > 3;
+		const machineOptions = question.area === "machine";
+		console.log(machineOptions);
+		const useGrid = question.options.length === selectedFiles.length && selectedFiles.length > 3;
 		
 		// Check if this is a "find 3" question (checkbox + grid)
 		const isFind3Question = question.type === 'checkbox' && useGrid;
@@ -311,7 +319,9 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 		.on("click", onNextClick);
 	
 	function onNextClick() {
-		console.log("clicked");
+		// Stop animation
+		stopAnimation();
+		
 		// Prepare export data
 		const userName = sessionStorage.getItem('username') || 'Unknown';
 		const timestamp = new Date().toISOString();
@@ -328,30 +338,43 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 			clickLog: clickLog
 		};
 		
-		// Download JSON file
-		const blob = new Blob([JSON.stringify(exportData, null, 2)], {type: 'application/json'});
-		const a = document.createElement('a');
-		a.href = URL.createObjectURL(blob);
-		a.download = `SituatedVis_${userName}_${currentSetup['setup']}_${getTimestamp()}.json`;
-		document.body.appendChild(a);
-		a.click();
-
-		requestAnimationFrame(() => {
-			document.body.removeChild(a);
-			URL.revokeObjectURL(a.href);
+		saveUserData(exportData).then(success => {
+			if (success) {
+				console.log('Data saved to cloud database');
+			} else {
+				console.log('Failed to save to cloud, but continuing with local download');
+			}		
+			// Download JSON file
+			// const blob = new Blob([JSON.stringify(exportData, null, 2)], {type: // 'application/json'});
+			// const a = document.createElement('a');
+			// a.href = URL.createObjectURL(blob);
+			// a.download = `${userName}_${currentSetup['setup']}_${getTimestamp()}.json`;
+			// document.body.appendChild(a);
+			// a.click();
+			// document.body.removeChild(a);
+			// URL.revokeObjectURL(a.href);
 			
 			// Check if there's a next setup
+
 			const nextIndex = setupIndex + 1;
 			if (nextIndex < config.length) {
-				// Navigate to next setup
-				window.location.href = `index.html?setup=${nextIndex + 1}`;
+				// Update storage and navigate
+				sessionStorage.setItem('SituatedVisCurrentIndex', String(nextIndex));
+				setTimeout(() => {
+					window.location.replace('index.html');
+				}, 100);
 			} else {
 				// All setups completed
 				alert('Study completed! Thank you for participating.');
 				sessionStorage.clear();
-				window.location.href = 'index.html';
+				setTimeout(() => {
+					window.location.replace('index.html');
+				}, 100);
 			}
-		});
+		})
+
+
+
 	}
 
 	function startAnimation() {
@@ -361,6 +384,8 @@ Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then
 	function stopAnimation() {
 		clearInterval(INTERVAL_ID);
 	}
+
+	stop = stopAnimation;
 
 	function playSound() {
 		const audio = new Audio('beep.mp3');

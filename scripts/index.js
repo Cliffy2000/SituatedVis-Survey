@@ -1,37 +1,44 @@
-const params = new URLSearchParams(window.location.search);
-const setupParam = params.get('setup');
-const setupIndex = setupParam ? parseInt(setupParam) - 1 : 0;
+document.addEventListener("DOMContentLoaded", async () => {
 
-fetch('config.json')
-    .then(r => r.json())
-    .then(config => {
-		console.log("storing");
-        sessionStorage.setItem("SituatedVisConfig", JSON.stringify(config));
-        sessionStorage.setItem("SituatedVisCurrentIndex", setupIndex);
-
-        document.querySelector(".setup-name").textContent = config[setupIndex].setup;
-
-        const existingUsername = sessionStorage.getItem('username');
-        const usernameInput = document.getElementById('user-name');
-        const startButton = document.querySelector('.startTrialButton');
-
-        if (existingUsername) {
-            usernameInput.value = existingUsername;
-            startButton.disabled = false;
-        } else {
-            startButton.disabled = true;
-        }
-
-        usernameInput.addEventListener('input', () => {
-            startButton.disabled = !usernameInput.value.trim();
-        });
-    })
-    .catch(error => console.error('Error fetching config.json:', error));
-
+    // Get setup index from storage, not URL
+    const setupIndex = parseInt(sessionStorage.getItem("SituatedVisCurrentIndex") || "0");
+    
+    const config = await fetch('config.json').then(r => r.json());
+    
+    // Validate index
+    if (setupIndex >= config.length) {
+        sessionStorage.clear();
+        window.location.replace('index.html');
+        return;
+    }
+    
+    sessionStorage.setItem("SituatedVisConfig", JSON.stringify(config));
+    sessionStorage.setItem("SituatedVisCurrentIndex", String(setupIndex));
+    
+    document.querySelector(".setup-name").textContent = config[setupIndex].setup;
+    
+    const existingUsername = sessionStorage.getItem('username');
+    const usernameInput = document.getElementById('user-name');
+    const startButton = document.querySelector('.startTrialButton');
+    
+    if (existingUsername) {
+        usernameInput.value = existingUsername;
+        startButton.disabled = false;
+    } else {
+        startButton.disabled = true;
+    }
+    
+    usernameInput.addEventListener('input', () => {
+        startButton.disabled = !usernameInput.value.trim();
+    });
+});
 
 function startTrial() {
-	const username = document.getElementById('user-name').value.trim();
-	sessionStorage.setItem('username', username);
-	const setupIndex = parseInt(sessionStorage.getItem('SituatedVisCurrentIndex'));
-	window.location.href = `dashboard.html?setup=${setupIndex + 1}`;
+    const username = document.getElementById('user-name').value.trim();
+    sessionStorage.setItem('username', username);
+
+    // Replace the current page in history with dashboard
+    setTimeout(() => {
+        window.location.href = 'dashboard.html';
+    }, 10);
 }

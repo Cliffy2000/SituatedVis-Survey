@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Situated Vis</title>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="scripts/firebase-config.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .auth-form {
+            max-width: 300px;
+            margin: 50px auto;
+        }
+        .auth-form input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+        .auth-form button {
+            width: 100%;
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .stat-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .download-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+        .response-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .response-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .question-response {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        .error {
+            color: red;
+            margin: 10px 0;
+        }
+        .logout-btn {
+            float: right;
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login -->
+        <div id="authSection" class="auth-form">
+            <h2>Admin Login</h2>
+            <input type="email" id="email" placeholder="Email">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="handleLogin()">Sign In</button>
+            <div id="authError" class="error"></div>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboardSection" class="hidden">
+            <button class="logout-btn" onclick="handleLogout()">Logout</button>
+            <h1>Response Data</h1>
+            
+            <div class="stats">
+                <div class="stat-box">
+                    <div>Total Responses</div>
+                    <div class="stat-value" id="totalResponses">0</div>
+                </div>
+                <div class="stat-box">
+                    <div>Unique Users</div>
+                    <div class="stat-value" id="uniqueUsers">0</div>
+                </div>
+            </div>
+
+            <button class="download-btn" onclick="downloadData()">Download All Data</button>
+
+            <h2>Responses</h2>
+            <div id="responsesList"></div>
+        </div>
+    </div>
+
+    <script>
+        let allData = [];
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('authSection').classList.add('hidden');
+                document.getElementById('dashboardSection').classList.remove('hidden');
+                loadData();
+            } else {
+                document.getElementById('authSection').classList.remove('hidden');
+                document.getElementById('dashboardSection').classList.add('hidden');
+            }
+        });
+
+        async function handleLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                document.getElementById('authError').textContent = '';
+            } catch (error) {
+                document.getElementById('authError').textContent = error.message;
+            }
+        }
+
+        async function handleLogout() {
+            await auth.signOut();
+        }
+
+        async function loadData() {
+            try {
+                const snapshot = await db.collection('userResponses').get();
+                allData = [];
+                snapshot.forEach(doc => {
+                    allData.push(doc.data());
+                });
+                updateDisplay();
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function updateDisplay() {
+            // Stats
+            document.getElementById('totalResponses').textContent = allData.length;
+            const users = new Set(allData.map(d => d.metadata?.userName));
+            document.getElementById('uniqueUsers').textContent = users.size;
+
+            // Response list
+            const container = document.getElementById('responsesList');
+            container.innerHTML = '';
+            
+            allData.sort((a, b) => new Date(b.metadata?.timestamp) - new Date(a.metadata?.timestamp));
+            
+            allData.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'response-item';
+                
+                const header = document.createElement('div');
+                header.className = 'response-header';
+                header.textContent = `${item.metadata?.userName} - ${item.metadata?.setupName} - ${new Date(item.metadata?.timestamp).toLocaleString()}`;
+                div.appendChild(header);
+                
+                if (item.responses) {
+                    Object.entries(item.responses).forEach(([qId, qData]) => {
+                        const qDiv = document.createElement('div');
+                        qDiv.className = 'question-response';
+                        const response = Array.isArray(qData.response) ? qData.response.join(', ') : qData.response;
+                        qDiv.textContent = `${qId}: ${response}`;
+                        div.appendChild(qDiv);
+                    });
+                }
+                
+                container.appendChild(div);
+            });
+        }
+
+        function downloadData() {
+            const json = JSON.stringify(allData, null, 2);
+            const blob = new Blob([json], {type: 'application/json'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `SituatedVis_AllData_${new Date().toISOString()}.json`;
+            a.click();
+        }
+
+        document.getElementById('password').addEventListener('keypress', e => {
+            if (e.key === 'Enter') handleLogin();
+        });
+    </script>
+</body>
+</html>

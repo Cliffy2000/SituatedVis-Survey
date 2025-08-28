@@ -83,6 +83,7 @@ svg {
 #sidePanel {
     width: 25%;
     height: 100%;
+    padding-right: 10px;
 }
 
 #buttonContainer {
@@ -102,7 +103,7 @@ svg {
 /* Question container styles */
 .question-item {
     margin-bottom: 20px;
-    padding: 15px;
+    padding: 5px;
     border: 1px solid #ddd;
     border-radius: 5px;
     background-color: #f9f9f9;
@@ -110,7 +111,8 @@ svg {
 
 .question-prompt {
     font-weight: 600;
-    margin-bottom: 15px;
+    margin: 5px;
+    margin-bottom: 10px;
     font-size: 16px;
     color: #333;
 }
@@ -136,7 +138,7 @@ svg {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 8px;
+    padding: 8px 2px;
     text-align: center;
     cursor: pointer;
     border: 1px solid transparent;
