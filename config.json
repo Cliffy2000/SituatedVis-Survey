@@ -1,7 +1,6 @@
-[
-    {
-        "setup": "setup1",
-        "files": [
+{
+    "filesets": [
+        [
             "Trial1Machine1.csv",
             "Trial1Machine2.csv",
             "Trial1Machine3.csv",
@@ -15,121 +14,234 @@
             "Trial1Machine11.csv",
             "Trial1Machine12.csv"
         ],
-        "setup-length": 100,
-        "num-rows": 3,
-        "num-columns": 4,
-        "anim-duration": 400,
-        "anim-delay": 250,
-        "num-points": 10,
-        "rolling-avg": 5,
-        "sound": [5, 20, 40, 60, 80],
-        "vis-showXAxisTicks": true,
-        "vis-xAxisInverseStatic": false,
-        "vis-useThresholdColors": true,
-        "vis-showThresholdBand": false,
-        "vis-backgroundEncoding": false,
-        "vis-gridBackgroundMove": false,
-        "vis-showVerticalBar": false,
-        "vis-useRollingAverage": false,
-        "vis-easeInOut": true,
-        "vis-dynamicLabelSize": "none",
-        "vis-labelPosition": "integrated",
-        "questions": [
-            {
-                "id": "q1",
-                "prompt": "which machine has the highest output right now?",
-                "step": 5,
-                "type": "radio",
-                "area": "machine",
-                "options": [
-                    "Mach. 1", "Mach. 2", "Mach. 3", "Mach. 4",
-                    "Mach. 5", "Mach. 6", "Mach. 7", "Mach. 8",
-                    "Mach. 9", "Mach. 10", "Mach. 11", "Mach. 12"
-                ]
-            },
-            {
-                "id": "q2",
-                "prompt": "which machine has the lowest output right now?",
-                "step": 20,
-                "type": "radio",
-                "area": "machine",
-                "options": [
-                    "Machine 1", "Machine 2", "Machine 3", "Machine 4",
-                    "Machine 5", "Machine 6", "Machine 7", "Machine 8",
-                    "Machine 9", "Machine 10", "Machine 11", "Machine 12"
-                ]
-            },
-            {
-                "id": "q3",
-                "prompt": "Find 3 plots that have most increased output over time.",
-                "step": 40,
-                "type": "checkbox",
-                "area": "machine",
-                "options": [
-                    "Machine 1", "Machine 2", "Machine 3", "Machine 4",
-                    "Machine 5", "Machine 6", "Machine 7", "Machine 8",
-                    "Machine 9", "Machine 10", "Machine 11", "Machine 12"
-                ]
-            },
-            {
-                "id": "q4",
-                "prompt": "Find 3 plots that have most decreased output over time.",
-                "step": 60,
-                "type": "checkbox",
-                "area": "machine",
-                "options": [
-                    "Machine 1", "Machine 2", "Machine 3", "Machine 4",
-                    "Machine 5", "Machine 6", "Machine 7", "Machine 8",
-                    "Machine 9", "Machine 10", "Machine 11", "Machine 12"
-                ]
-            },
-            {
-                "id": "q5",
-                "prompt": "Is the overall output of Machine 1 increasing, decreasing or staying the same?",
-                "step": 80,
-                "type": "radio",
-                "area": "other",
-                "options": [
-                    "increasing",
-                    "same",
-                    "decreasing"
-                ]
-            }
+        [
+            "Trial2Machine1.csv",
+            "Trial2Machine2.csv",
+            "Trial2Machine3.csv",
+            "Trial2Machine4.csv",
+            "Trial2Machine5.csv",
+            "Trial2Machine6.csv",
+            "Trial2Machine7.csv",
+            "Trial2Machine8.csv",
+            "Trial2Machine9.csv",
+            "Trial2Machine10.csv",
+            "Trial2Machine11.csv",
+            "Trial2Machine12.csv"
+        ],
+        [
+            "Trial3Machine1.csv",
+            "Trial3Machine2.csv",
+            "Trial3Machine3.csv",
+            "Trial3Machine4.csv",
+            "Trial3Machine5.csv",
+            "Trial3Machine6.csv",
+            "Trial3Machine7.csv",
+            "Trial3Machine8.csv",
+            "Trial3Machine9.csv",
+            "Trial3Machine10.csv",
+            "Trial3Machine11.csv",
+            "Trial3Machine12.csv"
+        ],
+        [
+            "Trial4Machine1.csv",
+            "Trial4Machine2.csv",
+            "Trial4Machine3.csv",
+            "Trial4Machine4.csv",
+            "Trial4Machine5.csv",
+            "Trial4Machine6.csv",
+            "Trial4Machine7.csv",
+            "Trial4Machine8.csv",
+            "Trial4Machine9.csv",
+            "Trial4Machine10.csv",
+            "Trial4Machine11.csv",
+            "Trial4Machine12.csv"
+        ],
+        [
+            "Trial5Machine1.csv",
+            "Trial5Machine2.csv",
+            "Trial5Machine3.csv",
+            "Trial5Machine4.csv",
+            "Trial5Machine5.csv",
+            "Trial5Machine6.csv",
+            "Trial5Machine7.csv",
+            "Trial5Machine8.csv",
+            "Trial5Machine9.csv",
+            "Trial5Machine10.csv",
+            "Trial5Machine11.csv",
+            "Trial5Machine12.csv"
+        ],
+        [
+            "Trial6Machine1.csv",
+            "Trial6Machine2.csv",
+            "Trial6Machine3.csv",
+            "Trial6Machine4.csv",
+            "Trial6Machine5.csv",
+            "Trial6Machine6.csv",
+            "Trial6Machine7.csv",
+            "Trial6Machine8.csv",
+            "Trial6Machine9.csv",
+            "Trial6Machine10.csv",
+            "Trial6Machine11.csv",
+            "Trial6Machine12.csv"
         ]
-    },
-    {
-        "setup": "setup2",
-        "files": [
-            "Trial1Machine1.csv",
-            "Trial1Machine2.csv",
-            "Trial1Machine3.csv",
-            "Trial1Machine4.csv",
-            "Trial1Machine5.csv",
-            "Trial1Machine6.csv",
-            "Trial1Machine7.csv",
-            "Trial1Machine8.csv",
-            "Trial1Machine9.csv",
-            "Trial1Machine10.csv",
-            "Trial1Machine11.csv",
-            "Trial1Machine12.csv"
-        ],
-        "num-rows": 2,
-        "num-columns": 2,
-        "anim-duration": 250,
-        "anim-delay": 100,
-        "num-points": 10,
-        "rolling-avg": 5,
-        "sound": [2, 10, 12, 60],
-        "vis-showXAxisTicks": true,
-        "vis-xAxisInverseStatic": false,
-        "vis-useThresholdColors": true,
-        "vis-showThresholdBand": false,
-        "vis-backgroundEncoding": false,
-        "vis-gridBackgroundMove": false,
-        "vis-showVerticalBar": false,
-        "vis-useRollingAverage": false,
-        "vis-easeInOut": true,
-        "vis-dynamicLabelSize": "none",
-        "vis-labelPosition": "integrated"
-    }
-]
+    ],
+    "setups": [
+        {
+            "setup": "setup1",
+            "setup-length": 100,
+            "min-spacing": 10,
+            "no-questions": [
+                [45, 55]
+            ],
+            "num-rows": 3,
+            "num-columns": 4,
+            "anim-duration": 400,
+            "anim-delay": 250,
+            "num-points": 10,
+            "rolling-avg": 5,
+            "sound": [
+                5,
+                20,
+                40,
+                60,
+                80
+            ],
+            "vis-showXAxisTicks": true,
+            "vis-xAxisInverseStatic": false,
+            "vis-useThresholdColors": true,
+            "vis-showThresholdBand": false,
+            "vis-backgroundEncoding": false,
+            "vis-gridBackgroundMove": false,
+            "vis-showVerticalBar": false,
+            "vis-useRollingAverage": false,
+            "vis-easeInOut": true,
+            "vis-dynamicLabelSize": "none",
+            "vis-labelPosition": "integrated"
+        },
+        {
+            "setup": "setup2",
+            "setup-length": 100,
+            "num-rows": 2,
+            "num-columns": 2,
+            "anim-duration": 250,
+            "anim-delay": 100,
+            "num-points": 10,
+            "rolling-avg": 5,
+            "sound": [
+                2,
+                10,
+                12,
+                60
+            ],
+            "vis-showXAxisTicks": true,
+            "vis-xAxisInverseStatic": false,
+            "vis-useThresholdColors": true,
+            "vis-showThresholdBand": false,
+            "vis-backgroundEncoding": false,
+            "vis-gridBackgroundMove": false,
+            "vis-showVerticalBar": false,
+            "vis-useRollingAverage": false,
+            "vis-easeInOut": true,
+            "vis-dynamicLabelSize": "none",
+            "vis-labelPosition": "integrated"
+        }
+    ],
+    "questions": [
+        {
+            "id": "q1",
+            "prompt": "which machine has the highest output right now?",
+            "step": 5,
+            "type": "radio",
+            "area": "machine",
+            "options": [
+                "Mach. 1",
+                "Mach. 2",
+                "Mach. 3",
+                "Mach. 4",
+                "Mach. 5",
+                "Mach. 6",
+                "Mach. 7",
+                "Mach. 8",
+                "Mach. 9",
+                "Mach. 10",
+                "Mach. 11",
+                "Mach. 12"
+            ]
+        },
+        {
+            "id": "q2",
+            "prompt": "which machine has the lowest output right now?",
+            "step": 20,
+            "type": "radio",
+            "area": "machine",
+            "options": [
+                "Machine 1",
+                "Machine 2",
+                "Machine 3",
+                "Machine 4",
+                "Machine 5",
+                "Machine 6",
+                "Machine 7",
+                "Machine 8",
+                "Machine 9",
+                "Machine 10",
+                "Machine 11",
+                "Machine 12"
+            ]
+        },
+        {
+            "id": "q3",
+            "prompt": "Find 3 plots that have most increased output over time.",
+            "step": 40,
+            "type": "checkbox",
+            "area": "machine",
+            "options": [
+                "Machine 1",
+                "Machine 2",
+                "Machine 3",
+                "Machine 4",
+                "Machine 5",
+                "Machine 6",
+                "Machine 7",
+                "Machine 8",
+                "Machine 9",
+                "Machine 10",
+                "Machine 11",
+                "Machine 12"
+            ]
+        },
+        {
+            "id": "q4",
+            "prompt": "Find 3 plots that have most decreased output over time.",
+            "step": 60,
+            "type": "checkbox",
+            "area": "machine",
+            "options": [
+                "Machine 1",
+                "Machine 2",
+                "Machine 3",
+                "Machine 4",
+                "Machine 5",
+                "Machine 6",
+                "Machine 7",
+                "Machine 8",
+                "Machine 9",
+                "Machine 10",
+                "Machine 11",
+                "Machine 12"
+            ]
+        },
+        {
+            "id": "q5",
+            "prompt": "Is the overall output of Machine 1 increasing, decreasing or staying the same?",
+            "step": 80,
+            "type": "radio",
+            "area": "other",
+            "options": [
+                "increasing",
+                "same",
+                "decreasing"
+            ]
+        }
+    ]
+}

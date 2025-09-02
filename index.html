@@ -1,46 +1,13 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Situated Visualization</title>
     <link rel="icon" href="logo.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="styles/styles.css">
-    <link rel="stylesheet" href="styles/index.css">
-	<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
-    <script src="scripts/firebase-config.js"></script>
     <script src="scripts/index.js" type="text/javascript" defer></script>
 </head>
-
 <body>
-    <div class="page-container">
-        <div class="header-row">
-            <div class="header-text">Situated Vis Dashboard</div>
-            <img class="header-logo" src="logo.svg" alt="Northeastern University Logo">
-        </div>
-
-        <div class="options-row">
-            <div class="display-options-panel">
-                <div class="text-entry-container">
-                    <label for="user-name">User Name</label>
-                    <input type="text" id="user-name" name="user-name" placeholder="Enter your name...">
-                </div>
-                <div class="text-entry-container">
-                    <text>Trial</text>
-                    <text class="setup-name"></text>
-                </div>
-            </div>
-            <div>
-                <button class="startTrialButton" onclick="startTrial()">Start</button>
-            </div>
-        </div>
-
-        
-    </div>
+    <div id="app-container"></div>
 </body>
-
 </html>
