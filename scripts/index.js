@@ -10,7 +10,7 @@ async function loadView(viewName) {
     
     try {
         // Load HTML
-        const response = await fetch(`pages/${viewName}.html`);
+        const response = await fetch(`${viewName}.html`);
         const html = await response.text();
         
         // Extract body content
