@@ -43,7 +43,7 @@ async function loadView(viewName) {
                 };
                 document.head.appendChild(script);
             } else {
-                window.homeInit();
+                await window.homeInit();
             }
         } else if (viewName === 'dashboard') {
             // Ensure D3 and visualization.js are loaded first

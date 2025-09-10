@@ -20,6 +20,7 @@ const auth = firebase.auth();
 
 // Function to save user data
 async function saveUserData(data) {
+  console.log(data);
   try {
     // Add timestamp if not present
     if (!data.metadata.timestamp) {

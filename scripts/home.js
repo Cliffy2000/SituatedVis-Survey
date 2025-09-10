@@ -41,6 +41,14 @@ function tryAssignQuestions(setup, questions) {
     return placed;
 }
 
+function shuffleFiles(files) {
+    const shuffled = [...files];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
 
 
 window.homeInit = async function () {
@@ -76,15 +84,15 @@ window.homeInit = async function () {
             
             return {
                 ...setup,
-                files: raw.filesets[filesetIndices[i]],
+                files: shuffleFiles(raw.filesets[filesetIndices[i]]),
                 questions
             };
         });
         config = processedConfig;
         console.log(config);
-        setTimeout(() => {
-            sessionStorage.setItem("SituatedVisConfig", JSON.stringify(config));
-        }, 0);
+        await new Promise(r => requestAnimationFrame(() => setTimeout(r, 0)));
+        sessionStorage.setItem("SituatedVisConfig", JSON.stringify(config));
+
     } else {
         // Config exists in sessionStorage, parse it
         config = JSON.parse(config);

@@ -77,8 +77,8 @@
             ],
             "num-rows": 3,
             "num-columns": 4,
-            "anim-duration": 400,
-            "anim-delay": 250,
+            "anim-duration": 20,
+            "anim-delay": 10,
             "num-points": 10,
             "rolling-avg": 5,
             "sound": [
@@ -109,8 +109,8 @@
             ],
             "num-rows": 3,
             "num-columns": 4,
-            "anim-duration": 400,
-            "anim-delay": 250,
+            "anim-duration": 20,
+            "anim-delay": 10,
             "num-points": 10,
             "rolling-avg": 5,
             "sound": [
@@ -141,8 +141,8 @@
             ],
             "num-rows": 3,
             "num-columns": 4,
-            "anim-duration": 400,
-            "anim-delay": 250,
+            "anim-duration": 20,
+            "anim-delay": 10,
             "num-points": 10,
             "rolling-avg": 5,
             "sound": [
@@ -173,8 +173,8 @@
             ],
             "num-rows": 3,
             "num-columns": 4,
-            "anim-duration": 400,
-            "anim-delay": 250,
+            "anim-duration": 20,
+            "anim-delay": 10,
             "num-points": 10,
             "rolling-avg": 5,
             "sound": [
@@ -205,8 +205,8 @@
             ],
             "num-rows": 3,
             "num-columns": 4,
-            "anim-duration": 400,
-            "anim-delay": 250,
+            "anim-duration": 20,
+            "anim-delay": 10,
             "num-points": 10,
             "rolling-avg": 5,
             "sound": [
@@ -237,8 +237,8 @@
             ],
             "num-rows": 3,
             "num-columns": 4,
-            "anim-duration": 400,
-            "anim-delay": 250,
+            "anim-duration": 20,
+            "anim-delay": 10,
             "num-points": 10,
             "rolling-avg": 5,
             "sound": [
@@ -277,10 +277,7 @@
                 "Mach. 6",
                 "Mach. 7",
                 "Mach. 8",
-                "Mach. 9",
-                "Mach. 10",
-                "Mach. 11",
-                "Mach. 12"
+                "Mach. 9"
             ]
         },
         {
@@ -298,10 +295,7 @@
                 "Machine 6",
                 "Machine 7",
                 "Machine 8",
-                "Machine 9",
-                "Machine 10",
-                "Machine 11",
-                "Machine 12"
+                "Machine 9"
             ]
         },
         {
@@ -319,10 +313,7 @@
                 "Machine 6",
                 "Machine 7",
                 "Machine 8",
-                "Machine 9",
-                "Machine 10",
-                "Machine 11",
-                "Machine 12"
+                "Machine 9"
             ]
         },
         {
@@ -340,10 +331,7 @@
                 "Machine 6",
                 "Machine 7",
                 "Machine 8",
-                "Machine 9",
-                "Machine 10",
-                "Machine 11",
-                "Machine 12"
+                "Machine 9"
             ]
         },
         {

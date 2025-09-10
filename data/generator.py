@@ -8,5 +8,5 @@ for set_num in range(1, 7):
         with open(filename, 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['index', 'value'])
-            for index in range(1, 101):
+            for index in range(1, 301):
                 writer.writerow([index, value])

@@ -340,26 +340,24 @@ window.dashboardInit = function() {
 					setupIndex: setupIndex,
 					timestamp: timestamp
 				},
-				configuration: currentSetup,
+				configuration: {
+					...currentSetup,
+					'no-questions': currentSetup['no-questions']?.map(range => ({
+						start: range[0],
+						end: range[1]
+					})) || []
+				},
 				responses: questionResponses,
 				clickLog: clickLog
 			};
-			
+
 			saveUserData(exportData).then(success => {
 				if (success) {
 					console.log('Data saved to cloud database');
 				} else {
 					console.log('Failed to save to cloud, but continuing with local download');
 				}		
-				// Download JSON file
-				// const blob = new Blob([JSON.stringify(exportData, null, 2)], {type: // 'application/json'});
-				// const a = document.createElement('a');
-				// a.href = URL.createObjectURL(blob);
-				// a.download = `${userName}_${currentSetup['setup']}_${getTimestamp()}.json`;
-				// document.body.appendChild(a);
-				// a.click();
-				// document.body.removeChild(a);
-				// URL.revokeObjectURL(a.href);
+
 				
 				// Check if there's a next setup
 
@@ -381,8 +379,6 @@ window.dashboardInit = function() {
 					}, 100);
 				}
 			})
-
-
 
 		}
 
@@ -435,7 +431,6 @@ window.dashboardInit = function() {
 				chart.update(step, ANIM_DURATION);
 			}
 
-			console.log(step + POINTS - 1);
 			if (step + POINTS - 1 >= SETUP_LENGTH) {
 				stopAnimation();
 				if (nextButton) {
