@@ -38,7 +38,9 @@ async function loadView(viewName) {
             if (!window.homeInit) {
                 const script = document.createElement('script');
                 script.src = 'scripts/home.js';
-                script.onload = () => window.homeInit();
+                script.onload = async () => {
+                    await window.homeInit();
+                };
                 document.head.appendChild(script);
             } else {
                 window.homeInit();
