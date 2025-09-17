@@ -81,11 +81,15 @@ window.homeInit = async function () {
                 alert(`Failed to assign questions for setup ${setup.setup}`);
                 questions = [];
             }
+
+            questions.sort((a, b) => a.step - b.step);
+            const questionSteps = questions.map(q => q.step);
             
             return {
                 ...setup,
                 files: shuffleFiles(raw.filesets[filesetIndices[i]]),
-                questions
+                questions,
+                sound: questionSteps
             };
         });
         config = processedConfig;
