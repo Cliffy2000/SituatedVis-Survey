@@ -394,7 +394,7 @@ window.dashboardInit = function() {
 
 		function playSound() {
 			const audio = new Audio('beep.mp3');
-			audio.volume = 0.03;
+			audio.volume = 0.1;
 			audio.play().catch(err => console.log('Audio play failed:', err));
 		}
 
