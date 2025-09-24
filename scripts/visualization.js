@@ -281,6 +281,11 @@ function generateChart(
 	const linearFontSizeScale = d3.scaleLinear()
 		.domain(y.domain())
 		.range([LABEL_FONT_SIZE_RANGE[0], LABEL_FONT_SIZE_RANGE[1]]);
+	
+	// Font size scale when linear scale and side position
+	const linearSizeFontSizeScale = d3.scaleLinear()
+		.domain(y.domain())
+		.range(40, 80);
 
 	const ushapedFontSizeScale = d3.scaleLinear()
 		.domain([y.domain()[0], (y.domain()[0] + y.domain()[1]) / 2, y.domain()[1]])
@@ -423,8 +428,13 @@ function generateChart(
 	}
 
 	function getDynamicFontSize(n) {
+		// u shaped side scaling is disabled
 		if (labelPosition === "side") {
-			return `74px`;
+			if (dynamicLabelSize === "linear") {
+				return `${linearSizeFontSizeScale(n)}px`;
+			} else {
+				return `74px`;
+			}
 		}
 
 		if (dynamicLabelSize === "none") {

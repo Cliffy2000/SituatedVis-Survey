@@ -1,43 +1,63 @@
-// Random order of datasets
 // Switch for random components
+
+let attentionQuestions = [
+    {
+        "id": "atn",
+        "prompt": "What is the largest number among the options below? You must choose option B for this question no matter the values",
+        "type": "radio",
+        "area": "other",
+        "options": [
+            "10",
+            "40",
+            "90",
+            "25"
+        ]
+    }
+];
 
 function tryAssignQuestions(setup, questions) {
     ITERATIONS = 3;
 
     const valid = [];
     for (let i = 1; i <= setup['setup-length']; i++) {
-        const forbidden = setup['no-questions']?.some(([start, end]) => 
+        const forbidden = setup['no-questions']?.some(([start, end]) =>
             i >= start && i <= end) ?? false;
         if (!forbidden) valid.push(i);
     }
-    
+
     // Need to place each question 3 times
     const toPlace = [];
     questions.forEach(q => {
-        for (let i = 0; i < ITERATIONS; i++) toPlace.push({...q});
+        for (let i = 0; i < ITERATIONS; i++) toPlace.push({ ...q });
     });
-    
+
+    attentionQuestions.forEach(q => {
+        toPlace.push({ ...q });
+    });
+
     const placed = [];
     const usedPositions = [];
-    
+
     // Random order for questions
     toPlace.sort(() => Math.random() - 0.5);
-    
+
     for (const q of toPlace) {
         // Find positions that maintain min-spacing
-        const available = valid.filter(pos => 
-            usedPositions.every(used => 
+        const available = valid.filter(pos =>
+            usedPositions.every(used =>
                 Math.abs(used - pos) >= setup['min-spacing']
             )
         );
-        
+
         if (available.length === 0) return null; // Failed, need retry
-        
+
         const pos = available[Math.floor(Math.random() * available.length)];
         usedPositions.push(pos);
-        placed.push({...q, step: pos});
+        placed.push({ ...q, step: pos });
     }
-    
+
+    console.log("placed", placed);
+
     return placed;
 }
 
@@ -57,12 +77,11 @@ window.homeInit = async function () {
     const setupIndex = parseInt(sessionStorage.getItem("SituatedVisCurrentIndex") || "0");
 
     let config = sessionStorage.getItem("SituatedVisConfig");
-    console.log("check what is config", config);
 
     if (!config) {
         // Config not in sessionStorage
         const raw = await fetch('config.json').then(r => r.json());
-        
+
         // Randomize and pair filesets with setups
         const filesetIndices = [...Array(raw.filesets.length).keys()].sort(() => Math.random() - 0.5);
         const setupIndices = [...Array(raw.setups.length).keys()].sort(() => Math.random() - 0.5);
@@ -71,12 +90,12 @@ window.homeInit = async function () {
             const setup = raw.setups[setupIdx];
             let questions = null;
             let attempts = 0;
-            
+
             while (!questions && attempts < 100) {
                 questions = tryAssignQuestions(setup, raw.questions);
                 attempts++;
             }
-            
+
             if (!questions) {
                 alert(`Failed to assign questions for setup ${setup.setup}`);
                 questions = [];
@@ -84,7 +103,7 @@ window.homeInit = async function () {
 
             questions.sort((a, b) => a.step - b.step);
             const questionSteps = questions.map(q => q.step);
-            
+
             return {
                 ...setup,
                 files: shuffleFiles(raw.filesets[filesetIndices[i]]),
