@@ -285,7 +285,7 @@ function generateChart(
 	// Font size scale when linear scale and side position
 	const linearSizeFontSizeScale = d3.scaleLinear()
 		.domain(y.domain())
-		.range(40, 80);
+		.range([20, 100]);
 
 	const ushapedFontSizeScale = d3.scaleLinear()
 		.domain([y.domain()[0], (y.domain()[0] + y.domain()[1]) / 2, y.domain()[1]])
@@ -431,6 +431,7 @@ function generateChart(
 		// u shaped side scaling is disabled
 		if (labelPosition === "side") {
 			if (dynamicLabelSize === "linear") {
+			console.log(n);
 				return `${linearSizeFontSizeScale(n)}px`;
 			} else {
 				return `74px`;
