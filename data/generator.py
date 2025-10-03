@@ -1,12 +1,8 @@
-import csv
+import pandas as pd
+import os
 
-for set_num in range(1, 7):
-    for machine_num in range(1, 10):
-        filename = f"Set{set_num}Machine{machine_num}.csv"
-        value = set_num * 10 + machine_num
-        
-        with open(filename, 'w', newline='') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(['index', 'value'])
-            for index in range(1, 301):
-                writer.writerow([index, value])
+for file in os.listdir():
+    if file.endswith('.csv') and file.startswith('Set'):
+        df = pd.read_csv(file)
+        df.rename(columns={'rand': 'value'}, inplace=True)
+        df.to_csv(file, index=False)

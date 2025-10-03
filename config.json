@@ -9,7 +9,10 @@
             "Set1Machine6.csv",
             "Set1Machine7.csv",
             "Set1Machine8.csv",
-            "Set1Machine9.csv"
+            "Set1Machine9.csv",
+            "Set1Machine10.csv",
+            "Set1Machine11.csv",
+            "Set1Machine12.csv"
         ],
         [
             "Set2Machine1.csv",
@@ -20,7 +23,10 @@
             "Set2Machine6.csv",
             "Set2Machine7.csv",
             "Set2Machine8.csv",
-            "Set2Machine9.csv"
+            "Set2Machine9.csv",
+            "Set2Machine10.csv",
+            "Set2Machine11.csv",
+            "Set2Machine12.csv"
         ],
         [
             "Set3Machine1.csv",
@@ -31,7 +37,10 @@
             "Set3Machine6.csv",
             "Set3Machine7.csv",
             "Set3Machine8.csv",
-            "Set3Machine9.csv"
+            "Set3Machine9.csv",
+            "Set3Machine10.csv",
+            "Set3Machine11.csv",
+            "Set3Machine12.csv"
         ],
         [
             "Set4Machine1.csv",
@@ -42,7 +51,10 @@
             "Set4Machine6.csv",
             "Set4Machine7.csv",
             "Set4Machine8.csv",
-            "Set4Machine9.csv"
+            "Set4Machine9.csv",
+            "Set4Machine10.csv",
+            "Set4Machine11.csv",
+            "Set4Machine12.csv"
         ],
         [
             "Set5Machine1.csv",
@@ -53,7 +65,10 @@
             "Set5Machine6.csv",
             "Set5Machine7.csv",
             "Set5Machine8.csv",
-            "Set5Machine9.csv"
+            "Set5Machine9.csv",
+            "Set5Machine10.csv",
+            "Set5Machine11.csv",
+            "Set5Machine12.csv"
         ],
         [
             "Set6Machine1.csv",
@@ -64,22 +79,25 @@
             "Set6Machine6.csv",
             "Set6Machine7.csv",
             "Set6Machine8.csv",
-            "Set6Machine9.csv"
+            "Set6Machine9.csv",
+            "Set6Machine10.csv",
+            "Set6Machine11.csv",
+            "Set6Machine12.csv"
         ]
     ],
     "setups": [
         {
             "setup": "setup1",
-            "setup-length": 300,
+            "setup-length": 500,
             "min-spacing": 10,
             "no-questions": [
-                [45, 55]
+                [240, 260]
             ],
             "num-rows": 3,
             "num-columns": 4,
             "anim-duration": 400,
             "anim-delay": 200,
-            "num-points": 10,
+            "num-points": 15,
             "rolling-avg": 5,
             "sound": [
                 5,
@@ -91,7 +109,7 @@
             "vis-showXAxisTicks": true,
             "vis-xAxisInverseStatic": false,
             "vis-useThresholdColors": true,
-            "vis-showThresholdBand": false,
+            "vis-showThresholdBand": true,
             "vis-backgroundEncoding": false,
             "vis-gridBackgroundMove": false,
             "vis-showVerticalBar": false,
@@ -102,16 +120,16 @@
         },
         {
             "setup": "setup2",
-            "setup-length": 300,
+            "setup-length": 500,
             "min-spacing": 10,
             "no-questions": [
-                [45, 55]
+                [240, 260]
             ],
-            "num-rows": 3,
-            "num-columns": 4,
+            "num-rows": 4,
+            "num-columns": 3,
             "anim-duration": 400,
             "anim-delay": 200,
-            "num-points": 10,
+            "num-points": 15,
             "rolling-avg": 5,
             "sound": [
                 5,
@@ -123,27 +141,27 @@
             "vis-showXAxisTicks": true,
             "vis-xAxisInverseStatic": false,
             "vis-useThresholdColors": true,
-            "vis-showThresholdBand": false,
+            "vis-showThresholdBand": true,
             "vis-backgroundEncoding": false,
             "vis-gridBackgroundMove": false,
             "vis-showVerticalBar": false,
             "vis-useRollingAverage": false,
             "vis-easeInOut": true,
             "vis-dynamicLabelSize": "none",
-            "vis-labelPosition": "integrated"
+            "vis-labelPosition": "side"
         },
         {
             "setup": "setup3",
-            "setup-length": 300,
+             "setup-length": 500,
             "min-spacing": 10,
             "no-questions": [
-                [45, 55]
+                [240, 260]
             ],
             "num-rows": 3,
             "num-columns": 4,
             "anim-duration": 400,
             "anim-delay": 200,
-            "num-points": 10,
+            "num-points": 15,
             "rolling-avg": 5,
             "sound": [
                 5,
@@ -161,21 +179,21 @@
             "vis-showVerticalBar": false,
             "vis-useRollingAverage": false,
             "vis-easeInOut": true,
-            "vis-dynamicLabelSize": "none",
+            "vis-dynamicLabelSize": "linear",
             "vis-labelPosition": "integrated"
         },
         {
             "setup": "setup4",
-            "setup-length": 300,
+            "setup-length": 100,
             "min-spacing": 10,
             "no-questions": [
                 [45, 55]
             ],
-            "num-rows": 3,
-            "num-columns": 4,
-            "anim-duration": 400,
-            "anim-delay": 200,
-            "num-points": 10,
+            "num-rows": 4,
+            "num-columns": 3,
+            "anim-duration": 500,
+            "anim-delay": 300,
+            "num-points": 15,
             "rolling-avg": 5,
             "sound": [
                 5,
@@ -193,21 +211,21 @@
             "vis-showVerticalBar": false,
             "vis-useRollingAverage": false,
             "vis-easeInOut": true,
-            "vis-dynamicLabelSize": "none",
-            "vis-labelPosition": "integrated"
+            "vis-dynamicLabelSize": "linear",
+            "vis-labelPosition": "side"
         },
         {
             "setup": "setup5",
-            "setup-length": 300,
+            "setup-length": 100,
             "min-spacing": 10,
             "no-questions": [
                 [45, 55]
             ],
             "num-rows": 3,
             "num-columns": 4,
-            "anim-duration": 400,
-            "anim-delay": 200,
-            "num-points": 10,
+            "anim-duration": 500,
+            "anim-delay": 300,
+            "num-points": 15,
             "rolling-avg": 5,
             "sound": [
                 5,
@@ -218,11 +236,11 @@
             ],
             "vis-showXAxisTicks": true,
             "vis-xAxisInverseStatic": false,
-            "vis-useThresholdColors": true,
-            "vis-showThresholdBand": false,
+            "vis-useThresholdColors": false,
+            "vis-showThresholdBand": true,
             "vis-backgroundEncoding": false,
             "vis-gridBackgroundMove": false,
-            "vis-showVerticalBar": false,
+            "vis-showVerticalBar": true,
             "vis-useRollingAverage": false,
             "vis-easeInOut": true,
             "vis-dynamicLabelSize": "none",
@@ -230,16 +248,16 @@
         },
         {
             "setup": "setup6",
-            "setup-length": 300,
+            "setup-length": 100,
             "min-spacing": 10,
             "no-questions": [
                 [45, 55]
             ],
             "num-rows": 3,
             "num-columns": 4,
-            "anim-duration": 400,
-            "anim-delay": 200,
-            "num-points": 10,
+            "anim-duration": 500,
+            "anim-delay": 300,
+            "num-points": 15,
             "rolling-avg": 5,
             "sound": [
                 5,
@@ -250,11 +268,11 @@
             ],
             "vis-showXAxisTicks": true,
             "vis-xAxisInverseStatic": false,
-            "vis-useThresholdColors": true,
-            "vis-showThresholdBand": false,
+            "vis-useThresholdColors": false,
+            "vis-showThresholdBand": true,
             "vis-backgroundEncoding": false,
             "vis-gridBackgroundMove": false,
-            "vis-showVerticalBar": false,
+            "vis-showVerticalBar": true,
             "vis-useRollingAverage": false,
             "vis-easeInOut": true,
             "vis-dynamicLabelSize": "none",

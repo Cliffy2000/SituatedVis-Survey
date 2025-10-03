@@ -79,9 +79,6 @@ window.dashboardInit = function() {
 		let cellWidth = gridWidth / COLS;
 		let cellHeight = gridHeight / ROWS;
 
-		
-		console.log('generateChart exists:', typeof generateChart);
-		console.log('Grid dimensions:', gridWidth, gridHeight);
 
 		// Fills the titles array
 		const titles = Array.from({ length: selectedFiles.length }, (_, i) => `Machine ${i + 1}`);
@@ -206,7 +203,6 @@ window.dashboardInit = function() {
 			
 			// Check if options match machine count and should use grid
 			const machineOptions = question.area === "machine";
-			console.log(machineOptions);
 			const useGrid = question.options.length === selectedFiles.length && selectedFiles.length > 3;
 			
 			// Check if this is a "find 3" question (checkbox + grid)

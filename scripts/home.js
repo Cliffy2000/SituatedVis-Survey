@@ -3,6 +3,9 @@
 
 function tryAssignQuestions(setup, questions) {
     ITERATIONS = 3;
+    if (setup['setup'] == 'setup4' || setup['setup'] == 'setup5' || setup['setup'] == 'setup6') {
+        ITERATIONS = 1;
+    }
 
     const valid = [];
     for (let i = 1; i <= setup['setup-length']; i++) {
@@ -57,7 +60,6 @@ window.homeInit = async function () {
     const setupIndex = parseInt(sessionStorage.getItem("SituatedVisCurrentIndex") || "0");
 
     let config = sessionStorage.getItem("SituatedVisConfig");
-    console.log("check what is config", config);
 
     if (!config) {
         // Config not in sessionStorage
@@ -93,7 +95,6 @@ window.homeInit = async function () {
             };
         });
         config = processedConfig;
-        console.log(config);
         await new Promise(r => requestAnimationFrame(() => setTimeout(r, 0)));
         sessionStorage.setItem("SituatedVisConfig", JSON.stringify(config));
 
