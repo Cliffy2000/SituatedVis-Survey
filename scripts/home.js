@@ -1,26 +1,13 @@
-// Switch for random components
-
-let attentionQuestions = [
-    {
-        "id": "atn",
-        "prompt": "What is the largest number among the options below? You must choose option B for this question no matter the values",
-        "type": "radio",
-        "area": "other",
-        "options": [
-            "10",
-            "40",
-            "90",
-            "25"
-        ]
+function shuffleFiles(files) {
+    const shuffled = [...files];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-];
+    return shuffled;
+}
 
-function tryAssignQuestions(setup, questions) {
-    ITERATIONS = 3;
-    if (setup['setup'] == 'setup4' || setup['setup'] == 'setup5' || setup['setup'] == 'setup6') {
-        ITERATIONS = 1;
-    }
-
+function tryAssignQuestions(setup, questions, qsetIndex) {
     const valid = [];
     for (let i = 1; i <= setup['setup-length']; i++) {
         const forbidden = setup['no-questions']?.some(([start, end]) =>
@@ -28,15 +15,26 @@ function tryAssignQuestions(setup, questions) {
         if (!forbidden) valid.push(i);
     }
 
-    // Need to place each question 3 times
     const toPlace = [];
-    questions.forEach(q => {
-        for (let i = 0; i < ITERATIONS; i++) toPlace.push({ ...q });
-    });
-
-    attentionQuestions.forEach(q => {
-        toPlace.push({ ...q });
-    });
+    
+    // Handle different question sets based on qsetIndex (0-3)
+    if (qsetIndex === 0) {
+        // q1 and q2, 2 iterations each
+        [questions[0], questions[1]].forEach(q => {
+            for (let i = 0; i < 2; i++) toPlace.push({ ...q });
+        });
+    } else if (qsetIndex === 1) {
+        // q3 and q4, 2 iterations each
+        [questions[2], questions[3]].forEach(q => {
+            for (let i = 0; i < 2; i++) toPlace.push({ ...q });
+        });
+    } else if (qsetIndex === 2) {
+        // q5, 5 iterations
+        for (let i = 0; i < 5; i++) toPlace.push({ ...questions[4] });
+    } else if (qsetIndex === 3) {
+        // q6, 5 iterations
+        for (let i = 0; i < 5; i++) toPlace.push({ ...questions[5] });
+    }
 
     const placed = [];
     const usedPositions = [];
@@ -64,20 +62,11 @@ function tryAssignQuestions(setup, questions) {
     return placed;
 }
 
-function shuffleFiles(files) {
-    const shuffled = [...files];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
-}
-
-
 window.homeInit = async function () {
-
-    // Get setup index from storage, not URL
-    const setupIndex = parseInt(sessionStorage.getItem("SituatedVisCurrentIndex") || "0");
+    // Get URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const qsetParam = urlParams.get('qset');
+    const setupParam = urlParams.get('setup');
 
     let config = sessionStorage.getItem("SituatedVisConfig");
 
@@ -85,36 +74,42 @@ window.homeInit = async function () {
         // Config not in sessionStorage
         const raw = await fetch('config.json').then(r => r.json());
 
-        // Randomize and pair filesets with setups
-        const filesetIndices = [...Array(raw.filesets.length).keys()].sort(() => Math.random() - 0.5);
-        const setupIndices = [...Array(raw.setups.length).keys()].sort(() => Math.random() - 0.5);
+        // Determine which question set to use (0-3)
+        const qsetIndex = qsetParam ? parseInt(qsetParam) - 1 : Math.floor(Math.random() * 4);
+        
+        // Determine which setup to use (0-5)
+        const setupIndex = setupParam ? parseInt(setupParam) - 1 : Math.floor(Math.random() * 6);
+        
+        const setup = raw.setups[setupIndex];
+        
+        // Randomly select a fileset
+        const filesetIndex = Math.floor(Math.random() * raw.filesets.length);
+        
+        let questions = null;
+        let attempts = 0;
 
-        const processedConfig = setupIndices.map((setupIdx, i) => {
-            const setup = raw.setups[setupIdx];
-            let questions = null;
-            let attempts = 0;
+        while (!questions && attempts < 100) {
+            questions = tryAssignQuestions(setup, raw.questions, qsetIndex);
+            attempts++;
+        }
 
-            while (!questions && attempts < 100) {
-                questions = tryAssignQuestions(setup, raw.questions);
-                attempts++;
-            }
+        if (!questions) {
+            alert(`Failed to assign questions for setup ${setup.setup}`);
+            questions = [];
+        }
 
-            if (!questions) {
-                alert(`Failed to assign questions for setup ${setup.setup}`);
-                questions = [];
-            }
+        questions.sort((a, b) => a.step - b.step);
+        const questionSteps = questions.map(q => q.step);
 
-            questions.sort((a, b) => a.step - b.step);
-            const questionSteps = questions.map(q => q.step);
-
-            return {
-                ...setup,
-                files: shuffleFiles(raw.filesets[filesetIndices[i]]),
-                questions,
-                sound: questionSteps
-            };
-        });
-        config = processedConfig;
+        config = [{
+            ...setup,
+            files: shuffleFiles(raw.filesets[filesetIndex]),
+            questions,
+            sound: questionSteps,
+            qsetIndex: qsetIndex,
+            setupIndex: setupIndex
+        }];
+        
         await new Promise(r => requestAnimationFrame(() => setTimeout(r, 0)));
         sessionStorage.setItem("SituatedVisConfig", JSON.stringify(config));
 
@@ -123,16 +118,11 @@ window.homeInit = async function () {
         config = JSON.parse(config);
     }
 
-    // Validate index
-    if (setupIndex >= config.length) {
-        sessionStorage.clear();
-        window.navigateToHome();
-        return;
-    }
+    sessionStorage.setItem("SituatedVisCurrentIndex", "0");
 
-    sessionStorage.setItem("SituatedVisCurrentIndex", String(setupIndex));
-
-    document.querySelector(".setup-name").textContent = config[setupIndex].setup;
+    // Display 1-indexed values
+    document.querySelector(".qset-index").textContent = (config[0].qsetIndex + 1);
+    document.querySelector(".config-index").textContent = (config[0].setupIndex + 1);
 
     const existingUsername = sessionStorage.getItem('username');
     const usernameInput = document.getElementById('user-name');
@@ -148,8 +138,6 @@ window.homeInit = async function () {
     usernameInput.addEventListener('input', () => {
         startButton.disabled = !usernameInput.value.trim();
     });
-
-
 }
 
 function startTrial() {

@@ -46,7 +46,7 @@ function generateChart(
 	let CANVAS_HEIGHT = height;
 
 	// this is the width on the right side of the plot for additional information
-	const INFO_DEFAULT_WIDTH = 150;
+	const INFO_DEFAULT_WIDTH = 100;
 	let INFO_WIDTH = (labelPosition === "side") ? INFO_DEFAULT_WIDTH : 0;
 
 	// this is the size of the chart area
@@ -285,7 +285,7 @@ function generateChart(
 	// Font size scale when linear scale and side position
 	const linearSizeFontSizeScale = d3.scaleLinear()
 		.domain(y.domain())
-		.range([20, 100]);
+		.range([20, 84]);
 
 	const ushapedFontSizeScale = d3.scaleLinear()
 		.domain([y.domain()[0], (y.domain()[0] + y.domain()[1]) / 2, y.domain()[1]])
@@ -431,10 +431,9 @@ function generateChart(
 		// u shaped side scaling is disabled
 		if (labelPosition === "side") {
 			if (dynamicLabelSize === "linear") {
-			console.log(n);
 				return `${linearSizeFontSizeScale(n)}px`;
 			} else {
-				return `74px`;
+				return `64px`;
 			}
 		}
 
