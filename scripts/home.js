@@ -8,8 +8,14 @@ function shuffleArray(arr) {
 }
 
 function tryAssignQuestions(setup, questions, qsetIndex) {
+    // Last animated step: SETUP_LENGTH - num-points + 1
+    // We need the clear event (lastQuestion + END_MARGIN) to fire before animation ends
+    // So last valid question step = SETUP_LENGTH - num-points - END_MARGIN + 1
+    const END_MARGIN = 5;
+    const lastValidStep = setup['setup-length'] - setup['num-points'] - END_MARGIN + 1;
+
     const valid = [];
-    for (let i = 1; i <= setup['setup-length']; i++) {
+    for (let i = 1; i <= lastValidStep; i++) {
         const forbidden = setup['no-questions']?.some(([start, end]) =>
             i >= start && i <= end) ?? false;
         if (!forbidden) valid.push(i);
@@ -50,6 +56,19 @@ function tryAssignQuestions(setup, questions, qsetIndex) {
         placed.push({ ...q, step: pos });
     }
 
+    // Add a clear event after the last question so it disappears like the rest
+    if (placed.length > 0) {
+        const lastStep = Math.max(...placed.map(q => q.step));
+        placed.push({
+            step: lastStep + END_MARGIN,
+            id: '_clear',
+            prompt: '',
+            type: 'clear',
+            area: '',
+            options: []
+        });
+    }
+
     console.log("placed", placed);
     return placed;
 }
@@ -63,14 +82,17 @@ window.homeInit = async function () {
     if (!config) {
         const raw = await fetch('config.json').then(r => r.json());
 
+        // One question set for the entire session (all 6 trials)
         const qsetIndex = qsetParam ? parseInt(qsetParam) - 1 : Math.floor(Math.random() * 4);
 
+        // Shuffle the 6 setups and 6 filesets independently
         const setupOrder = shuffleArray([0, 1, 2, 3, 4, 5]);
         const filesetOrder = shuffleArray([0, 1, 2, 3, 4, 5]);
 
         console.log("Setup order:", setupOrder.map(i => i + 1));
         console.log("Fileset order:", filesetOrder.map(i => i + 1));
 
+        // Build all 6 trial configs
         const allConfigs = [];
 
         for (let trial = 0; trial < 6; trial++) {
@@ -112,27 +134,35 @@ window.homeInit = async function () {
         config = JSON.parse(config);
     }
 
+    // Determine which trial we're on
     const currentIndex = parseInt(sessionStorage.getItem("SituatedVisCurrentIndex") || "0");
     sessionStorage.setItem("SituatedVisCurrentIndex", String(currentIndex));
 
+    // Display info for the current trial
     const current = config[currentIndex];
     document.querySelector(".qset-index").textContent = (current.qsetIndex + 1);
-    document.querySelector(".config-index").textContent = 
-        `${current.trialNumber} of 6  (Setup ${current.setupIndex + 1}, Fileset ${current.filesetIndex + 1})`;
+    document.querySelector(".config-index").textContent = `${current.trialNumber} of 6  (Setup ${current.setupIndex + 1}, Fileset ${current.filesetIndex + 1})`;
 
-    // Display the Prolific ID (read-only, already saved from training page)
-    const username = sessionStorage.getItem('username') || '';
-    const idDisplay = document.querySelector('.prolific-id-display');
-    if (idDisplay) {
-        idDisplay.textContent = username || '(not set)';
+    const existingUsername = sessionStorage.getItem('username');
+    const usernameInput = document.getElementById('user-name');
+    const startButton = document.querySelector('.startTrialButton');
+
+    if (existingUsername) {
+        usernameInput.value = existingUsername;
+        startButton.disabled = false;
+    } else {
+        startButton.disabled = true;
     }
 
-    const startButton = document.querySelector('.startTrialButton');
-    // Enable start if we have a username; otherwise disable
-    startButton.disabled = !username;
+    usernameInput.addEventListener('input', () => {
+        startButton.disabled = !usernameInput.value.trim();
+    });
 }
 
 function startTrial() {
+    const username = document.getElementById('user-name').value.trim();
+    sessionStorage.setItem('username', username);
+
     setTimeout(() => {
         window.navigateToDashboard();
     }, 10);
