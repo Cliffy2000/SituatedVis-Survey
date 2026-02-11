@@ -10,7 +10,7 @@ function shuffleArray(arr) {
 function tryAssignQuestions(setup, questions, qsetIndex) {
     const valid = [];
     for (let i = 1; i <= setup['setup-length']; i++) {
-        const forbidden = setup['no-questions']?.some(([start, end-10]) =>
+        const forbidden = setup['no-questions']?.some(([start, end]) =>
             i >= start && i <= end) ?? false;
         if (!forbidden) valid.push(i);
     }
