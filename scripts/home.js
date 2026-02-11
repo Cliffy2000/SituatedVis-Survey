@@ -23,19 +23,7 @@ function tryAssignQuestions(setup, questions, qsetIndex) {
 
     const toPlace = [];
 
-    if (qsetIndex === 0) {
-        for (let i = 0; i < 5; i++) toPlace.push({ ...questions[0] });
-    } else if (qsetIndex === 1) {
-        for (let i = 0; i < 5; i++) toPlace.push({ ...questions[1] });
-    } else if (qsetIndex === 2) {
-        for (let i = 0; i < 5; i++) toPlace.push({ ...questions[2] });
-    } else if (qsetIndex === 3) {
-        for (let i = 0; i < 5; i++) toPlace.push({ ...questions[3] });
-    } else if (qsetIndex === 4) {
-        for (let i = 0; i < 5; i++) toPlace.push({ ...questions[4] });
-    } else if (qsetIndex === 5) {
-        for (let i = 0; i < 5; i++) toPlace.push({ ...questions[5] });
-    }
+    for (let i = 0; i < 5; i++) toPlace.push({ ...questions[qsetIndex] });
 
     const placed = [];
     const usedPositions = [];
