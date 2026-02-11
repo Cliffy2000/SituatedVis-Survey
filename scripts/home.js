@@ -1,5 +1,5 @@
-function shuffleFiles(files) {
-    const shuffled = [...files];
+function shuffleArray(arr) {
+    const shuffled = [...arr];
     for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
@@ -10,47 +10,40 @@ function shuffleFiles(files) {
 function tryAssignQuestions(setup, questions, qsetIndex) {
     const valid = [];
     for (let i = 1; i <= setup['setup-length']; i++) {
-        const forbidden = setup['no-questions']?.some(([start, end]) =>
+        const forbidden = setup['no-questions']?.some(([start, end-10]) =>
             i >= start && i <= end) ?? false;
         if (!forbidden) valid.push(i);
     }
 
     const toPlace = [];
-    
-    // Handle different question sets based on qsetIndex (0-3)
+
     if (qsetIndex === 0) {
-        // q1 and q2, 2 iterations each
         [questions[0], questions[1]].forEach(q => {
             for (let i = 0; i < 2; i++) toPlace.push({ ...q });
         });
     } else if (qsetIndex === 1) {
-        // q3 and q4, 2 iterations each
         [questions[2], questions[3]].forEach(q => {
             for (let i = 0; i < 2; i++) toPlace.push({ ...q });
         });
     } else if (qsetIndex === 2) {
-        // q5, 5 iterations
         for (let i = 0; i < 5; i++) toPlace.push({ ...questions[4] });
     } else if (qsetIndex === 3) {
-        // q6, 5 iterations
         for (let i = 0; i < 5; i++) toPlace.push({ ...questions[5] });
     }
 
     const placed = [];
     const usedPositions = [];
 
-    // Random order for questions
     toPlace.sort(() => Math.random() - 0.5);
 
     for (const q of toPlace) {
-        // Find positions that maintain min-spacing
         const available = valid.filter(pos =>
             usedPositions.every(used =>
                 Math.abs(used - pos) >= setup['min-spacing']
             )
         );
 
-        if (available.length === 0) return null; // Failed, need retry
+        if (available.length === 0) return null;
 
         const pos = available[Math.floor(Math.random() * available.length)];
         usedPositions.push(pos);
@@ -58,93 +51,88 @@ function tryAssignQuestions(setup, questions, qsetIndex) {
     }
 
     console.log("placed", placed);
-
     return placed;
 }
 
 window.homeInit = async function () {
-    // Get URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const qsetParam = urlParams.get('qset');
-    const setupParam = urlParams.get('setup');
 
     let config = sessionStorage.getItem("SituatedVisConfig");
 
     if (!config) {
-        // Config not in sessionStorage
         const raw = await fetch('config.json').then(r => r.json());
 
-        // Determine which question set to use (0-3)
         const qsetIndex = qsetParam ? parseInt(qsetParam) - 1 : Math.floor(Math.random() * 4);
-        
-        // Determine which setup to use (0-5)
-        const setupIndex = setupParam ? parseInt(setupParam) - 1 : Math.floor(Math.random() * 6);
-        
-        const setup = raw.setups[setupIndex];
-        
-        // Randomly select a fileset
-        const filesetIndex = Math.floor(Math.random() * raw.filesets.length);
-        
-        let questions = null;
-        let attempts = 0;
 
-        while (!questions && attempts < 100) {
-            questions = tryAssignQuestions(setup, raw.questions, qsetIndex);
-            attempts++;
+        const setupOrder = shuffleArray([0, 1, 2, 3, 4, 5]);
+        const filesetOrder = shuffleArray([0, 1, 2, 3, 4, 5]);
+
+        console.log("Setup order:", setupOrder.map(i => i + 1));
+        console.log("Fileset order:", filesetOrder.map(i => i + 1));
+
+        const allConfigs = [];
+
+        for (let trial = 0; trial < 6; trial++) {
+            const setupIdx = setupOrder[trial];
+            const filesetIdx = filesetOrder[trial];
+            const setup = raw.setups[setupIdx];
+
+            let questions = null;
+            let attempts = 0;
+            while (!questions && attempts < 100) {
+                questions = tryAssignQuestions(setup, raw.questions, qsetIndex);
+                attempts++;
+            }
+
+            if (!questions) {
+                alert(`Failed to assign questions for trial ${trial + 1} (setup ${setup.setup})`);
+                questions = [];
+            }
+
+            questions.sort((a, b) => a.step - b.step);
+            const questionSteps = questions.map(q => q.step);
+
+            allConfigs.push({
+                ...setup,
+                files: shuffleArray(raw.filesets[filesetIdx]),
+                questions,
+                sound: questionSteps,
+                qsetIndex: qsetIndex,
+                setupIndex: setupIdx,
+                filesetIndex: filesetIdx,
+                trialNumber: trial + 1
+            });
         }
 
-        if (!questions) {
-            alert(`Failed to assign questions for setup ${setup.setup}`);
-            questions = [];
-        }
-
-        questions.sort((a, b) => a.step - b.step);
-        const questionSteps = questions.map(q => q.step);
-
-        config = [{
-            ...setup,
-            files: shuffleFiles(raw.filesets[filesetIndex]),
-            questions,
-            sound: questionSteps,
-            qsetIndex: qsetIndex,
-            setupIndex: setupIndex
-        }];
-        
+        config = allConfigs;
         await new Promise(r => requestAnimationFrame(() => setTimeout(r, 0)));
         sessionStorage.setItem("SituatedVisConfig", JSON.stringify(config));
-
     } else {
-        // Config exists in sessionStorage, parse it
         config = JSON.parse(config);
     }
 
-    sessionStorage.setItem("SituatedVisCurrentIndex", "0");
+    const currentIndex = parseInt(sessionStorage.getItem("SituatedVisCurrentIndex") || "0");
+    sessionStorage.setItem("SituatedVisCurrentIndex", String(currentIndex));
 
-    // Display 1-indexed values
-    document.querySelector(".qset-index").textContent = (config[0].qsetIndex + 1);
-    document.querySelector(".config-index").textContent = (config[0].setupIndex + 1);
+    const current = config[currentIndex];
+    document.querySelector(".qset-index").textContent = (current.qsetIndex + 1);
+    document.querySelector(".config-index").textContent = 
+        `${current.trialNumber} of 6  (Setup ${current.setupIndex + 1}, Fileset ${current.filesetIndex + 1})`;
 
-    const existingUsername = sessionStorage.getItem('username');
-    const usernameInput = document.getElementById('user-name');
-    const startButton = document.querySelector('.startTrialButton');
-
-    if (existingUsername) {
-        usernameInput.value = existingUsername;
-        startButton.disabled = false;
-    } else {
-        startButton.disabled = true;
+    // Display the Prolific ID (read-only, already saved from training page)
+    const username = sessionStorage.getItem('username') || '';
+    const idDisplay = document.querySelector('.prolific-id-display');
+    if (idDisplay) {
+        idDisplay.textContent = username || '(not set)';
     }
 
-    usernameInput.addEventListener('input', () => {
-        startButton.disabled = !usernameInput.value.trim();
-    });
+    const startButton = document.querySelector('.startTrialButton');
+    // Enable start if we have a username; otherwise disable
+    startButton.disabled = !username;
 }
 
 function startTrial() {
-    const username = document.getElementById('user-name').value.trim();
-    sessionStorage.setItem('username', username);
-
-    // Replace the current page in history with dashboard
     setTimeout(() => {
         window.navigateToDashboard();
     }, 10);

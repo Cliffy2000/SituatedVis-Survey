@@ -9,7 +9,7 @@
     <link rel="icon" href="logo.svg" type="image/svg+xml">
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="styles/home.css">
-	<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
     <script src="scripts/firebase-config.js"></script>
@@ -25,8 +25,8 @@
         <div class="options-row">
             <div class="display-options-panel">
                 <div class="text-entry-container">
-                    <label for="user-name">User Name</label>
-                    <input type="text" id="user-name" name="user-name" placeholder="Enter your name...">
+                    <label>Prolific ID</label>
+                    <text class="prolific-id-display"></text>
                 </div>
                 <div class="text-entry-container">
                     <text>Question Set</text>
@@ -41,8 +41,6 @@
                 <button class="startTrialButton" onclick="startTrial()">Start</button>
             </div>
         </div>
-
-        
     </div>
 </body>
 

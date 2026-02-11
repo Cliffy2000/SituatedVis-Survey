@@ -126,37 +126,6 @@ window.dashboardInit = function() {
 			return `${year}${month}${day}_${hour}${minute}${second}`;
 		}
 
-		/*
-		function exportFile() {
-			const userName = sessionStorage.getItem('SituatedVisUserName') || 'Unknown';
-			const startTime = sessionStorage.getItem('SituatedVisConfirmationTime') || new Date().toISOString();
-			const exportTime = new Date().toISOString();
-			
-			const exportData = {
-				metadata: {
-					userName: userName,
-					startTime: startTime,
-					exportTime: exportTime,
-					selectedFiles: selectedFiles,
-					configurations: {
-						displaySliders: displaySliders,
-						visualizationOptions: visOptions
-					}
-				},
-				clickLog: clickLog
-			};
-			
-			const blob = new Blob([JSON.stringify(exportData, null, 2)], {type: 'application/json'});
-			const a = document.createElement('a');
-			a.href = URL.createObjectURL(blob);
-			a.download = `SituatedVisLog_${getTimestamp()}.json`;
-			document.body.appendChild(a);
-			a.click();
-			document.body.removeChild(a);
-			URL.revokeObjectURL(a.href);
-		}
-	*/
-
 		function onPauseClick() {
 			if (flag_running) {
 				stopAnimation();
@@ -351,31 +320,124 @@ window.dashboardInit = function() {
 				if (success) {
 					console.log('Data saved to cloud database');
 				} else {
-					console.log('Failed to save to cloud, but continuing with local download');
+					console.log('Failed to save to cloud, but continuing');
 				}		
 
-				
-				// Check if there's a next setup
-
-				// TODO: rework redirect after trial
 				const nextIndex = setupIndex + 1;
 				if (nextIndex < config.length) {
-					// Update storage and navigate
+					// More trials remaining — go to next
 					sessionStorage.setItem('SituatedVisCurrentIndex', String(nextIndex));
 					setTimeout(() => {
 						window.navigateToHome();
 					}, 100);
 				} else {
-					// All setups completed
-					// TODO
-					alert('Study completed! Thank you for participating.');
-					sessionStorage.clear();
-					setTimeout(() => {
-						window.navigateToHome();
-					}, 100);
+					// All 6 trials completed — show completion overlay then redirect
+					showCompletionOverlay();
 				}
-			})
+			});
+		}
 
+		function showCompletionOverlay() {
+			const overlay = document.createElement('div');
+			overlay.id = 'completion-overlay';
+			Object.assign(overlay.style, {
+				position: 'fixed',
+				top: '0',
+				left: '0',
+				width: '100vw',
+				height: '100vh',
+				backgroundColor: 'rgba(0, 0, 0, 0.6)',
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
+				zIndex: '10000'
+			});
+
+			const box = document.createElement('div');
+			Object.assign(box.style, {
+				backgroundColor: 'white',
+				borderRadius: '12px',
+				padding: '40px 50px',
+				textAlign: 'center',
+				maxWidth: '480px',
+				boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
+				fontFamily: 'sans-serif'
+			});
+
+			const icon = document.createElement('div');
+			icon.textContent = '✓';
+			Object.assign(icon.style, {
+				fontSize: '48px',
+				color: '#4CAF50',
+				marginBottom: '12px',
+				fontWeight: 'bold'
+			});
+
+			const heading = document.createElement('h2');
+			heading.textContent = 'All Trials Completed!';
+			Object.assign(heading.style, {
+				margin: '0 0 12px 0',
+				fontSize: '24px',
+				color: '#333'
+			});
+
+			const message = document.createElement('p');
+			message.textContent = 'Thank you for participating. You will now be redirected to a short demographics survey.';
+			Object.assign(message.style, {
+				margin: '0 0 24px 0',
+				fontSize: '15px',
+				color: '#666',
+				lineHeight: '1.5'
+			});
+
+			const countdown = document.createElement('p');
+			countdown.textContent = 'Redirecting in 5 seconds...';
+			Object.assign(countdown.style, {
+				margin: '0 0 20px 0',
+				fontSize: '14px',
+				color: '#999'
+			});
+
+			const btn = document.createElement('button');
+			btn.textContent = 'Continue Now';
+			Object.assign(btn.style, {
+				padding: '10px 28px',
+				fontSize: '15px',
+				backgroundColor: '#4CAF50',
+				color: 'white',
+				border: 'none',
+				borderRadius: '6px',
+				cursor: 'pointer',
+				fontWeight: '500'
+			});
+
+			const demographicsUrl = 'https://cliffy2000.github.io/SituatedVis-Portal/demographics.html';
+
+			btn.addEventListener('click', () => {
+				sessionStorage.clear();
+				window.location.href = demographicsUrl;
+			});
+
+			box.appendChild(icon);
+			box.appendChild(heading);
+			box.appendChild(message);
+			box.appendChild(countdown);
+			box.appendChild(btn);
+			overlay.appendChild(box);
+			document.body.appendChild(overlay);
+
+			// Countdown timer
+			let seconds = 5;
+			const timer = setInterval(() => {
+				seconds--;
+				if (seconds <= 0) {
+					clearInterval(timer);
+					sessionStorage.clear();
+					window.location.href = demographicsUrl;
+				} else {
+					countdown.textContent = `Redirecting in ${seconds} second${seconds !== 1 ? 's' : ''}...`;
+				}
+			}, 1000);
 		}
 
 		function startAnimation() {
