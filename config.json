@@ -334,7 +334,7 @@
         },
         {
             "id": "q6",
-            "prompt": "Find 3 machines that have been outside of the acceptable output range in the last 115 minutes, i.e. the entire visible time range. There may be more, but please select only 3.",
+            "prompt": "Find 3 machines that have been outside of the acceptable output range in the last 15 minutes, i.e. the entire visible time range. There may be more, but please select only 3.",
             "type": "checkbox",
             "area": "machine",
             "options": [
