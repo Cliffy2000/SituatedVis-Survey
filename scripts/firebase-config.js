@@ -27,8 +27,10 @@ async function saveUserData(data) {
       data.metadata.timestamp = new Date().toISOString();
     }
     
-    // Create a unique document ID based on username and timestamp
-    const docId = `${data.metadata.userName}_${data.metadata.setupName}_${Date.now()}`;
+    // Create a unique document ID using prolific ID and timestamp
+    const prolificId = data.metadata.prolificId || 'Unknown';
+    const type = data.metadata.type || 'unknown';
+    const docId = `${prolificId}_${type}_${Date.now()}`;
     
     // Save to Firestore
     await db.collection('userResponses').doc(docId).set(data);

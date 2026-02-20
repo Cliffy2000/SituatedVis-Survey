@@ -8,9 +8,6 @@ function shuffleArray(arr) {
 }
 
 function tryAssignQuestions(setup, questions, qsetIndex) {
-    // Last animated step: SETUP_LENGTH - num-points + 1
-    // We need the clear event (lastQuestion + END_MARGIN) to fire before animation ends
-    // So last valid question step = SETUP_LENGTH - num-points - END_MARGIN + 1
     const END_MARGIN = 5;
     const lastValidStep = setup['setup-length'] - setup['num-points'] - END_MARGIN + 1;
 
@@ -23,6 +20,7 @@ function tryAssignQuestions(setup, questions, qsetIndex) {
 
     const toPlace = [];
 
+    // Each participant gets one question type (0-5), repeated 5 times
     for (let i = 0; i < 5; i++) toPlace.push({ ...questions[qsetIndex] });
 
     const placed = [];
@@ -70,8 +68,17 @@ window.homeInit = async function () {
     if (!config) {
         const raw = await fetch('config.json').then(r => r.json());
 
-        // One question set for the entire session (all 6 trials)
-        const qsetIndex = qsetParam ? parseInt(qsetParam) - 1 : Math.floor(Math.random() * 4);
+        // Read qsetIndex from sessionStorage (set during training via Prolific ID % 6)
+        // Fall back to URL param or random
+        let qsetIndex;
+        const storedQset = sessionStorage.getItem('qsetIndex');
+        if (storedQset !== null) {
+            qsetIndex = parseInt(storedQset);
+        } else if (qsetParam) {
+            qsetIndex = parseInt(qsetParam) - 1;
+        } else {
+            qsetIndex = Math.floor(Math.random() * 6);
+        }
 
         // Shuffle the 6 setups and 6 filesets independently
         const setupOrder = shuffleArray([0, 1, 2, 3, 4, 5]);
@@ -129,28 +136,33 @@ window.homeInit = async function () {
     // Display info for the current trial
     const current = config[currentIndex];
     document.querySelector(".qset-index").textContent = (current.qsetIndex + 1);
-    document.querySelector(".config-index").textContent = `${current.trialNumber} of 6  (Setup ${current.setupIndex + 1}, Fileset ${current.filesetIndex + 1})`;
+    document.querySelector(".config-index").textContent =
+        `${current.trialNumber} of 6  (Setup ${current.setupIndex + 1}, Fileset ${current.filesetIndex + 1})`;
 
-    const existingUsername = sessionStorage.getItem('username');
-    const usernameInput = document.getElementById('user-name');
-    const startButton = document.querySelector('.startTrialButton');
-
-    if (existingUsername) {
-        usernameInput.value = existingUsername;
-        startButton.disabled = false;
+    // Show pause message between trials (index > 0), logo on first visit
+    const logo = document.getElementById('header-logo');
+    const message = document.getElementById('header-message');
+    if (currentIndex > 0) {
+        if (logo) logo.style.display = 'none';
+        if (message) message.style.display = '';
     } else {
-        startButton.disabled = true;
+        if (logo) logo.style.display = '';
+        if (message) message.style.display = 'none';
     }
 
-    usernameInput.addEventListener('input', () => {
-        startButton.disabled = !usernameInput.value.trim();
-    });
+    // Display the Prolific ID (read-only, already saved from training page)
+    const username = sessionStorage.getItem('username') || '';
+    const idDisplay = document.querySelector('.prolific-id-display');
+    if (idDisplay) {
+        idDisplay.textContent = username || '(not set)';
+    }
+
+    const startButton = document.querySelector('.startTrialButton');
+    // Enable start if we have a username; otherwise disable
+    startButton.disabled = !username;
 }
 
 function startTrial() {
-    const username = document.getElementById('user-name').value.trim();
-    sessionStorage.setItem('username', username);
-
     setTimeout(() => {
         window.navigateToDashboard();
     }, 10);

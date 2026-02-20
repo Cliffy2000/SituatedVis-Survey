@@ -294,15 +294,16 @@ window.dashboardInit = function() {
 			// Stop animation
 			stopAnimation();
 			
-			// Prepare export data
+			// Prepare export data for this trial
 			const userName = sessionStorage.getItem('username') || 'Unknown';
 			const timestamp = new Date().toISOString();
 			
-			const exportData = {
+			const trialData = {
 				metadata: {
-					userName: userName,
 					setupName: currentSetup['setup'],
 					setupIndex: setupIndex,
+					trialNumber: currentSetup['trialNumber'],
+					filesetIndex: currentSetup['filesetIndex'],
 					timestamp: timestamp
 				},
 				configuration: {
@@ -316,25 +317,49 @@ window.dashboardInit = function() {
 				clickLog: clickLog
 			};
 
-			saveUserData(exportData).then(success => {
-				if (success) {
-					console.log('Data saved to cloud database');
-				} else {
-					console.log('Failed to save to cloud, but continuing');
-				}		
+			// Accumulate trial data in sessionStorage
+			const accumulated = JSON.parse(sessionStorage.getItem('SituatedVisTrialResults') || '[]');
+			accumulated.push(trialData);
+			sessionStorage.setItem('SituatedVisTrialResults', JSON.stringify(accumulated));
 
-				const nextIndex = setupIndex + 1;
-				if (nextIndex < config.length) {
-					// More trials remaining — go to next
-					sessionStorage.setItem('SituatedVisCurrentIndex', String(nextIndex));
-					setTimeout(() => {
-						window.navigateToHome();
-					}, 100);
-				} else {
-					// All 6 trials completed — show completion overlay then redirect
+			const nextIndex = setupIndex + 1;
+			if (nextIndex < config.length) {
+				// More trials remaining — go to next
+				sessionStorage.setItem('SituatedVisCurrentIndex', String(nextIndex));
+				setTimeout(() => {
+					window.navigateToHome();
+				}, 100);
+			} else {
+				// All 6 trials completed — save everything at once, then redirect
+				const fullExport = {
+					metadata: {
+						prolificId: userName,
+						qsetIndex: currentSetup['qsetIndex'],
+						timestamp: new Date().toISOString(),
+						type: 'survey',
+						browser: {
+							windowWidth: window.innerWidth,
+							windowHeight: window.innerHeight,
+							screenWidth: screen.width,
+							screenHeight: screen.height,
+							devicePixelRatio: window.devicePixelRatio || 1,
+							userAgent: navigator.userAgent
+						}
+					},
+					trials: accumulated
+				};
+
+				saveUserData(fullExport).then(success => {
+					if (success) {
+						console.log('All trial data saved to cloud database');
+					} else {
+						console.log('Failed to save to cloud');
+					}
+					// Clear accumulated results
+					sessionStorage.removeItem('SituatedVisTrialResults');
 					showCompletionOverlay();
-				}
-			});
+				});
+			}
 		}
 
 		function showCompletionOverlay() {

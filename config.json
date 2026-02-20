@@ -234,7 +234,7 @@
     "questions": [
         {
             "id": "q1",
-            "prompt": "which machine has the highest output right now?",
+            "prompt": "Find the machine that has the highest output right now.",
             "type": "radio",
             "area": "machine",
             "options": [
@@ -254,7 +254,7 @@
         },
         {
             "id": "q2",
-            "prompt": "which machine has the lowest output right now?",
+            "prompt": "Find the machine that has the lowest output right now.",
             "type": "radio",
             "area": "machine",
             "options": [
@@ -274,7 +274,7 @@
         },
         {
             "id": "q3",
-            "prompt": "Find 3 plots that have an overall output increasing over time. There may be more, but please select only 3.",
+            "prompt": "Find 3 machines that have an overall output increasing over time. There may be more, but please select only 3.",
             "type": "checkbox",
             "area": "machine",
             "options": [
@@ -294,7 +294,7 @@
         },
         {
             "id": "q4",
-            "prompt": "Find 3 plots that have an overall output decreasing over time. There may be more, but please select only 3.",
+            "prompt": "Find 3 machines that have an overall output decreasing over time. There may be more, but please select only 3.",
             "type": "checkbox",
             "area": "machine",
             "options": [
@@ -314,28 +314,27 @@
         },
         {
             "id": "q5",
-            "prompt": "How many machines are outside of the acceptable range?",
+            "prompt": "Find 1 machine that is outside of the acceptable range right now.",
             "type": "radio",
             "area": "other",
             "options": [
-                "0",
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
-                "6",
-                "7",
-                "8",
-                "9",
-                "10", 
-                "11", 
-                "12"
+                "Mach. 1",
+                "Mach. 2",
+                "Mach. 3",
+                "Mach. 4",
+                "Mach. 5",
+                "Mach. 6",
+                "Mach. 7",
+                "Mach. 8",
+                "Mach. 9",
+                "Mach. 10", 
+                "Mach. 11", 
+                "Mach. 12"
             ]
         },
         {
             "id": "q6",
-            "prompt": "Find 3 plots where the machine’s output has ever been outside of the acceptable output range in the visible time range. There may be more, but please select only 3.",
+            "prompt": "Find 3 machines that have been outside of the acceptable output range in the last 115 minutes, i.e. the entire visible time range. There may be more, but please select only 3.",
             "type": "checkbox",
             "area": "machine",
             "options": [
