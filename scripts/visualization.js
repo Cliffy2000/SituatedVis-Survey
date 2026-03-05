@@ -90,8 +90,8 @@ function generateChart(
 		totalPointWidth = 2 * POINT_SIZE * viewRange;
 	}
 	
-	let LABEL_FONT_DEFAULT_SIZE = 17;
-	let LABEL_FONT_SIZE_RANGE = [14, 40];
+	let LABEL_FONT_DEFAULT_SIZE = 18;
+	let LABEL_FONT_SIZE_RANGE = [14, 42];
 	let VERTICAL_BAR_WIDTH = 20;
 
 	const MIN_THRESHOLD = 30;

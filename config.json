@@ -89,7 +89,8 @@
         {
             "setup": "setup1",
             "setup-length": 100,
-            "min-spacing": 15,
+            "question-time": 12,
+            "question-min-spacing": 13,
             "no-questions": [],
             "num-rows": 4,
             "num-columns": 3,
@@ -113,7 +114,8 @@
         {
             "setup": "setup2",
             "setup-length": 100,
-            "min-spacing": 15,
+            "question-time": 12,
+            "question-min-spacing": 13,
             "no-questions": [],
             "num-rows": 4,
             "num-columns": 3,
@@ -137,10 +139,11 @@
         {
             "setup": "setup3",
             "setup-length": 100,
-            "min-spacing": 15,
+            "question-time": 12,
+            "question-min-spacing": 13,
             "no-questions": [],
-            "num-rows": 3,
-            "num-columns": 4,
+            "num-rows": 4,
+            "num-columns": 3,
             "anim-duration": 500,
             "anim-delay": 300,
             "num-points": 12,
@@ -161,10 +164,11 @@
         {
             "setup": "setup4",
             "setup-length": 100,
-            "min-spacing": 15,
+            "question-time": 12,
+            "question-min-spacing": 13,
             "no-questions": [],
-            "num-rows": 3,
-            "num-columns": 4,
+            "num-rows": 4,
+            "num-columns": 3,
             "anim-duration": 500,
             "anim-delay": 300,
             "num-points": 12,
@@ -185,7 +189,8 @@
         {
             "setup": "setup5",
             "setup-length": 100,
-            "min-spacing": 15,
+            "question-time": 12,
+            "question-min-spacing": 13,
             "no-questions": [],
             "num-rows": 4,
             "num-columns": 3,
@@ -209,7 +214,8 @@
         {
             "setup": "setup6",
             "setup-length": 100,
-            "min-spacing": 15,
+            "question-time": 12,
+            "question-min-spacing": 13,
             "no-questions": [],
             "num-rows": 4,
             "num-columns": 3,
@@ -234,7 +240,7 @@
     "questions": [
         {
             "id": "q1",
-            "prompt": "Find the machine that has the highest output right now.",
+            "prompt": "Find the machine that has the <b>highest</b> output right now.",
             "type": "radio",
             "area": "machine",
             "options": [
@@ -247,14 +253,14 @@
                 "Mach. 7",
                 "Mach. 8",
                 "Mach. 9",
-                "Mach. 10", 
-                "Mach. 11", 
+                "Mach. 10",
+                "Mach. 11",
                 "Mach. 12"
             ]
         },
         {
             "id": "q2",
-            "prompt": "Find the machine that has the lowest output right now.",
+            "prompt": "Find the machine that has the <b>lowest</b> output right now.",
             "type": "radio",
             "area": "machine",
             "options": [
@@ -267,15 +273,15 @@
                 "Mach. 7",
                 "Mach. 8",
                 "Mach. 9",
-                "Mach. 10", 
-                "Mach. 11", 
+                "Mach. 10",
+                "Mach. 11",
                 "Mach. 12"
             ]
         },
         {
             "id": "q3",
-            "prompt": "Find 3 machines that have an overall output increasing over time. There may be more, but please select only 3.",
-            "type": "checkbox",
+            "prompt": "Find 1 machine that has a visible output <b>increasing</b> over time at the beginning of the question. There may be more, but please select only 1.",
+            "type": "radio",
             "area": "machine",
             "options": [
                 "Mach. 1",
@@ -287,15 +293,15 @@
                 "Mach. 7",
                 "Mach. 8",
                 "Mach. 9",
-                "Mach. 10", 
-                "Mach. 11", 
+                "Mach. 10",
+                "Mach. 11",
                 "Mach. 12"
             ]
         },
         {
             "id": "q4",
-            "prompt": "Find 3 machines that have an overall output decreasing over time. There may be more, but please select only 3.",
-            "type": "checkbox",
+            "prompt": "Find 1 machine that has a visible output <b>decreasing</b> over time at the beginning of the question. There may be more, but please select only 1.",
+            "type": "radio",
             "area": "machine",
             "options": [
                 "Mach. 1",
@@ -307,8 +313,8 @@
                 "Mach. 7",
                 "Mach. 8",
                 "Mach. 9",
-                "Mach. 10", 
-                "Mach. 11", 
+                "Mach. 10",
+                "Mach. 11",
                 "Mach. 12"
             ]
         },
@@ -316,26 +322,6 @@
             "id": "q5",
             "prompt": "Find 1 machine that is outside of the acceptable range right now.",
             "type": "radio",
-            "area": "other",
-            "options": [
-                "Mach. 1",
-                "Mach. 2",
-                "Mach. 3",
-                "Mach. 4",
-                "Mach. 5",
-                "Mach. 6",
-                "Mach. 7",
-                "Mach. 8",
-                "Mach. 9",
-                "Mach. 10", 
-                "Mach. 11", 
-                "Mach. 12"
-            ]
-        },
-        {
-            "id": "q6",
-            "prompt": "Find 3 machines that have been outside of the acceptable output range in the last 15 minutes, i.e. the entire visible time range. There may be more, but please select only 3.",
-            "type": "checkbox",
             "area": "machine",
             "options": [
                 "Mach. 1",
@@ -347,8 +333,28 @@
                 "Mach. 7",
                 "Mach. 8",
                 "Mach. 9",
-                "Mach. 10", 
-                "Mach. 11", 
+                "Mach. 10",
+                "Mach. 11",
+                "Mach. 12"
+            ]
+        },
+        {
+            "id": "q6",
+            "prompt": "Find 1 machine that has been outside of the acceptable range in the visible time range at the beginning of the question. There may be more, but please select only 1.",
+            "type": "radio",
+            "area": "machine",
+            "options": [
+                "Mach. 1",
+                "Mach. 2",
+                "Mach. 3",
+                "Mach. 4",
+                "Mach. 5",
+                "Mach. 6",
+                "Mach. 7",
+                "Mach. 8",
+                "Mach. 9",
+                "Mach. 10",
+                "Mach. 11",
                 "Mach. 12"
             ]
         }

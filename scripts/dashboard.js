@@ -39,6 +39,7 @@ window.dashboardInit = function() {
 	const SHOW_VERTICAL_BAR = currentSetup['vis-showVerticalBar'];
 	const DYNAMIC_LABEL_SIZE = currentSetup['vis-dynamicLabelSize'];
 	const LABEL_POSITION = currentSetup['vis-labelPosition'];
+	const QUESTION_TIME = currentSetup['questionTime'] || 15;
 
 	const soundSteps = currentSetup['sound'];
 
@@ -59,6 +60,7 @@ window.dashboardInit = function() {
 	}
 
 	let clickLog = [];
+	let currentQuestionStep = null;
 
 	Promise.all(selectedFiles.map(file => d3.csv(`data/${file}`, d3.autoType))).then((datasets) => {
 
@@ -76,9 +78,11 @@ window.dashboardInit = function() {
 			.style("grid-template-columns", `repeat(${COLS}, 1fr)`)
 
 		let { width: gridWidth, height: gridHeight } = chartsContainer.node().getBoundingClientRect();
-		let cellWidth = gridWidth / COLS;
+		let wrapperRatio = LABEL_POSITION === "side" ? 1.0 : 0.85;
+		let cellWidth = (gridWidth / COLS) * wrapperRatio;
 		let cellHeight = gridHeight / ROWS;
 
+		const wrapperClass = LABEL_POSITION === "side" ? "chart-wrapper chart-wrapper-side" : "chart-wrapper chart-wrapper-integrated";
 
 		// Fills the titles array
 		const titles = Array.from({ length: selectedFiles.length }, (_, i) => `Machine ${i + 1}`);
@@ -90,6 +94,8 @@ window.dashboardInit = function() {
 				.on("mousedown", event => d3.select(event.currentTarget).style("box-shadow", "inset 0 0 0 2px black"))
 				.on("mouseup", event => d3.select(event.currentTarget).style("box-shadow", null))
 				.on("mouseleave", event => d3.select(event.currentTarget).style("box-shadow", null))
+			.append("div")
+				.attr("class", wrapperClass)
 			.append(([data, title]) => generateChart(
 				data = data, 
 				title = title, 
@@ -157,6 +163,7 @@ window.dashboardInit = function() {
 
 		const questions = currentSetup['questions'] || [];
 		const questionResponses = {};
+		let activeQuestions = []; // track shown but unanswered questions
 
 		// Display question in side panel
 		function showQuestion(question) {
@@ -179,6 +186,13 @@ window.dashboardInit = function() {
 			
 			// Record when question is shown
 			const questionStartTime = Date.now();
+
+			// Track this question as active
+			activeQuestions.push({
+				id: question.id,
+				startTime: questionStartTime,
+				step: step
+			});
 			
 			if (useGrid) {
 				// Apply same grid layout as charts
@@ -232,20 +246,16 @@ window.dashboardInit = function() {
 					const checkedCount = checkboxes.filter(cb => cb.checked).length;
 					
 					if (isFind3Question) {
-						// For checkbox + grid questions
 						if (checkedCount === 3) {
-							// Disable unchecked checkboxes
 							checkboxes.forEach(cb => {
 								if (!cb.checked) cb.disabled = true;
 							});
 							submitButton.disabled = false;
 						} else {
-							// Enable all checkboxes
 							checkboxes.forEach(cb => cb.disabled = false);
 							submitButton.disabled = true;
 						}
 					} else {
-						// For regular checkbox questions
 						submitButton.disabled = checkedCount === 0;
 					}
 				});
@@ -264,7 +274,9 @@ window.dashboardInit = function() {
 					if (selected) {
 						questionResponses[question.id] = {
 							response: selected.value,
-							responseTime: responseTime,
+							responseTimeMs: responseTime,
+							answered: true,
+							questionStep: step,
 							timestamp: new Date().toISOString()
 						};
 					}
@@ -273,10 +285,15 @@ window.dashboardInit = function() {
 						.map(cb => cb.value);
 					questionResponses[question.id] = {
 						response: selected,
-						responseTime: responseTime,
+						responseTimeMs: responseTime,
+						answered: true,
+						questionStep: step,
 						timestamp: new Date().toISOString()
 					};
 				}
+				
+				// Remove from active tracking
+				activeQuestions = activeQuestions.filter(q => q.id !== question.id);
 				
 				// Disable submit after clicking
 				submitButton.disabled = true;
@@ -287,6 +304,22 @@ window.dashboardInit = function() {
 			});
 		}
 
+		// Record unanswered questions when they get cleared
+		function recordUnanswered() {
+			for (const aq of activeQuestions) {
+				if (!questionResponses[aq.id]) {
+					questionResponses[aq.id] = {
+						response: null,
+						responseTimeMs: QUESTION_TIME * (ANIM_DURATION + ANIM_DELAY),
+						answered: false,
+						questionStep: aq.step,
+						timestamp: new Date().toISOString()
+					};
+				}
+			}
+			activeQuestions = [];
+		}
+
 		const buttonNext = d3.select("#buttonContainer").select("#nextButton")
 			.on("click", onNextClick);
 		
@@ -294,27 +327,21 @@ window.dashboardInit = function() {
 			// Stop animation
 			stopAnimation();
 			
-			// Prepare export data for this trial
-			const userName = sessionStorage.getItem('username') || 'Unknown';
+			// Build per-trial export
 			const timestamp = new Date().toISOString();
+
+			const trialQuestions = (currentSetup['questions'] || [])
+				.filter(q => q.type !== 'clear')
+				.map(q => ({ id: q.id, step: q.step }));
 			
 			const trialData = {
-				metadata: {
-					setupName: currentSetup['setup'],
-					setupIndex: setupIndex,
-					trialNumber: currentSetup['trialNumber'],
-					filesetIndex: currentSetup['filesetIndex'],
-					timestamp: timestamp
-				},
-				configuration: {
-					...currentSetup,
-					'no-questions': currentSetup['no-questions']?.map(range => ({
-						start: range[0],
-						end: range[1]
-					})) || []
-				},
+				trialNumber: currentSetup['trialNumber'],
+				trialIndex: setupIndex,
+				filesetIndex: currentSetup['filesetIndex'],
+				questionOrder: currentSetup['questionOrder'],
+				questionPlacements: trialQuestions,
 				responses: questionResponses,
-				clickLog: clickLog
+				timestamp: timestamp
 			};
 
 			// Accumulate trial data in sessionStorage
@@ -331,10 +358,12 @@ window.dashboardInit = function() {
 				}, 100);
 			} else {
 				// All 6 trials completed — save everything at once, then redirect
+				const userName = sessionStorage.getItem('username') || 'Unknown';
 				const fullExport = {
 					metadata: {
 						prolificId: userName,
-						qsetIndex: currentSetup['qsetIndex'],
+						designIndex: currentSetup['designIndex'],
+						questionMapping: JSON.parse(sessionStorage.getItem('questionMapping') || '[]'),
 						timestamp: new Date().toISOString(),
 						type: 'survey',
 						browser: {
@@ -363,96 +392,29 @@ window.dashboardInit = function() {
 		}
 
 		function showCompletionOverlay() {
-			const overlay = document.createElement('div');
-			overlay.id = 'completion-overlay';
-			Object.assign(overlay.style, {
-				position: 'fixed',
-				top: '0',
-				left: '0',
-				width: '100vw',
-				height: '100vh',
-				backgroundColor: 'rgba(0, 0, 0, 0.6)',
-				display: 'flex',
-				alignItems: 'center',
-				justifyContent: 'center',
-				zIndex: '10000'
-			});
-
-			const box = document.createElement('div');
-			Object.assign(box.style, {
-				backgroundColor: 'white',
-				borderRadius: '12px',
-				padding: '40px 50px',
-				textAlign: 'center',
-				maxWidth: '480px',
-				boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
-				fontFamily: 'sans-serif'
-			});
-
-			const icon = document.createElement('div');
-			icon.textContent = '✓';
-			Object.assign(icon.style, {
-				fontSize: '48px',
-				color: '#4CAF50',
-				marginBottom: '12px',
-				fontWeight: 'bold'
-			});
-
-			const heading = document.createElement('h2');
-			heading.textContent = 'All Trials Completed!';
-			Object.assign(heading.style, {
-				margin: '0 0 12px 0',
-				fontSize: '24px',
-				color: '#333'
-			});
-
-			const message = document.createElement('p');
-			message.textContent = 'Thank you for participating. You will now be redirected to a short demographics survey.';
-			Object.assign(message.style, {
-				margin: '0 0 24px 0',
-				fontSize: '15px',
-				color: '#666',
-				lineHeight: '1.5'
-			});
-
-			const countdown = document.createElement('p');
-			countdown.textContent = 'Redirecting in 5 seconds...';
-			Object.assign(countdown.style, {
-				margin: '0 0 20px 0',
-				fontSize: '14px',
-				color: '#999'
-			});
-
-			const btn = document.createElement('button');
-			btn.textContent = 'Continue Now';
-			Object.assign(btn.style, {
-				padding: '10px 28px',
-				fontSize: '15px',
-				backgroundColor: '#4CAF50',
-				color: 'white',
-				border: 'none',
-				borderRadius: '6px',
-				cursor: 'pointer',
-				fontWeight: '500'
-			});
-
 			const demographicsUrl = 'https://cliffy2000.github.io/SituatedVis-Portal/demographics.html';
 
-			btn.addEventListener('click', () => {
+			const overlay = document.createElement('div');
+			overlay.id = 'completion-overlay';
+			overlay.innerHTML = `
+				<div class="completion-box">
+					<div class="completion-icon">✓</div>
+					<h2 class="completion-heading">All Trials Completed!</h2>
+					<p class="completion-message">Thank you for participating. You will now be redirected to a short demographics survey.</p>
+					<p class="completion-countdown">Redirecting in 5 seconds...</p>
+					<button class="completion-button">Continue Now</button>
+				</div>
+			`;
+
+			document.body.appendChild(overlay);
+
+			overlay.querySelector('.completion-button').addEventListener('click', () => {
 				sessionStorage.clear();
 				window.location.href = demographicsUrl;
 			});
 
-			box.appendChild(icon);
-			box.appendChild(heading);
-			box.appendChild(message);
-			box.appendChild(countdown);
-			box.appendChild(btn);
-			overlay.appendChild(box);
-			document.body.appendChild(overlay);
-
-			// Countdown timer
 			let seconds = 5;
+			const countdown = overlay.querySelector('.completion-countdown');
 			const timer = setInterval(() => {
 				seconds--;
 				if (seconds <= 0) {
@@ -494,16 +456,36 @@ window.dashboardInit = function() {
 			
 			// If there are questions at this step, clear previous and show new ones
 			if (questionsAtCurrentStep.length > 0) {
+				// Record any unanswered questions before clearing
+				recordUnanswered();
+
 				// Clear the question container
 				const container = document.getElementById('questionContainer');
 				if (container) {
 					container.innerHTML = '';
 				}
+
+				const realQuestions = questionsAtCurrentStep.filter(q => q.type !== 'clear');
 				
-				// Show all questions for this step
-				questionsAtCurrentStep.forEach((question, index) => {
-					showQuestion(question);
-				});
+				if (realQuestions.length > 0) {
+					currentQuestionStep = step;
+					realQuestions.forEach((question, index) => {
+						showQuestion(question);
+					});
+					const timerEl = document.getElementById('questionTimer');
+					if (timerEl) timerEl.textContent = QUESTION_TIME - 1;
+				} else {
+					currentQuestionStep = null;
+					const timerEl = document.getElementById('questionTimer');
+					if (timerEl) timerEl.textContent = '';
+				}
+			}
+
+			// Update timer
+			if (currentQuestionStep !== null) {
+				const remaining = QUESTION_TIME - 1 - (step - currentQuestionStep);
+				const timerEl = document.getElementById('questionTimer');
+				if (timerEl && remaining >= 0) timerEl.textContent = remaining;
 			}
 			
 			if (soundSteps.includes(step)) {

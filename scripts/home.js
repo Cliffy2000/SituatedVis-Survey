@@ -1,3 +1,4 @@
+// Same ordering table as training.js
 const QUESTION_ORDERS = [
     [1, 4, 0, 5, 2, 3],
     [3, 0, 5, 2, 4, 1],
@@ -17,8 +18,9 @@ function shuffleArray(arr) {
 }
 
 function assignQuestionSteps(setup, questionsToPlace) {
-    const END_MARGIN = 5;
-    const lastValidStep = setup['setup-length'] - setup['num-points'] - END_MARGIN + 1;
+    const questionTime = setup['question-time'];
+    const minSpacing = setup['question-min-spacing'];
+    const lastValidStep = setup['setup-length'] - setup['num-points'] - questionTime + 1;
 
     const valid = [];
     for (let i = 1; i <= lastValidStep; i++) {
@@ -36,7 +38,7 @@ function assignQuestionSteps(setup, questionsToPlace) {
     for (const q of shuffled) {
         const available = valid.filter(pos =>
             usedPositions.every(used =>
-                Math.abs(used - pos) >= setup['min-spacing']
+                Math.abs(used - pos) >= minSpacing
             )
         );
 
@@ -47,17 +49,19 @@ function assignQuestionSteps(setup, questionsToPlace) {
         placed.push({ ...q, step: pos });
     }
 
-    // Add clear event after last question
+    // Add clear events after each question based on question-time
     if (placed.length > 0) {
-        const lastStep = Math.max(...placed.map(q => q.step));
-        placed.push({
-            step: lastStep + END_MARGIN,
-            id: '_clear',
-            prompt: '',
-            type: 'clear',
-            area: '',
-            options: []
-        });
+        const realQuestions = placed.filter(q => q.id !== '_clear');
+        for (const q of realQuestions) {
+            placed.push({
+                step: q.step + questionTime,
+                id: '_clear',
+                prompt: '',
+                type: 'clear',
+                area: '',
+                options: []
+            });
+        }
     }
 
     return placed;
@@ -69,8 +73,8 @@ window.homeInit = async function () {
     if (!config) {
         const raw = await fetch('config.json').then(r => r.json());
 
-        const designIndex = parseInt(sessionStorage.getItem('designIndex') || '0');
-        const questionMapping = JSON.parse(sessionStorage.getItem('questionMapping') || '[0,1,2,3,4,5]');
+        const designIndex = parseInt(sessionStorage.getItem('designIndex'));
+        const questionMapping = JSON.parse(sessionStorage.getItem('questionMapping'));
 
         const setup = raw.setups[designIndex];
         const filesetOrder = shuffleArray([0, 1, 2, 3, 4, 5]);
@@ -114,7 +118,8 @@ window.homeInit = async function () {
                 designIndex: designIndex,
                 filesetIndex: filesetIdx,
                 trialNumber: trial + 1,
-                questionOrder: actualQuestions
+                questionOrder: actualQuestions,
+                questionTime: setup['question-time']
             });
         }
 

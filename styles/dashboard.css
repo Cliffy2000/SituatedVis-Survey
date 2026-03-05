@@ -16,6 +16,13 @@ body {
     display: grid;
 }
 
+.chart-div,
+.chart-div-side {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .chart-div {
     background-color: white;
 }
@@ -24,61 +31,21 @@ body {
     outline: 0.2px solid #cfcfcf;
 }
 
-#buttonsContainer {
-    display: flex;
-    justify-content: center;
-    height: 50px;
-    align-items: center;
+.chart-wrapper {
+    height: 100%;
 }
 
-#export {
-    position: absolute;
-    left: 5px;
-    margin: 0px 10px 0px 10px;
-    width: 75px;
-    height: 30px;
+.chart-wrapper-integrated {
+    width: 85%;
 }
 
-#pause {
-    margin: 0px 10px 0px 10px;
-    width: 75px;
-    height: 30px;
-}
-
-#restart {
-    margin: 0px 10px 0px 10px;
-    width: 75px;
-    height: 30px;
-}
-
-.window-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-left: 15px;
-}
-
-#window-slider {
-    margin: 0 10px;
-}
-
-.window-container input[type="number"] {
-    width: 35px;
-    text-align: center;
-    -moz-appearance: textfield;
-    appearance: textfield;
-}
-
-.window-container input[type="number"]::-webkit-inner-spin-button,
-.window-container input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+.chart-wrapper-side {
+    width: 100%;
 }
 
 svg {
     display: block;
 }
-
 
 #sidePanel {
     width: 25%;
@@ -88,6 +55,8 @@ svg {
 }
 
 #buttonContainer {
+    display: flex;
+    align-items: center;
     position: absolute;
     bottom: 25px;
     right: 25px;
@@ -100,6 +69,11 @@ svg {
     border-radius: 10px;
 }
 
+#questionTimer {
+    font-size: 16px;
+    font-weight: bold;
+    margin-left: 15px;
+}
 
 /* Question container styles */
 .question-item {
@@ -111,19 +85,17 @@ svg {
 }
 
 .question-prompt {
-    font-weight: 600;
+    font-weight: 400;
     margin: 5px;
     margin-bottom: 10px;
     font-size: 16px;
     color: #333;
 }
 
-/* Options container */
 .question-options-container {
     margin-bottom: 15px;
 }
 
-/* Vertical layout for options */
 .question-vertical-option {
     display: block;
     margin-bottom: 8px;
@@ -134,13 +106,12 @@ svg {
     margin-right: 8px;
 }
 
-/* Grid layout for options */
 .question-grid-option {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     padding: 8px 2px;
-    text-align: center;
+    padding-left: 15%;
     cursor: pointer;
     border: 1px solid transparent;
     border-radius: 3px;
@@ -159,7 +130,6 @@ svg {
     font-size: 13px;
 }
 
-/* Disabled state for checkboxes */
 .question-grid-option input:disabled,
 .question-vertical-option input:disabled {
     cursor: not-allowed;
@@ -170,7 +140,6 @@ svg {
     opacity: 0.5;
 }
 
-/* Submit button */
 .question-submit-button {
     background-color: #4CAF50;
     color: white;
@@ -189,4 +158,65 @@ svg {
 .question-submit-button:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
+}
+
+/* Completion overlay */
+#completion-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.completion-box {
+    background-color: white;
+    border-radius: 12px;
+    padding: 40px 50px;
+    text-align: center;
+    max-width: 480px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    font-family: sans-serif;
+}
+
+.completion-icon {
+    font-size: 48px;
+    color: #4CAF50;
+    margin-bottom: 12px;
+    font-weight: bold;
+}
+
+.completion-heading {
+    margin: 0 0 12px 0;
+    font-size: 24px;
+    color: #333;
+}
+
+.completion-message {
+    margin: 0 0 24px 0;
+    font-size: 15px;
+    color: #666;
+    line-height: 1.5;
+}
+
+.completion-countdown {
+    margin: 0 0 20px 0;
+    font-size: 14px;
+    color: #999;
+}
+
+.completion-button {
+    padding: 10px 28px;
+    font-size: 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
 }
