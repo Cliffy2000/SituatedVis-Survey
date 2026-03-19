@@ -46,7 +46,7 @@ function generateChart(
 	let CANVAS_HEIGHT = height;
 
 	// this is the width on the right side of the plot for additional information
-	const INFO_DEFAULT_WIDTH = 100;
+	const INFO_DEFAULT_WIDTH = CANVAS_WIDTH / 5;
 	let INFO_WIDTH = (labelPosition === "side") ? INFO_DEFAULT_WIDTH : 0;
 
 	// this is the size of the chart area
@@ -405,9 +405,9 @@ function generateChart(
 		}
 
 		if (n > MAX_THRESHOLD) {
-			return "#FF7F50";
+			return "#9D5DD5";
 		} else if (n < MIN_THRESHOLD) {
-			return "#00B2EE";
+			return "#5DD5BF";
 		} else {
 			return "#8C8C8C";
 		}
@@ -419,11 +419,11 @@ function generateChart(
 		}
 
 		if (n > MAX_THRESHOLD) {
-			return "#FFBFA8";
+			return "#9D5DD5";
 		} else if (n < MIN_THRESHOLD) {
-			return "#80D9F7";
+			return "#5DD5BF";
 		} else {
-			return "white";
+			return "#8C8C8C";
 		}
 	}
 
@@ -452,11 +452,11 @@ function generateChart(
 		}
 
 		if (n > MAX_THRESHOLD) {
-			return "#FF7F50";
+			return "#9D5DD5";
 		} else if (n < MIN_THRESHOLD) {
-			return "#00B2EE";
+			return "#5DD5BF";
 		} else {
-			return "#121212";
+			return "#8C8C8C";
 		}
 	}
 	

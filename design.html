@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Situated Visualization - Design Description</title>
+    <style>
+        .container {
+            width: 100%;
+            min-height: 100%;
+            background: linear-gradient(180deg, #fafbff 0%, #d6d6d6 100%);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .article {
+            width: calc(max(900px, 60%));
+            box-shadow: 4px 4px 4px #777777;
+            background-color: white;
+            z-index: 1;
+            position: relative;
+            margin: 50px 0px;
+            align-self: stretch;
+            text-align: justify;
+        }
+        .articleContent {
+            margin: 60px;
+            margin-top: 0px;
+        }
+        .articleHeader {
+            margin: 15px 0px;
+            border-bottom: 2px solid black;
+            padding-bottom: 7px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+        }
+        .articleHeaderImage { height: 100%; }
+        .articleHeaderText { font-size: 27px; font-weight: 500; }
+        .articleSection > div,
+        .articleSection > p {
+            line-height: 1.6;
+            color: #292929;
+            margin-bottom: 15px;
+        }
+        .continue-button {
+            width: 100%;
+            padding: 15px 30px;
+            margin-top: 30px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .continue-button:hover {
+            background-color: #45a049;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .continue-button:active { transform: scale(0.98); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="article">
+            <div class="articleContent">
+                <div class="articleHeader">
+                    <img src="logo-dog.svg" class="articleHeaderImage">
+                    <div class="articleHeaderText">Khoury Vis Lab</div>
+                </div>
+                <div class="articleSection">
+                    <div><strong id="design-title"></strong></div>
+                    <div id="design-description"></div>
+                </div>
+                <button id="continueButton" class="continue-button">
+                    Continue to Study
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

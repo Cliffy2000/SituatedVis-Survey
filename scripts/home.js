@@ -1,5 +1,4 @@
-// Same ordering table as training.js
-const QUESTION_ORDERS = [
+let QUESTION_ORDERS = [
     [1, 4, 0, 5, 2, 3],
     [3, 0, 5, 2, 4, 1],
     [5, 2, 4, 1, 3, 0],
@@ -29,29 +28,28 @@ function assignQuestionSteps(setup, questionsToPlace) {
         if (!forbidden) valid.push(i);
     }
 
-    const placed = [];
-    const usedPositions = [];
+    const selectedPositions = [];
 
-    // Randomize placement order
-    const shuffled = [...questionsToPlace].sort(() => Math.random() - 0.5);
-
-    for (const q of shuffled) {
+    for (let i = 0; i < questionsToPlace.length; i++) {
         const available = valid.filter(pos =>
-            usedPositions.every(used =>
-                Math.abs(used - pos) >= minSpacing
-            )
+            selectedPositions.every(used => Math.abs(used - pos) >= minSpacing)
         );
 
         if (available.length === 0) return null;
 
         const pos = available[Math.floor(Math.random() * available.length)];
-        usedPositions.push(pos);
-        placed.push({ ...q, step: pos });
+        selectedPositions.push(pos);
     }
 
-    // Add clear events after each question based on question-time
+    selectedPositions.sort((a, b) => a - b);
+
+    const placed = questionsToPlace.map((q, index) => ({
+        ...q,
+        step: selectedPositions[index]
+    }));
+
     if (placed.length > 0) {
-        const realQuestions = placed.filter(q => q.id !== '_clear');
+        const realQuestions = [...placed];
         for (const q of realQuestions) {
             placed.push({
                 step: q.step + questionTime,
@@ -74,26 +72,47 @@ window.homeInit = async function () {
         const raw = await fetch('config.json').then(r => r.json());
 
         const designIndex = parseInt(sessionStorage.getItem('designIndex'));
-        const questionMapping = JSON.parse(sessionStorage.getItem('questionMapping'));
 
         const setup = raw.setups[designIndex];
         const filesetOrder = shuffleArray([0, 1, 2, 3, 4, 5]);
+        QUESTION_ORDERS = shuffleArray(QUESTION_ORDERS);
 
         console.log("Design:", designIndex);
-        console.log("Question mapping:", questionMapping);
         console.log("Fileset order:", filesetOrder.map(i => i + 1));
 
         const allConfigs = [];
 
+        // Attention check question (not in config.json)
+        const ATN_QUESTION = {
+            id: "atn",
+            prompt: "What is the largest number among the options below? You must choose the third option on the last row for this question no matter the values",
+            type: "radio",
+            area: "machine",
+            options: [
+                "Mach. 1", "Mach. 2", "Mach. 3", "Mach. 4",
+                "Mach. 5", "Mach. 6", "Mach. 7", "Mach. 8",
+                "Mach. 9", "Mach. 10", "Mach. 11", "Mach. 12"
+            ]
+        };
+
         for (let trial = 0; trial < 6; trial++) {
             const filesetIdx = filesetOrder[trial];
 
-            // Decode this trial's question order through the mapping
-            const slotOrder = QUESTION_ORDERS[trial];
-            const actualQuestions = slotOrder.map(slot => questionMapping[slot]);
+            // Start with the predefined order for this trial
+            let slotOrder = [...QUESTION_ORDERS[trial]];
 
-            // Build the 6 questions for this trial
-            const questionsToPlace = actualQuestions.map(qIdx => ({ ...raw.questions[qIdx] }));
+            // For trial index 3, randomly insert the attention question (index 6)
+            if (trial === 3) {
+                const insertPos = Math.floor(Math.random() * (slotOrder.length + 1));
+                slotOrder.splice(insertPos, 0, 6);
+                console.log(`Trial 4: inserted atn question at position ${insertPos} → [${slotOrder}]`);
+            }
+
+            // Build the questions for this trial
+            // Index 6 = attention check (hardcoded), all others from config
+            const questionsToPlace = slotOrder.map(qIdx =>
+                qIdx === 6 ? { ...ATN_QUESTION } : { ...raw.questions[qIdx] }
+            );
 
             let placed = null;
             let attempts = 0;
@@ -118,7 +137,7 @@ window.homeInit = async function () {
                 designIndex: designIndex,
                 filesetIndex: filesetIdx,
                 trialNumber: trial + 1,
-                questionOrder: actualQuestions,
+                questionOrder: slotOrder,
                 questionTime: setup['question-time']
             });
         }
@@ -160,7 +179,12 @@ window.homeInit = async function () {
 }
 
 function startTrial() {
+    const currentIndex = parseInt(sessionStorage.getItem('SituatedVisCurrentIndex') || '0');
     setTimeout(() => {
-        window.navigateToDashboard();
+        if (currentIndex === 0) {
+            window.navigateToDesign();
+        } else {
+            window.navigateToDashboard();
+        }
     }, 10);
 }
