@@ -280,7 +280,7 @@
         },
         {
             "id": "q3",
-            "prompt": "Find 1 machine that has a visible output <b>increasing</b> over time at the beginning of the question. There may be more, but please select only 1.",
+            "prompt": "Find 1 machine that has a visible output <b>increasing</b> over time.",
             "type": "radio",
             "area": "machine",
             "options": [
@@ -300,7 +300,7 @@
         },
         {
             "id": "q4",
-            "prompt": "Find 1 machine that has a visible output <b>decreasing</b> over time at the beginning of the question. There may be more, but please select only 1.",
+            "prompt": "Find 1 machine that has a visible output <b>decreasing</b> over time.",
             "type": "radio",
             "area": "machine",
             "options": [
@@ -340,7 +340,7 @@
         },
         {
             "id": "q6",
-            "prompt": "Find 1 machine that <b>has been outside of the acceptable range in the visible time range</b> at the beginning of the question. There may be more, but please select only 1.",
+            "prompt": "Find 1 machine that <b>has been outside of the acceptable range</b> in the visible time range.",
             "type": "radio",
             "area": "machine",
             "options": [

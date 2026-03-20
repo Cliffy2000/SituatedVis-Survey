@@ -85,13 +85,11 @@ window.homeInit = async function () {
         // Attention check question (not in config.json)
         const ATN_QUESTION = {
             id: "atn",
-            prompt: "What is the largest number among the options below? You must choose the third option on the last row for this question no matter the values",
+            prompt: "Which of the following response options is a fruit?",
             type: "radio",
             area: "machine",
             options: [
-                "Mach. 1", "Mach. 2", "Mach. 3", "Mach. 4",
-                "Mach. 5", "Mach. 6", "Mach. 7", "Mach. 8",
-                "Mach. 9", "Mach. 10", "Mach. 11", "Mach. 12"
+                "Chair", "Book", "Apple", "Pencil"
             ]
         };
 
@@ -181,10 +179,6 @@ window.homeInit = async function () {
 function startTrial() {
     const currentIndex = parseInt(sessionStorage.getItem('SituatedVisCurrentIndex') || '0');
     setTimeout(() => {
-        if (currentIndex === 0) {
-            window.navigateToDesign();
-        } else {
-            window.navigateToDashboard();
-        }
+        window.navigateToDashboard();
     }, 10);
 }

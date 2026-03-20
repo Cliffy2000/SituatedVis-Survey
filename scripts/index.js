@@ -58,15 +58,6 @@ async function loadView(viewName) {
             } else {
                 window.dashboardInit();
             }
-        } else if (viewName === 'design') {
-            if (!window.designInit) {
-                const script = document.createElement('script');
-                script.src = 'scripts/design.js';
-                script.onload = () => window.designInit();
-                document.head.appendChild(script);
-            } else {
-                window.designInit();
-            }
         }
         
     } catch (error) {
@@ -90,7 +81,6 @@ function loadScript(src) {
 
 // Navigation functions
 window.navigateToHome = () => loadView('home');
-window.navigateToDesign = () => loadView('design');
 window.navigateToDashboard = () => loadView('dashboard');
 
 // Initialize

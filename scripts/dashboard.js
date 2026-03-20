@@ -78,7 +78,7 @@ window.dashboardInit = function() {
 			.style("grid-template-columns", `repeat(${COLS}, 1fr)`)
 
 		let { width: gridWidth, height: gridHeight } = chartsContainer.node().getBoundingClientRect();
-		let wrapperRatio = LABEL_POSITION === "side" ? 1.0 : 0.85;
+		let wrapperRatio = LABEL_POSITION === "side" ? 1.0 : 0.8;
 		let cellWidth = (gridWidth / COLS) * wrapperRatio;
 		let cellHeight = gridHeight / ROWS;
 
