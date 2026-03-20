@@ -91,7 +91,7 @@ function generateChart(
 	}
 	
 	let LABEL_FONT_DEFAULT_SIZE = 15;
-	let LABEL_FONT_SIZE_RANGE = [11, 21];
+	let LABEL_FONT_SIZE_RANGE = [11, 24];
 	let VERTICAL_BAR_WIDTH = 20;
 
 	const MIN_THRESHOLD = 30;
