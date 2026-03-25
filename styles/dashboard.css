@@ -27,10 +27,6 @@ body {
     background-color: white;
 }
 
-.chart-div-side {
-    outline: 0.2px solid #cfcfcf;
-}
-
 .chart-wrapper {
     height: 100%;
 }

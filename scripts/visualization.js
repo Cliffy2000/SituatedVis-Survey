@@ -46,7 +46,7 @@ function generateChart(
 	let CANVAS_HEIGHT = height;
 
 	// this is the width on the right side of the plot for additional information
-	const INFO_DEFAULT_WIDTH = CANVAS_WIDTH / 5;
+	const INFO_DEFAULT_WIDTH = CANVAS_WIDTH * 0.15;
 	let INFO_WIDTH = (labelPosition === "side") ? INFO_DEFAULT_WIDTH : 0;
 
 	// this is the size of the chart area
@@ -91,7 +91,7 @@ function generateChart(
 	}
 	
 	let LABEL_FONT_DEFAULT_SIZE = 17;
-	let LABEL_FONT_SIZE_RANGE = [12, 27];
+	let LABEL_FONT_SIZE_RANGE = [11, 28];
 	let VERTICAL_BAR_WIDTH = 20;
 
 	const MIN_THRESHOLD = 30;
@@ -282,17 +282,9 @@ function generateChart(
 		.domain(y.domain())
 		.range([LABEL_FONT_SIZE_RANGE[0], LABEL_FONT_SIZE_RANGE[1]]);
 	
-	const linearSideFontSizeScale = d3.scaleLinear()
-		.domain(y.domain())
-		.range([20, 84]);
-	
-	const ushapedSideFontSizeScale = d3.scaleLinear()
-		.domain([y.domain()[0], (y.domain()[0] + y.domain()[1]) / 2, y.domain()[1]])
-		.range([84, 40, 84]);
-
 	const ushapedFontSizeScale = d3.scaleLinear()
 		.domain([y.domain()[0], (y.domain()[0] + y.domain()[1]) / 2, y.domain()[1]])
-		.range([LABEL_FONT_SIZE_RANGE[1], LABEL_FONT_SIZE_RANGE[0], LABEL_FONT_SIZE_RANGE[1]]);
+		.range([LABEL_FONT_SIZE_RANGE[1], LABEL_FONT_DEFAULT_SIZE, LABEL_FONT_SIZE_RANGE[1]]);
 	
 	const labelText = labelGroup.append("text")
 		.text(labelValue)
