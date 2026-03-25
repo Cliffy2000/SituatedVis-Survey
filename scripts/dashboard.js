@@ -43,6 +43,9 @@ window.dashboardInit = function() {
 
 	const soundSteps = currentSetup['sound'];
 
+	const prolificID = sessionStorage.getItem('username') || 'Unknown';
+	const commitmentQuality = sessionStorage.getItem('vis-commitmentQuality') || 'Unknown';
+
 	if (selectedFiles.length > ROWS * COLS) {
 		selectedFiles = selectedFiles.slice(0, ROWS * COLS);
 	}
@@ -410,6 +413,8 @@ window.dashboardInit = function() {
 
 			overlay.querySelector('.completion-button').addEventListener('click', () => {
 				sessionStorage.clear();
+				sessionStorage.setItem('username', prolificID);
+				sessionStorage.setItem('vis-commitmentQuality', commitmentQuality);
 				window.location.href = demographicsUrl;
 			});
 
@@ -420,6 +425,8 @@ window.dashboardInit = function() {
 				if (seconds <= 0) {
 					clearInterval(timer);
 					sessionStorage.clear();
+					sessionStorage.setItem('username', prolificID);
+					sessionStorage.setItem('vis-commitmentQuality', commitmentQuality);
 					window.location.href = demographicsUrl;
 				} else {
 					countdown.textContent = `Redirecting in ${seconds} second${seconds !== 1 ? 's' : ''}...`;
