@@ -292,10 +292,10 @@ function generateChart(
 		.attr("dominant-baseline", "middle")
 		.style("font-family", "sans-serif")
 		.style("font-size", getDynamicFontSize(labelValue))
-		.style("fill", "white");
+		.style("fill", (labelPosition === "side" && dynamicLabelSize === "none") ? getSideFontColor(labelValue) : "white");
 	
 	// adjust the position of the label to match its value 
-	if (labelPosition !== "side") {
+	if (!(labelPosition === "side" && dynamicLabelSize === "none")) {
 		labelText.transition()
 			.duration(0)
 			.on("end", function () {
@@ -356,7 +356,7 @@ function generateChart(
 			.attr("height", textBBox.height + 2 * TEXT_PADDING.vertical)
 			.attr("fill", getThresholdColor(labelValue));
 		
-		if (labelPosition === "side") {
+		if (labelPosition === "side" && dynamicLabelSize === "none") {
 			labelText.style("fill", getSideFontColor(labelValue));
 		}
 	}
@@ -435,6 +435,10 @@ function generateChart(
 		// 		return `64px`;
 		// 	}
 		// }
+
+		if (labelPosition === "side" && dynamicLabelSize === "none") {
+			return `${LABEL_FONT_SIZE_RANGE[1] * 1.75}px`;
+		}
 
 		if (dynamicLabelSize === "none") {
 			return `${LABEL_FONT_DEFAULT_SIZE}px`;
