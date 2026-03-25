@@ -412,9 +412,6 @@ window.dashboardInit = function() {
 			document.body.appendChild(overlay);
 
 			overlay.querySelector('.completion-button').addEventListener('click', () => {
-				sessionStorage.clear();
-				sessionStorage.setItem('username', prolificID);
-				sessionStorage.setItem('vis-commitmentQuality', commitmentQuality);
 				window.location.href = demographicsUrl;
 			});
 
@@ -424,9 +421,6 @@ window.dashboardInit = function() {
 				seconds--;
 				if (seconds <= 0) {
 					clearInterval(timer);
-					sessionStorage.clear();
-					sessionStorage.setItem('username', prolificID);
-					sessionStorage.setItem('vis-commitmentQuality', commitmentQuality);
 					window.location.href = demographicsUrl;
 				} else {
 					countdown.textContent = `Redirecting in ${seconds} second${seconds !== 1 ? 's' : ''}...`;
