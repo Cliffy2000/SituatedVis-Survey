@@ -155,6 +155,7 @@ window.homeInit = async function () {
     const questionsDisplay = current.questionOrder.map(q => `q${q + 1}`).join(', ');
     document.querySelector(".qset-index").textContent = questionsDisplay;
     document.querySelector(".config-index").textContent = `Trial ${current.trialNumber} of 6 — ${designDisplay}`;
+    document.querySelector(".trial-index").textContent = `Trial ${currentIndex} of 6`;
 
     const logo = document.getElementById('header-logo');
     const message = document.getElementById('header-message');
