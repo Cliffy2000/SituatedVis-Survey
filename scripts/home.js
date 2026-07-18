@@ -85,11 +85,22 @@ window.homeInit = async function () {
         // Attention check question (not in config.json)
         const ATN_QUESTION = {
             id: "atn",
-            prompt: "Which of the following response options is a fruit?",
+            prompt: "This is an attention check. Please select Machine 5.",
             type: "radio",
             area: "machine",
             options: [
-                "Chair", "Book", "Apple", "Pencil"
+                "Mach. 1",
+                "Mach. 2",
+                "Mach. 3",
+                "Mach. 4",
+                "Mach. 5",
+                "Mach. 6",
+                "Mach. 7",
+                "Mach. 8",
+                "Mach. 9",
+                "Mach. 10",
+                "Mach. 11",
+                "Mach. 12"
             ]
         };
 
