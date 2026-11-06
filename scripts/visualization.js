@@ -19,7 +19,7 @@
  * @param {boolean} [showThresholdBand=false] - Whether to show a gray band that marks the area within the min and max threshold
  * @param {boolean} [showVerticalBar=false] - Whether to show a vertical bar under the integrated label position
  * @param {string} [dynamicLabelSize="none"] - The size of the dynamic labels. Possible options: "none", "linear", "ushaped".
- * @param {string} [labelPosition="integrated"] - The position of the labels. Possible options: "integrated", "separated", "side".
+ * @param {string} [labelPosition="integrated"] - The position of the labels. Possible options: "integrated", "separated", "side", "control".
  * 
  */
 function generateChart(
@@ -273,6 +273,9 @@ function generateChart(
 		labelYPos = CHART_HEIGHT / 1.85;
 	} else if (labelPosition === "separated") {
 		labelYPos = y.range()[1] - 10;
+	} else if (labelPosition === "control") {
+		labelXPos = labelXPos + 5;
+		labelYPos = labelYPos + 5;
 	}
 
 	const labelGroup = svg.append("g")
@@ -295,7 +298,7 @@ function generateChart(
 		.style("fill", (labelPosition === "side" && dynamicLabelSize === "none") ? getSideFontColor(labelValue) : "white");
 	
 	// adjust the position of the label to match its value 
-	if (!(labelPosition === "side" && dynamicLabelSize === "none")) {
+	if (!((labelPosition === "side" && dynamicLabelSize === "none") || (labelPosition === "control"))) {
 		labelText.transition()
 			.duration(0)
 			.on("end", function () {
@@ -339,7 +342,7 @@ function generateChart(
 				.attr("fill", getThresholdColor(labelValue))
 		}
 				
-		if (labelPosition === "integrated") {
+		if (labelPosition === "integrated" || labelPosition === "control") {
 			labelGroup.transition(anim).attr("transform", `translate(${labelXPos}, ${y(labelValue)})`);
 		} else {
 			labelGroup.transition(anim).duration(0);

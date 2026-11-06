@@ -378,7 +378,14 @@ window.dashboardInit = function() {
 							userAgent: navigator.userAgent
 						}
 					},
-					trials: accumulated
+					trials: accumulated,
+					configuration: {
+					...currentSetup,
+					'no-questions': currentSetup['no-questions']?.map(range => ({
+						start: range[0],
+						end: range[1]
+					})) || []
+				},
 				};
 
 				saveUserData(fullExport).then(success => {
