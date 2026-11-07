@@ -274,8 +274,7 @@ function generateChart(
 	} else if (labelPosition === "separated") {
 		labelYPos = y.range()[1] - 10;
 	} else if (labelPosition === "control") {
-		labelXPos = labelXPos + 5;
-		labelYPos = labelYPos + 5;
+		labelXPos = CHART_WIDTH - 10;
 	}
 
 	const labelGroup = svg.append("g")
@@ -295,7 +294,7 @@ function generateChart(
 		.attr("dominant-baseline", "middle")
 		.style("font-family", "sans-serif")
 		.style("font-size", getDynamicFontSize(labelValue))
-		.style("fill", (labelPosition === "side" && dynamicLabelSize === "none") ? getSideFontColor(labelValue) : "white");
+		.style("fill", ((labelPosition === "side" && dynamicLabelSize === "none") || labelPosition == "control") ? getSideFontColor(labelValue) : "white");
 	
 	// adjust the position of the label to match its value 
 	if (!((labelPosition === "side" && dynamicLabelSize === "none") || (labelPosition === "control"))) {
@@ -359,7 +358,7 @@ function generateChart(
 			.attr("height", textBBox.height + 2 * TEXT_PADDING.vertical)
 			.attr("fill", getThresholdColor(labelValue));
 		
-		if (labelPosition === "side" && dynamicLabelSize === "none") {
+		if ((labelPosition === "side" && dynamicLabelSize === "none") || labelPosition == "control") {
 			labelText.style("fill", getSideFontColor(labelValue));
 		}
 	}
@@ -453,7 +452,7 @@ function generateChart(
 	}
 
 	function getSideFontColor(n) {
-		if (!useThresholdColors) {
+		if (!useThresholdColors || labelPosition == "control") {
 			return "#121212";
 		}
 
