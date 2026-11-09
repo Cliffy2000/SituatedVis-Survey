@@ -53,7 +53,7 @@ function generateChart(
 	let CHART_WIDTH = CANVAS_WIDTH - INFO_WIDTH;
 	let CHART_HEIGHT = CANVAS_HEIGHT;
 	const CHART_MARGIN = { top: 10, right: 15, bottom: 30, left: 35 };
-	const CHART_PADDING = { top: 40, right: 20, bottom: 30, left: 40 };
+	const CHART_PADDING = { top: 40, right: 30, bottom: 30, left: 40 };
 
 	const VIEW_RANGE = viewRange;
 	// const X_AXIS_RIGHT_PADDING = CHART_WIDTH * 0.05;
@@ -253,7 +253,7 @@ function generateChart(
 		d => d.value
 	));
 	let labelValue = useRollingAverage ? average : rightPoint.value;
-	let labelXPos = x(rightPoint.index);
+	let labelXPos = x(rightPoint.index) + 2 * TEXT_PADDING.horizontal;
 	let labelYPos = y(labelValue);
 
 	let verticalBar;
@@ -272,7 +272,7 @@ function generateChart(
 		labelXPos = CHART_WIDTH + INFO_WIDTH / 2 - 10;
 		labelYPos = CHART_HEIGHT / 1.85;
 	} else if (labelPosition === "separated") {
-		labelYPos = y.range()[1] - 10;
+		labelYPos = y.range()[1] - 15;
 	} else if (labelPosition === "control") {
 		labelXPos = CHART_WIDTH - 10;
 	}
