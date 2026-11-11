@@ -394,7 +394,7 @@ function generateChart(
 
 			selection.selectAll(".tick text")
 				.style("fill", "gray")
-				.style("font-size", AXIS_FONT_SIZE);
+				.style("font-size", 0);
 		};
 	}
 
