@@ -66,6 +66,10 @@ svg {
 }
 
 #nextButton:not(:disabled) {
+    font-family: inherit;
+    padding: 20px 30px;
+    font-size: 20px;
+    border-radius: 10px;
     background-color: #4CAF50;
 }
 
