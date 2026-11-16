@@ -341,6 +341,7 @@ window.dashboardInit = function() {
 				trialNumber: currentSetup['trialNumber'],
 				trialIndex: setupIndex,
 				filesetIndex: currentSetup['filesetIndex'],
+				fileOrder: currentSetup['files'],
 				questionOrder: currentSetup['questionOrder'],
 				questionPlacements: trialQuestions,
 				responses: questionResponses,
@@ -379,13 +380,13 @@ window.dashboardInit = function() {
 						}
 					},
 					trials: accumulated,
-					configuration: {
-					...currentSetup,
-					'no-questions': currentSetup['no-questions']?.map(range => ({
-						start: range[0],
-						end: range[1]
-					})) || []
-				},
+					// configuration: {
+					// ...currentSetup,
+					// 'no-questions': currentSetup['no-questions']?.map(range => ({
+					// 	start: range[0],
+					// 	end: range[1]
+					// })) || []
+					// },
 				};
 
 				saveUserData(fullExport).then(success => {
