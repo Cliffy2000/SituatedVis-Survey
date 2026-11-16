@@ -58,11 +58,15 @@ svg {
     right: 25px;
 }
 
-#nextButton {
+#nextButton:disabled {
     font-family: inherit;
     padding: 20px 30px;
     font-size: 20px;
     border-radius: 10px;
+}
+
+#nextButton:not(:disabled) {
+    background-color: #4CAF50;
 }
 
 #questionTimer {
