@@ -56,21 +56,32 @@ svg {
     position: absolute;
     bottom: 25px;
     right: 25px;
+    
 }
 
 #nextButton:disabled {
     font-family: inherit;
     padding: 20px 30px;
     font-size: 20px;
-    border-radius: 10px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 #nextButton:not(:disabled) {
     font-family: inherit;
     padding: 20px 30px;
     font-size: 20px;
-    border-radius: 10px;
+    color: white;
+    border: none;
+    border-radius: 5px;
     background-color: #4CAF50;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 #questionTimer {
