@@ -85,7 +85,7 @@ window.homeInit = async function () {
         // Attention check question (not in config.json)
         const ATN_QUESTION = {
             id: "atn",
-            prompt: "This is an attention check. Please select Machine 5.",
+            prompt: "<b>This is an attention check. Please select Machine 5.</b>",
             type: "radio",
             area: "machine",
             options: [
