@@ -89,8 +89,8 @@
         {
             "setup": "setup1",
             "setup-length": 150,
-            "question-time": 12,
-            "question-min-spacing": 14,
+            "question-time": 15,
+            "question-min-spacing": 17,
             "no-questions": [],
             "num-rows": 4,
             "num-columns": 3,
@@ -114,8 +114,8 @@
         {
             "setup": "setup2",
             "setup-length": 150,
-            "question-time": 12,
-            "question-min-spacing": 14,
+            "question-time": 15,
+            "question-min-spacing": 17,
             "no-questions": [],
             "num-rows": 4,
             "num-columns": 3,
@@ -139,8 +139,8 @@
         {
             "setup": "setup3",
             "setup-length": 150,
-            "question-time": 12,
-            "question-min-spacing": 14,
+            "question-time": 15,
+            "question-min-spacing": 17,
             "no-questions": [],
             "num-rows": 4,
             "num-columns": 3,
@@ -164,8 +164,8 @@
         {
             "setup": "setup4",
             "setup-length": 150,
-            "question-time": 12,
-            "question-min-spacing": 14,
+            "question-time": 15,
+            "question-min-spacing": 17,
             "no-questions": [],
             "num-rows": 4,
             "num-columns": 3,
@@ -189,8 +189,8 @@
         {
             "setup": "setup5",
             "setup-length": 150,
-            "question-time": 12,
-            "question-min-spacing": 14,
+            "question-time": 15,
+            "question-min-spacing": 17,
             "no-questions": [],
             "num-rows": 4,
             "num-columns": 3,
@@ -214,8 +214,8 @@
         {
             "setup": "setup6",
             "setup-length": 150,
-            "question-time": 12,
-            "question-min-spacing": 14,
+            "question-time": 15,
+            "question-min-spacing": 17,
             "no-questions": [],
             "num-rows": 4,
             "num-columns": 3,
@@ -239,8 +239,8 @@
         {
             "setup": "setup7",
             "setup-length": 150,
-            "question-time": 12,
-            "question-min-spacing": 14,
+            "question-time": 15,
+            "question-min-spacing": 17,
             "no-questions": [],
             "num-rows": 4,
             "num-columns": 3,
@@ -264,8 +264,8 @@
         {
             "setup": "setup8",
             "setup-length": 150,
-            "question-time": 12,
-            "question-min-spacing": 14,
+            "question-time": 15,
+            "question-min-spacing": 17,
             "no-questions": [],
             "num-rows": 4,
             "num-columns": 3,
@@ -290,7 +290,7 @@
     "questions": [
         {
             "id": "q1",
-            "prompt": "Find the machine that has the <b>highest</b> output right now.",
+            "prompt": "<b>Highest now</b>",
             "type": "radio",
             "area": "machine",
             "options": [
@@ -310,7 +310,7 @@
         },
         {
             "id": "q2",
-            "prompt": "Find the machine that has the <b>lowest</b> output right now.",
+            "prompt": "<b>Lowest now</b>",
             "type": "radio",
             "area": "machine",
             "options": [
@@ -330,7 +330,7 @@
         },
         {
             "id": "q3",
-            "prompt": "Find 1 machine that has a visible output <b>increasing</b> over time.",
+            "prompt": "<b>Increasing overall</b>",
             "type": "radio",
             "area": "machine",
             "options": [
@@ -350,7 +350,7 @@
         },
         {
             "id": "q4",
-            "prompt": "Find 1 machine that has a visible output <b>decreasing</b> over time.",
+            "prompt": "<b>Decreasing overall</b>",
             "type": "radio",
             "area": "machine",
             "options": [
@@ -370,7 +370,7 @@
         },
         {
             "id": "q5",
-            "prompt": "Find 1 machine that <b><i>is</i> outside of the acceptable range (30-70)</b> right now.",
+            "prompt": "<b><i>Now</i> outside of 30-70</b>",
             "type": "radio",
             "area": "machine",
             "options": [
@@ -390,7 +390,7 @@
         },
         {
             "id": "q6",
-            "prompt": "Find 1 machine that <b><i>has been</i> outside of the acceptable range (30-70)</b> in the visible time range.",
+            "prompt": "<b><i>Ever</i> outside of 30-70</b>",
             "type": "radio",
             "area": "machine",
             "options": [
