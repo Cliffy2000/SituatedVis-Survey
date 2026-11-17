@@ -134,14 +134,16 @@ svg {
     border: 1px solid transparent;
     border-radius: 3px;
     transition: background-color 0.2s;
+    background-color: #e8e8e8;
 }
 
 .question-grid-option:hover {
-    background-color: #e8e8e8;
+    background-color: #45a049;
 }
 
 .question-grid-option input {
     margin-right: 5px;
+    display: none;
 }
 
 .question-grid-option span {

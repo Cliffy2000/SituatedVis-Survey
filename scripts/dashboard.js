@@ -225,8 +225,32 @@ window.dashboardInit = function() {
 				
 				// Enable submit when radio is selected
 				optionsContainer.addEventListener('change', () => {
-					submitButton.disabled = false;
-				});
+				const responseTime = Date.now() - questionStartTime;
+				
+				if (question.type === 'radio') {
+					const selected = optionsContainer.querySelector(`input[name="${question.id}"]:checked`);
+					if (selected) {
+						questionResponses[question.id] = {
+							response: selected.value,
+							responseTimeMs: responseTime,
+							answered: true,
+							questionStep: step,
+							timestamp: new Date().toISOString()
+						};
+					}
+				}
+				
+				// Remove from active tracking
+				activeQuestions = activeQuestions.filter(q => q.id !== question.id);
+				
+				// // Disable submit after clicking
+				// submitButton.disabled = true;
+				// submitButton.textContent = 'Submitted';
+				
+				// Disable all inputs for this question
+				optionsContainer.querySelectorAll('input').forEach(input => input.disabled = true);
+		
+				})
 				
 			} else if (question.type === 'checkbox') {
 				const checkboxes = [];
@@ -265,7 +289,7 @@ window.dashboardInit = function() {
 			}
 			
 			questionDiv.appendChild(optionsContainer);
-			questionDiv.appendChild(submitButton);
+			// questionDiv.appendChild(submitButton);
 			container.appendChild(questionDiv);
 			
 			// Track responses on submit
@@ -298,9 +322,9 @@ window.dashboardInit = function() {
 				// Remove from active tracking
 				activeQuestions = activeQuestions.filter(q => q.id !== question.id);
 				
-				// Disable submit after clicking
-				submitButton.disabled = true;
-				submitButton.textContent = 'Submitted';
+				// // Disable submit after clicking
+				// submitButton.disabled = true;
+				// submitButton.textContent = 'Submitted';
 				
 				// Disable all inputs for this question
 				optionsContainer.querySelectorAll('input').forEach(input => input.disabled = true);
