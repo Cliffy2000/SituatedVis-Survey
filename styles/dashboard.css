@@ -137,13 +137,17 @@ svg {
     background-color: #e8e8e8;
 }
 
-.question-grid-option:hover {
+.question-grid-option:hover:has(> input:not([disabled])){
     background-color: #45a049;
 }
 
 .question-grid-option input {
     margin-right: 5px;
     display: none;
+}
+
+.question-grid-option:has(> input[type="radio"]:checked){
+    background-color: #45a049;
 }
 
 .question-grid-option span {
@@ -158,6 +162,7 @@ svg {
 .question-grid-option input:disabled + span,
 .question-vertical-option input:disabled + span {
     opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .question-submit-button {
