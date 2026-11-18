@@ -21,6 +21,8 @@ function assignQuestionSteps(setup, questionsToPlace) {
     const minSpacing = setup['question-min-spacing'];
     const lastValidStep = setup['setup-length'] - setup['num-points'] - questionTime + 1;
 
+
+
     const valid = [];
     for (let i = 1; i <= lastValidStep; i++) {
         const forbidden = setup['no-questions']?.some(([start, end]) =>
@@ -127,6 +129,7 @@ window.homeInit = async function () {
             let attempts = 0;
             while (!placed && attempts < 100) {
                 placed = assignQuestionSteps(setup, questionsToPlace);
+                console.log(placed)
                 attempts++;
             }
 
